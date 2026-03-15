@@ -24,10 +24,6 @@ const Login = () => {
     });
   }, []);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.type === 'email' ? 'email' : 'password']: e.target.value });
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');

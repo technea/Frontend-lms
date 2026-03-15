@@ -3,7 +3,6 @@ import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import PlayfulButton from '../../components/PlayfulButton';
 import gsap from 'gsap';
-import { useTheme } from '../../context/ThemeContext';
 
 const About = () => {
   useEffect(() => {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import api from '../../services/api';
@@ -7,7 +7,6 @@ import gsap from 'gsap';
 
 const LessonPlayer = () => {
   const { courseId, lessonId } = useParams();
-  const navigate = useNavigate();
   const [course, setCourse] = useState(null);
   const [lessons, setLessons] = useState([]);
   const [currentLesson, setCurrentLesson] = useState(null);
