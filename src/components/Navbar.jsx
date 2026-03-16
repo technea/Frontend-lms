@@ -1,236 +1,137 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
-import gsap from 'gsap';
-import PlayfulButton from './PlayfulButton';
+import React, { useState, useEffect } from 'react';
+import { Navbar, Nav, Container, Button } from 'react-bootstrap';
+import { Link, useNavigate } from 'react-router-dom';
 import authService from '../services/authService';
 import { useTheme } from '../context/ThemeContext';
 
-const Navbar = () => {
-  const navRef = useRef(null);
-  const toggleRef = useRef(null);
+const AppNavbar = () => {
   const [user, setUser] = useState(null);
-  const [mobileOpen, setMobileOpen] = useState(false);
   const { isDark, toggleTheme } = useTheme();
+  const navigate = useNavigate();
 
   const API_URL = process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://127.0.0.1:5000';
 
   useEffect(() => {
-    const currentUser = authService.getCurrentUser();
-    setUser(currentUser);
-
-    if (!navRef.current) return;
-    
-    // Smooth entrance animation
-    gsap.from(navRef.current, {
-      y: -100,
-      opacity: 0,
-      duration: 1,
-      ease: 'power4.out'
-    });
-
-    // Logo reveal
-    gsap.from('.nav-logo-responsive', {
-      scale: 0.8,
-      opacity: 0,
-      duration: 0.8,
-      delay: 0.3,
-      ease: 'back.out(1.7)'
-    });
+    setUser(authService.getCurrentUser());
   }, []);
 
-  useEffect(() => {
-    if (toggleRef.current) {
-      gsap.fromTo(toggleRef.current, 
-        { rotation: -180, scale: 0 },
-        { rotation: 0, scale: 1, duration: 0.5, ease: 'back.out(1.7)' }
-      );
-    }
-  }, [isDark]);
-
-  const closeMobile = () => setMobileOpen(false);
-
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth > 768) {
-        setMobileOpen(false);
-      }
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  useEffect(() => {
-    if (mobileOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => { document.body.style.overflow = ''; };
-  }, [mobileOpen]);
+  const handleLogout = () => {
+    authService.logout();
+    window.location.reload();
+  };
 
   return (
-    <>
-      <nav ref={navRef} style={navStyles.nav} className="navbar-fixed navbar-fixed-shadow">
-        <div style={navStyles.container} className="nav-container-responsive">
-          <Link to="/" style={navStyles.logo} className="nav-logo-responsive" onClick={closeMobile}>
-            Nex<span className="gradient-text">Learn</span>
-          </Link>
+    <Navbar
+      expand="lg"
+      fixed="top"
+      className="shadow-sm"
+      style={{
+        background: isDark ? 'rgba(15,23,42,0.85)' : 'rgba(255,255,255,0.85)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        borderBottom: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.08)',
+        transition: 'all 0.3s ease',
+        minHeight: '80px',
+      }}
+    >
+      <Container>
 
-          {/* Desktop & Mobile Links */}
-          <div 
-            style={navStyles.links} 
-            className={`nav-links-responsive ${mobileOpen ? 'mobile-open' : ''}`}
-          >
-            <Link to="/courses" style={navStyles.link} onClick={closeMobile}>Courses</Link>
-            <Link to="/about" style={navStyles.link} onClick={closeMobile}>About</Link>
+        {/* Logo */}
+        <Navbar.Brand as={Link} to="/" style={{ fontWeight: 800, fontSize: '1.5rem', letterSpacing: '-1px', color: isDark ? '#f1f5f9' : '#0f172a' }}>
+          Nex<span style={{ background: 'linear-gradient(to right, #4f46e5, #9333ea)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Learn</span>
+        </Navbar.Brand>
+
+        {/* Hamburger - Auto Bootstrap */}
+        <Navbar.Toggle aria-controls="main-navbar" style={{ border: 'none', background: 'linear-gradient(135deg, #6366f1, #4f46e5)', borderRadius: '12px', padding: '8px 12px' }}>
+          <span className="navbar-toggler-icon" style={{ filter: 'invert(1)' }} />
+        </Navbar.Toggle>
+
+        <Navbar.Collapse id="main-navbar">
+
+          {/* Nav Links */}
+          <Nav className="me-auto gap-2 mt-2 mt-lg-0">
+            <Nav.Link as={Link} to="/courses" style={{ color: isDark ? '#94a3b8' : '#475569', fontWeight: 600 }}>
+              Courses
+            </Nav.Link>
+            <Nav.Link as={Link} to="/about" style={{ color: isDark ? '#94a3b8' : '#475569', fontWeight: 600 }}>
+              About
+            </Nav.Link>
             {user && (
-              <Link to="/my-courses" style={navStyles.link} onClick={closeMobile}>My Courses</Link>
+              <Nav.Link as={Link} to="/my-courses" style={{ color: isDark ? '#94a3b8' : '#475569', fontWeight: 600 }}>
+                My Courses
+              </Nav.Link>
             )}
-            {user && user.role === 'admin' && (
-              <Link to="/admin" style={navStyles.link} onClick={closeMobile}>Admin Panel</Link>
+            {user?.role === 'admin' && (
+              <Nav.Link as={Link} to="/admin" style={{ color: isDark ? '#94a3b8' : '#475569', fontWeight: 600 }}>
+                Admin Panel
+              </Nav.Link>
             )}
-            {user && (user.role === 'instructor' || user.role === 'admin') && (
-              <Link to="/instructor" style={navStyles.link} onClick={closeMobile}>Instructor Dashboard</Link>
+            {(user?.role === 'instructor' || user?.role === 'admin') && (
+              <Nav.Link as={Link} to="/instructor" style={{ color: isDark ? '#94a3b8' : '#475569', fontWeight: 600 }}>
+                Instructor Dashboard
+              </Nav.Link>
             )}
+          </Nav>
 
-            {/* Mobile-only auth links inside the menu */}
-            <div className="mobile-auth-links" style={navStyles.mobileAuth}>
-              {user ? (
-                <>
-                  <Link to="/profile" style={navStyles.mobileAuthLink} onClick={closeMobile}>
-                    👤 My Profile
-                  </Link>
-                  <button 
-                    style={navStyles.mobileLogoutBtn} 
-                    onClick={() => { authService.logout(); window.location.reload(); }}
-                  >
-                    Logout
-                  </button>
-                </>
-              ) : (
-                <Link to="/login" style={navStyles.mobileAuthLink} onClick={closeMobile}>Login</Link>
-              )}
-            </div>
-          </div>
+          {/* Right Side */}
+          <Nav className="align-items-center gap-2">
 
-          <div style={navStyles.rightSection}>
-            {/* Auth section - desktop */}
-            <div style={navStyles.auth} className="auth-responsive">
-              <div
-                onClick={toggleTheme}
-                style={{
-                  ...navStyles.themeToggle,
-                  background: isDark 
-                    ? 'linear-gradient(135deg, #1e293b, #334155)' 
-                    : 'linear-gradient(135deg, #e0e7ff, #c7d2fe)',
-                  border: `2px solid ${isDark ? 'rgba(129,140,248,0.3)' : 'rgba(79,70,229,0.2)'}`,
-                }}
-              >
-                <span ref={toggleRef} style={{ fontSize: '1.1rem', lineHeight: 1 }}>
-                  {isDark ? '🌙' : '☀️'}
-                </span>
-              </div>
-
-              {user ? (
-                <>
-                  <Link to="/profile" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <div style={navStyles.avatarSmall}>
-                      {user.avatar ? (
-                        <img 
-                          src={`${API_URL}${user.avatar}`} 
-                          alt="P" 
-                          style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-                        />
-                      ) : (
-                        user.name.charAt(0).toUpperCase()
-                      )}
-                    </div>
-                    <span style={navStyles.userText} className="user-name-responsive">{user.name}</span>
-                  </Link>
-                  <button 
-                    style={navStyles.logoutBtn} 
-                    className="user-name-responsive"
-                    onClick={() => { authService.logout(); window.location.reload(); }}
-                  >
-                    Logout
-                  </button>
-                </>
-              ) : (
-                <Link to="/login" style={{ textDecoration: 'none' }}>
-                  <PlayfulButton>Login</PlayfulButton>
-                </Link>
-              )}
-            </div>
-
-            {/* Hamburger Button */}
-            <button 
-              className={`hamburger-btn ${mobileOpen ? 'active' : ''}`}
-              onClick={() => setMobileOpen(!mobileOpen)}
-              aria-label="Toggle menu"
+            {/* Theme Toggle */}
+            <div
+              onClick={toggleTheme}
+              style={{
+                width: '42px', height: '42px', borderRadius: '14px',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer', transition: 'all 0.3s ease',
+                background: isDark ? 'linear-gradient(135deg, #1e293b, #334155)' : 'linear-gradient(135deg, #e0e7ff, #c7d2fe)',
+                border: isDark ? '2px solid rgba(129,140,248,0.3)' : '2px solid rgba(79,70,229,0.2)',
+              }}
             >
-              <span></span>
-              <span></span>
-              <span></span>
-            </button>
-          </div>
-        </div>
-      </nav>
+              {isDark ? '🌙' : '☀️'}
+            </div>
 
-      {/* Mobile overlay */}
-      <div 
-        className={`mobile-menu-overlay ${mobileOpen ? 'active' : ''}`}
-        onClick={closeMobile}
-        style={{ display: mobileOpen ? 'block' : 'none' }}
-      />
-    </>
+            {/* Auth */}
+            {user ? (
+              <>
+                <Nav.Link as={Link} to="/profile" className="d-flex align-items-center gap-2 text-decoration-none">
+                  <div style={{
+                    width: '35px', height: '35px', borderRadius: '50%',
+                    background: '#4f46e5', color: '#fff',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontWeight: 700, fontSize: '0.85rem', overflow: 'hidden'
+                  }}>
+                    {user.avatar
+                      ? <img src={`${API_URL}${user.avatar}`} alt="P" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      : (user.name || 'U').charAt(0).toUpperCase()
+                    }
+                  </div>
+                  <span style={{ color: '#4f46e5', fontWeight: 700 }}>{user.name}</span>
+                </Nav.Link>
+
+                <Button
+                  size="sm"
+                  onClick={handleLogout}
+                  style={{ background: '#ef4444', border: 'none', borderRadius: '10px', fontWeight: 600, padding: '8px 16px' }}
+                >
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <Button
+                as={Link}
+                to="/login"
+                size="sm"
+                style={{ background: 'linear-gradient(135deg, #4f46e5, #9333ea)', border: 'none', borderRadius: '10px', fontWeight: 600, padding: '8px 20px' }}
+              >
+                Login
+              </Button>
+            )}
+          </Nav>
+
+        </Navbar.Collapse>
+      </Container>
+    </Navbar>
   );
-};
-
-const navStyles = {
-  nav: {
-    position: 'fixed', top: 0, left: 0, right: 0, height: '80px',
-    backgroundColor: 'var(--navBg)', borderBottom: '1px solid var(--navBorder)',
-    backdropFilter: 'blur(12px)', zIndex: 1000, display: 'flex', alignItems: 'center'
-  },
-  container: {
-    width: '100%', maxWidth: '1200px', margin: '0 auto', padding: '0 20px',
-    display: 'flex', justifyContent: 'space-between', alignItems: 'center'
-  },
-  logo: { fontSize: '24px', fontWeight: '800', color: 'var(--text)', textDecoration: 'none', letterSpacing: '-0.5px' },
-  links: { display: 'flex', gap: '30px', alignItems: 'center' },
-  link: { 
-    color: 'var(--text)', 
-    textDecoration: 'none', 
-    fontSize: '1rem', 
-    fontWeight: '600' 
-  },
-  rightSection: { display: 'flex', alignItems: 'center', gap: '10px' },
-  auth: { display: 'flex', alignItems: 'center', gap: '16px' },
-  userText: { color: 'var(--accent)', fontWeight: '700', fontSize: '0.95rem' },
-  themeToggle: {
-    width: '42px', height: '42px', borderRadius: '14px', display: 'flex', alignItems: 'center',
-    justifyContent: 'center', cursor: 'pointer', transition: 'all 0.3s ease', boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
-  },
-  logoutBtn: {
-    padding: '8px 16px', backgroundColor: '#ef4444', color: 'white', border: 'none',
-    borderRadius: '10px', fontWeight: '600', fontSize: '0.9rem', cursor: 'pointer', marginLeft: '10px'
-  },
-  avatarSmall: {
-    width: '35px', height: '35px', borderRadius: '50%', backgroundColor: 'var(--accent)',
-    color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
-    fontSize: '0.8rem', fontWeight: '700', overflow: 'hidden'
-  },
-  mobileAuth: { display: 'none', flexDirection: 'column', gap: '10px', marginTop: '20px', paddingTop: '20px', borderTop: '1px solid var(--cardBorder)' },
-  mobileAuthLink: { 
-    color: 'var(--text)', 
-    textDecoration: 'none', 
-    fontSize: '1.05rem', 
-    fontWeight: '600', 
-    padding: '14px 20px', 
-    borderRadius: '12px', 
-    display: 'block' 
-  },
-  mobileLogoutBtn: { padding: '14px 20px', backgroundColor: '#fee2e2', color: '#ef4444', border: 'none', borderRadius: '12px', fontWeight: '700', fontSize: '1.05rem', textAlign: 'left' }
 };
 
 export default Navbar;

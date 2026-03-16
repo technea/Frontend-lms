@@ -191,6 +191,13 @@ code {
   }
 }
 
+/* Search Bar Focus Effects */
+.search-bar-responsive input:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 8px 25px rgba(79, 70, 229, 0.15) !important;
+  transform: translateY(-2px);
+}
+
 @media (max-width: 480px) {
   .stats-grid-responsive {
     grid-template-columns: 1fr !important;

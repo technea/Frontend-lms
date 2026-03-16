@@ -7,6 +7,8 @@ import gsap from 'gsap';
 
 const CourseList = () => {
   const [courses, setCourses] = useState([]);
+  const [filteredCourses, setFilteredCourses] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -14,6 +16,7 @@ const CourseList = () => {
       try {
         const res = await api.get('/courses');
         setCourses(res.data);
+        setFilteredCourses(res.data);
       } catch (err) {
         console.error('Error fetching courses:', err);
       } finally {
@@ -24,16 +27,25 @@ const CourseList = () => {
   }, []);
 
   useEffect(() => {
+    const filtered = courses.filter(course => 
+      course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      course.category.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setFilteredCourses(filtered);
+  }, [searchQuery, courses]);
+
+  useEffect(() => {
     if (!loading) {
       gsap.from('.course-card', {
         opacity: 0,
         y: 40,
         stagger: 0.1,
         duration: 0.8,
-        ease: 'power3.out'
+        ease: 'power3.out',
+        overwrite: 'auto'
       });
     }
-  }, [loading]);
+  }, [loading, filteredCourses]);
 
   return (
     <div style={styles.container}>
@@ -42,24 +54,50 @@ const CourseList = () => {
         <header style={styles.header}>
           <h1 style={styles.title}>Explore <span className="gradient-text">Our Courses</span></h1>
           <p style={styles.subtitle}>Start your learning journey with world-class curriculum curated by industry experts.</p>
+          
+          <div style={styles.searchContainer} className="search-bar-responsive">
+            <span style={styles.searchIcon}>🔍</span>
+            <input 
+              type="text" 
+              placeholder="Search by course name or category..." 
+              style={styles.searchInput}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
         </header>
 
         {loading ? (
           <div style={styles.loading}>Loading amazing courses for you...</div>
         ) : (
-          <div style={styles.grid}>
-            {courses.map((course) => (
-              <div key={course._id} className="course-card playful-card" style={styles.card}>
-                <div style={styles.categoryBadge}>{course.category}</div>
-                <h3 style={styles.courseTitle}>{course.title}</h3>
-                <p style={styles.courseDesc}>{course.description.substring(0, 100)}...</p>
-                <div style={styles.footer}>
-                  <span style={styles.price}>${course.price}</span>
-                  <Link to={`/course/${course._id}`} style={styles.viewBtn}>View Details</Link>
-                </div>
+          <>
+            {filteredCourses.length > 0 ? (
+              <div style={styles.grid}>
+                {filteredCourses.map((course) => (
+                  <div key={course._id} className="course-card playful-card" style={styles.card}>
+                    <div style={styles.categoryBadge}>{course.category}</div>
+                    <h3 style={styles.courseTitle}>{course.title}</h3>
+                    <p style={styles.courseDesc}>{course.description.substring(0, 100)}...</p>
+                    <div style={styles.footer}>
+                      <span style={styles.price}>${course.price}</span>
+                      <Link to={`/course/${course._id}`} style={styles.viewBtn}>View Details</Link>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            ) : (
+              <div style={styles.noResults}>
+                <h3>No courses found matching "{searchQuery}"</h3>
+                <p>Try searching for different keywords or categories.</p>
+                <button 
+                  onClick={() => setSearchQuery('')}
+                  style={styles.resetBtn}
+                >
+                  Clear Search
+                </button>
+              </div>
+            )}
+          </>
         )}
       </main>
       <Footer />
@@ -164,6 +202,50 @@ const styles = {
     fontWeight: '600',
     fontSize: '0.9rem',
     transition: 'opacity 0.2s'
+  },
+  searchContainer: {
+    maxWidth: '600px',
+    margin: '30px auto 0',
+    position: 'relative',
+    display: 'flex',
+    alignItems: 'center'
+  },
+  searchIcon: {
+    position: 'absolute',
+    left: '20px',
+    fontSize: '1.2rem',
+    opacity: 0.6
+  },
+  searchInput: {
+    width: '100%',
+    padding: '16px 20px 16px 55px',
+    borderRadius: '100px',
+    border: '2px solid var(--cardBorder)',
+    backgroundColor: 'var(--cardBg)',
+    color: 'var(--text)',
+    fontSize: '1rem',
+    fontFamily: 'inherit',
+    outline: 'none',
+    transition: 'all 0.3s ease',
+    boxShadow: '0 4px 15px rgba(0,0,0,0.05)'
+  },
+  noResults: {
+    textAlign: 'center',
+    padding: '60px 20px',
+    backgroundColor: 'var(--bgSecondary)',
+    borderRadius: '24px',
+    marginTop: '40px'
+  },
+  resetBtn: {
+    marginTop: '20px',
+    padding: '12px 24px',
+    backgroundColor: 'var(--accent)',
+    color: 'white',
+    border: 'none',
+    borderRadius: '12px',
+    fontWeight: '700',
+    cursor: 'pointer',
+    transition: 'transform 0.2s ease'
   }
 };
 
