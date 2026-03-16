@@ -14,8 +14,18 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background-color: var(--bg);
   color: var(--text);
+  overflow-x: hidden;
   transition: background-color 0.3s ease, color 0.3s ease;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
+
+html,
+body {
+  overflow-x: hidden;
+}
+
 
 .App {
   min-height: 100vh;
@@ -137,12 +147,12 @@ code {
     z-index: 1000;
     overflow-y: auto;
     border-top: 1px solid var(--navBorder);
-    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
   }
 
   [data-theme='dark'] .nav-links-responsive {
     background: var(--bgSecondary) !important;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
   }
 
   .nav-links-responsive.mobile-open {
@@ -196,3 +206,5 @@ code {
     padding: 8px;
   }
 }
+
+@

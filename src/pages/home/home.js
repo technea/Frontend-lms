@@ -138,15 +138,13 @@ const Home = () => {
       <Navbar />
       
       {/* Hero Section */}
-      <section className="hero-section" style={styles.hero}>
-        <div className="hero-overlay" style={styles.heroOverlay}></div>
-        <div ref={heroRef} className="hero-content" style={styles.heroContent}>
+      <section ref={heroRef} style={styles.hero} className="hero-responsive">
+        <div style={styles.heroOverlay}></div>
+        <div style={styles.heroContent} className="hero-content-anim">
           <div className="hero-badge" style={styles.badge}>Next Generation Learning</div>
-          <h1 style={styles.mainTitle}>
-            <span className="hero-title-word">Shape </span>
-            <span className="hero-title-word">Your </span>
+          <h1 style={styles.mainTitle} className="page-title-responsive">
+            <span className="hero-title-word">Master </span>
             <span className="hero-title-word">Future </span>
-            <span className="hero-title-word">with </span>
             <br />
             <span className="hero-title-word gradient-text">Professional </span>
             <span className="hero-title-word gradient-text">Skills</span>
@@ -154,7 +152,7 @@ const Home = () => {
           <p className="hero-subtitle" style={styles.heroSub}>
             Join 10,000+ students mastering Tech, Design, and Business with our award-winning LMS platform.
           </p>
-          <div style={styles.btnGroup}>
+          <div style={styles.btnGroup} className="mobile-stack">
             <Link to="/register" style={{ textDecoration: 'none' }}>
               <PlayfulButton>Get Started Today</PlayfulButton>
             </Link>
@@ -232,6 +230,7 @@ const styles = {
     background: 'url("https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=2071&q=80")',
     backgroundSize: 'cover',
     backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
     overflow: 'hidden'
   },
   heroOverlay: {
