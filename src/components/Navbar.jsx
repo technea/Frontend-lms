@@ -131,13 +131,15 @@ const styles = {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: '15px',
-        padding: '20px',
-        background: 'rgba(255,255,255,0.05)',
-        borderRadius: '24px',
+        gap: '12px',
+        padding: '25px 20px',
+        background: 'rgba(255, 255, 255, 0.1)',
+        borderRadius: '28px',
         width: '100%',
-        marginBottom: '20px',
-        border: '1px solid rgba(255,255,255,0.1)'
+        marginBottom: '15px',
+        border: '1px solid rgba(255, 255, 255, 0.15)',
+        backdropFilter: 'blur(10px)',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)'
     }
 };
 
