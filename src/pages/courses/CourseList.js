@@ -50,10 +50,10 @@ const CourseList = () => {
   return (
     <div style={styles.container}>
       <Navbar />
-      <main style={styles.main}>
+      <main style={styles.main} className="section-padding-responsive">
         <header style={styles.header}>
-          <h1 style={styles.title}>Explore <span className="gradient-text">Our Courses</span></h1>
-          <p style={styles.subtitle}>Start your learning journey with world-class curriculum curated by industry experts.</p>
+          <h1 style={styles.title} className="page-title-responsive">Explore <span className="gradient-text">Our Courses</span></h1>
+          <p style={styles.subtitle} className="mobile-text-center">Start your learning journey with world-class curriculum curated by industry experts.</p>
           
           <div style={styles.searchContainer} className="search-bar-responsive">
             <span style={styles.searchIcon}>🔍</span>

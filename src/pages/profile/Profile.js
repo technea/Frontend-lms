@@ -161,7 +161,7 @@ const Profile = () => {
   return (
     <div style={styles.container}>
       <Navbar />
-      <div style={styles.main}>
+      <div style={styles.main} className="section-padding-responsive">
         
         {/* Profile Header with Picture */}
         <div className="profile-header-anim" style={styles.profileHeader}>
@@ -194,7 +194,7 @@ const Profile = () => {
           </div>
         </div>
 
-        <div style={styles.settingsGrid}>
+        <div style={styles.settingsGrid} className="grid-1-mobile grid-2-tablet">
           
           {/* Update Profile Details */}
           <div className="settings-card-anim" style={styles.card}>

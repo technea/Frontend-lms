@@ -164,21 +164,21 @@ const Home = () => {
       </section>
 
       {/* Stats Section */}
-      <section ref={statsRef} style={styles.statsSection}>
-        <div style={styles.statsGrid}>
-          <div className="stat-card stat-card-anim" style={styles.statCard}>
+      <section ref={statsRef} style={styles.statsSection} className="section-padding-responsive">
+        <div style={styles.statsGrid} className="grid-2-mobile grid-4-tablet">
+          <div className="stat-card stat-card-anim mobile-text-center" style={styles.statCard}>
             <h2 className="stat-number gradient-text" style={styles.statNumber} data-target="150" data-suffix="+">0</h2>
             <p style={styles.statLabel}>Expert Courses</p>
           </div>
-          <div className="stat-card stat-card-anim" style={styles.statCard}>
+          <div className="stat-card stat-card-anim mobile-text-center" style={styles.statCard}>
             <h2 className="stat-number gradient-text" style={styles.statNumber} data-target="10" data-suffix="K+">0</h2>
             <p style={styles.statLabel}>Active Learners</p>
           </div>
-          <div className="stat-card stat-card-anim" style={styles.statCard}>
+          <div className="stat-card stat-card-anim mobile-text-center" style={styles.statCard}>
             <h2 className="stat-number gradient-text" style={styles.statNumber} data-target="98" data-suffix="%">0</h2>
             <p style={styles.statLabel}>Success Rate</p>
           </div>
-          <div className="stat-card stat-card-anim" style={styles.statCard}>
+          <div className="stat-card stat-card-anim mobile-text-center" style={styles.statCard}>
             <h2 className="stat-number gradient-text" style={styles.statNumber} data-target="24" data-suffix="/7">0</h2>
             <p style={styles.statLabel}>Student Support</p>
           </div>
@@ -186,11 +186,11 @@ const Home = () => {
       </section>
 
       {/* Features Section */}
-      <section ref={featuresRef} style={styles.featuresSection}>
-        <h2 className="section-heading" style={styles.sectionHeading}>
+      <section ref={featuresRef} style={styles.featuresSection} className="section-padding-responsive">
+        <h2 className="section-heading page-title-responsive mobile-text-center" style={styles.sectionHeading}>
           Why Choose <span className="gradient-text">NexLearn</span>?
         </h2>
-        <div className="features-grid" style={styles.featuresGrid}>
+        <div className="features-grid grid-1-mobile" style={styles.featuresGrid}>
           <div className="feature-card playful-card" style={styles.featureCard}>
             <div style={styles.iconBox}>🚀</div>
             <h3 style={styles.featureTitle}>Self-Paced Learning</h3>

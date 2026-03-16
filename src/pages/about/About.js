@@ -18,10 +18,10 @@ const About = () => {
   return (
     <div style={styles.container}>
       <Navbar />
-      <main style={styles.main}>
+      <main style={styles.main} className="section-padding-responsive">
         <section style={styles.heroSection}>
-          <h1 className="about-content gradient-text" style={styles.title}>About NexLearn</h1>
-          <p className="about-content" style={styles.subtitle}>
+          <h1 className="about-content gradient-text page-title-responsive" style={styles.title}>About NexLearn</h1>
+          <p className="about-content mobile-text-center" style={styles.subtitle}>
             Empowering the next generation of digital leaders through world-class education.
           </p>
         </section>
