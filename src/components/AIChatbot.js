@@ -6,10 +6,6 @@ import gsap from 'gsap';
 const AIChatbot = () => {
     const location = useLocation();
     const [isOpen, setIsOpen] = useState(false);
-    
-    // Only show on Home page (/)
-    if (location.pathname !== '/') return null;
-
     const [messages, setMessages] = useState([
         { role: 'model', parts: [{ text: "Hello! I'm your AI Tutor. How can I help you today?" }] }
     ]);
@@ -64,8 +60,8 @@ const AIChatbot = () => {
         }
     };
 
-    // Temporarily removed login requirement so visitors can also inquire about courses
-    // if (!authService.getCurrentUser()) return null;
+    // Only show on Home page (/)
+    if (location.pathname !== '/') return null;
 
     return (
         <div style={styles.container}>
