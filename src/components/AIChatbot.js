@@ -59,13 +59,14 @@ const AIChatbot = () => {
         }
     };
 
-    if (!authService.getCurrentUser()) return null;
+    // Temporarily removed login requirement so visitors can also inquire about courses
+    // if (!authService.getCurrentUser()) return null;
 
     return (
         <div style={styles.container}>
             {/* Chat Window */}
             {isOpen && (
-                <div ref={chatRef} style={styles.chatWindow}>
+                <div ref={chatRef} style={styles.chatWindow} className="ai-chat-window">
                     <div style={styles.header}>
                         <div style={styles.headerLeft}>
                             <div style={styles.botIcon}>🤖</div>
@@ -137,6 +138,14 @@ const AIChatbot = () => {
                     0% { opacity: .2; }
                     20% { opacity: 1; }
                     100% { opacity: .2; }
+                }
+                @media (max-width: 480px) {
+                    .ai-chat-window {
+                        width: 90vw !important;
+                        right: 5vw !important;
+                        bottom: 90px !important;
+                        height: 70vh !important;
+                    }
                 }
             `}</style>
         </div>
