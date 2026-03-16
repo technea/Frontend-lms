@@ -47,12 +47,43 @@ code {
 }
 
 .playful-card {
-  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  cursor: pointer;
+  background: var(--cardBg);
+  border: 1px solid var(--cardBorder);
+  position: relative;
+  overflow: hidden;
+}
+
+.playful-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  transition: 0.5s;
+}
+
+.playful-card:hover::before {
+  left: 100%;
 }
 
 .playful-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  border-color: var(--primary);
+}
+
+[data-theme='dark'] .playful-card:hover {
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  background: rgba(30, 41, 59, 0.8);
 }
 
 /* --- Main Custom Navbar (Desktop) --- */

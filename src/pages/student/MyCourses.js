@@ -38,10 +38,10 @@ const MyCourses = () => {
   return (
     <div style={styles.container}>
       <Navbar />
-      <main style={styles.main}>
+      <main style={styles.main} className="section-padding-responsive">
         <header style={styles.header}>
-          <h1 style={styles.title}>My <span className="gradient-text">Learning Journey</span></h1>
-          <p style={styles.subtitle}>Continue where you left off and master new skills.</p>
+          <h1 style={styles.title} className="page-title-responsive">My <span className="gradient-text">Learning Journey</span></h1>
+          <p style={styles.subtitle} className="mobile-text-center">Continue where you left off and master new skills.</p>
         </header>
 
         {loading ? (
@@ -133,7 +133,8 @@ const styles = {
   grid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-    gap: '30px'
+    gap: '35px',
+    width: '100%'
   },
   card: {
     backgroundColor: 'var(--cardBg)',
@@ -147,14 +148,15 @@ const styles = {
   },
   categoryBadge: {
     display: 'inline-block',
-    padding: '5px 12px',
-    backgroundColor: 'var(--badgeBg)',
-    color: 'var(--badgeText)',
+    padding: '6px 16px',
+    background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
+    color: '#fff',
     borderRadius: '100px',
-    fontSize: '0.75rem',
+    fontSize: '0.8rem',
     fontWeight: '700',
     marginBottom: '15px',
-    width: 'fit-content'
+    width: 'fit-content',
+    boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
   },
   courseTitle: {
     fontSize: '1.4rem',

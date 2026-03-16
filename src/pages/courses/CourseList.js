@@ -142,8 +142,9 @@ const styles = {
   },
   grid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-    gap: '30px'
+    gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+    gap: '35px',
+    width: '100%'
   },
   card: {
     backgroundColor: 'var(--cardBg)',
@@ -158,14 +159,15 @@ const styles = {
   },
   categoryBadge: {
     display: 'inline-block',
-    padding: '5px 12px',
-    backgroundColor: 'var(--badgeBg)',
-    color: 'var(--badgeText)',
+    padding: '6px 16px',
+    background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
+    color: '#fff',
     borderRadius: '100px',
-    fontSize: '0.75rem',
+    fontSize: '0.8rem',
     fontWeight: '700',
     marginBottom: '15px',
-    width: 'fit-content'
+    width: 'fit-content',
+    boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
   },
   courseTitle: {
     fontSize: '1.4rem',
@@ -194,14 +196,15 @@ const styles = {
     color: 'var(--text)'
   },
   viewBtn: {
-    backgroundColor: 'var(--accent)',
+    background: 'linear-gradient(135deg, #4f46e5, #9333ea)',
     color: 'white',
-    padding: '10px 20px',
-    borderRadius: '12px',
+    padding: '12px 24px',
+    borderRadius: '14px',
     textDecoration: 'none',
-    fontWeight: '600',
-    fontSize: '0.9rem',
-    transition: 'opacity 0.2s'
+    fontWeight: '700',
+    fontSize: '0.95rem',
+    transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+    boxShadow: '0 4px 12px rgba(79, 70, 229, 0.2)'
   },
   searchContainer: {
     maxWidth: '600px',
