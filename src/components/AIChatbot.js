@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import api from '../services/api';
-import authService from '../services/authService';
 import gsap from 'gsap';
 
 const AIChatbot = () => {

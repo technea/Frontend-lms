@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import authService from '../services/authService';
 import { useTheme } from '../context/ThemeContext';
 import { FaGithub, FaLinkedinIn, FaTimes, FaBars } from 'react-icons/fa';
@@ -8,7 +8,6 @@ const CustomNavbar = () => {
     const [user, setUser] = useState(null);
     const [mobileOpen, setMobileOpen] = useState(false);
     const { isDark, toggleTheme } = useTheme();
-    const navigate = useNavigate();
 
     const API_URL = process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://127.0.0.1:5000';
 
