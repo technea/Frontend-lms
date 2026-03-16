@@ -75,12 +75,33 @@ const CourseList = () => {
               <div style={styles.grid}>
                 {filteredCourses.map((course) => (
                   <div key={course._id} className="course-card playful-card" style={styles.card}>
-                    <div style={styles.categoryBadge}>{course.category}</div>
+                    {course.thumbnail && (
+                      <div style={styles.thumbnailContainer}>
+                        <img src={course.thumbnail} alt={course.title} style={styles.thumbnail} />
+                      </div>
+                    )}
+                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                      <div style={styles.categoryBadge}>{course.category}</div>
+                      {course.isExternal && (
+                        <div style={styles.sourceBadge}>{course.source}</div>
+                      )}
+                    </div>
                     <h3 style={styles.courseTitle}>{course.title}</h3>
                     <p style={styles.courseDesc}>{course.description.substring(0, 100)}...</p>
                     <div style={styles.footer}>
-                      <span style={styles.price}>${course.price}</span>
-                      <Link to={`/course/${course._id}`} style={styles.viewBtn}>View Details</Link>
+                      <span style={styles.price}>{course.price === 0 ? 'FREE' : `$${course.price}`}</span>
+                      {course.isExternal ? (
+                        <a 
+                          href={course.externalLink} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          style={styles.enrollBtn}
+                        >
+                          Enroll Now ➜
+                        </a>
+                      ) : (
+                        <Link to={`/course/${course._id}`} style={styles.viewBtn}>View Details</Link>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -205,6 +226,42 @@ const styles = {
     fontSize: '0.95rem',
     transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
     boxShadow: '0 4px 12px rgba(79, 70, 229, 0.2)'
+  },
+  enrollBtn: {
+    background: 'linear-gradient(135deg, #10b981, #059669)',
+    color: 'white',
+    padding: '12px 24px',
+    borderRadius: '14px',
+    textDecoration: 'none',
+    fontWeight: '700',
+    fontSize: '0.95rem',
+    transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+    boxShadow: '0 4px 12px rgba(16, 185, 129, 0.2)'
+  },
+  thumbnailContainer: {
+    width: '100%',
+    height: '180px',
+    borderRadius: '15px',
+    overflow: 'hidden',
+    marginBottom: '20px',
+    border: '1px solid var(--cardBorder)'
+  },
+  thumbnail: {
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover'
+  },
+  sourceBadge: {
+    display: 'inline-block',
+    padding: '6px 16px',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    color: 'var(--text)',
+    borderRadius: '100px',
+    fontSize: '0.8rem',
+    fontWeight: '700',
+    marginBottom: '15px',
+    border: '1px solid var(--cardBorder)',
+    width: 'fit-content'
   },
   searchContainer: {
     maxWidth: '600px',
