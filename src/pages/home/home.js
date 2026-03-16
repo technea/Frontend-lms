@@ -304,9 +304,10 @@ const styles = {
     margin: '0 0 5px 0'
   },
   statLabel: {
-    color: 'var(--textMuted)',
+    color: 'var(--textSecondary)',
     margin: 0,
-    fontSize: '0.95rem'
+    fontSize: '1rem',
+    fontWeight: '700'
   },
   featuresSection: {
     maxWidth: '1200px',
