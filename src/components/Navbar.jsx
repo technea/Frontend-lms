@@ -82,11 +82,27 @@ const CustomNavbar = () => {
                 </div>
 
                 <div className="mobile-links-container">
+                    {user && (
+                        <div style={styles.mobileUserHeader}>
+                            <div className="avatar-circle" style={{ width: '60px', height: '60px', fontSize: '1.5rem' }}>
+                                {user.avatar ? (
+                                    <img src={`${API_URL}${user.avatar}`} alt="Avatar" />
+                                ) : (
+                                    (user.name || 'U').charAt(0).toUpperCase()
+                                )}
+                            </div>
+                            <div style={{ textAlign: 'center' }}>
+                                <div style={{ fontSize: '1.2rem', fontWeight: '800' }}>{user.name}</div>
+                                <div style={{ fontSize: '0.8rem', opacity: 0.7, textTransform: 'uppercase' }}>{user.role}</div>
+                            </div>
+                        </div>
+                    )}
+                    
                     <Link to="/" onClick={toggleMobile}>Home</Link>
                     <Link to="/about" onClick={toggleMobile}>About</Link>
                     <Link to="/courses" onClick={toggleMobile}>Courses</Link>
                     {user && <Link to="/my-courses" onClick={toggleMobile}>My Courses</Link>}
-                    {user && <Link to="/profile" onClick={toggleMobile}>Profile</Link>}
+                    {user && <Link to="/profile" onClick={toggleMobile} style={{ color: '#64ffda', fontWeight: '800' }}>Dashboard / Profile</Link>}
                     
                     <div className="mobile-auth-section">
                         {user ? (
@@ -108,6 +124,21 @@ const CustomNavbar = () => {
             </div>
         </>
     );
+};
+
+const styles = {
+    mobileUserHeader: {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '15px',
+        padding: '20px',
+        background: 'rgba(255,255,255,0.05)',
+        borderRadius: '24px',
+        width: '100%',
+        marginBottom: '20px',
+        border: '1px solid rgba(255,255,255,0.1)'
+    }
 };
 
 export default CustomNavbar;

@@ -428,4 +428,12 @@ img {
   .features-grid-responsive {
     grid-template-columns: 1fr !important;
   }
+  
+  /* Responsive Buttons */
+  .btn-playful {
+    padding: 10px 20px !important;
+    font-size: 0.7rem !important;
+    letter-spacing: 1px !important;
+    margin: 5px !important;
+  }
 }
