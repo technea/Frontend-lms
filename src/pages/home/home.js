@@ -130,6 +130,19 @@ const Home = () => {
       ease: 'none'
     });
 
+    // Features Animations
+    gsap.from('.feature-card-anim', {
+      scrollTrigger: {
+        trigger: '.features-grid',
+        start: 'top 85%'
+      },
+      opacity: 0,
+      y: 40,
+      stagger: 0.2,
+      duration: 1,
+      ease: 'power3.out'
+    });
+
     return () => ScrollTrigger.getAll().forEach(t => t.kill());
   }, []);
 
@@ -191,17 +204,17 @@ const Home = () => {
           Why Choose <span className="gradient-text">NexLearn</span>?
         </h2>
         <div className="features-grid grid-1-mobile" style={styles.featuresGrid}>
-          <div className="feature-card playful-card" style={styles.featureCard}>
+          <div className="feature-card feature-card-anim playful-card" style={styles.featureCard}>
             <div style={styles.iconBox}>🚀</div>
             <h3 style={styles.featureTitle}>Self-Paced Learning</h3>
             <p style={styles.featureText}>Learn at your own speed with lifetime access to all course materials.</p>
           </div>
-          <div className="feature-card playful-card" style={styles.featureCard}>
+          <div className="feature-card feature-card-anim playful-card" style={styles.featureCard}>
             <div style={styles.iconBox}>🏆</div>
             <h3 style={styles.featureTitle}>Certified Mentors</h3>
             <p style={styles.featureText}>Learn from industry leaders with years of practical experience.</p>
           </div>
-          <div className="feature-card playful-card" style={styles.featureCard}>
+          <div className="feature-card feature-card-anim playful-card" style={styles.featureCard}>
             <div style={styles.iconBox}>💻</div>
             <h3 style={styles.featureTitle}>Interactive Projects</h3>
             <p style={styles.featureText}>Build real-world applications and portfolio-ready assignments.</p>
@@ -323,15 +336,21 @@ const styles = {
   featuresGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(3, 1fr)',
-    gap: '40px'
+    gap: '30px',
+    alignItems: 'stretch'
   },
   featureCard: {
-    padding: '40px',
+    padding: '40px 30px',
     backgroundColor: 'var(--cardBg)',
     borderRadius: '24px',
     boxShadow: 'var(--cardShadow)',
     border: '1px solid var(--cardBorder)',
-    cursor: 'pointer'
+    cursor: 'pointer',
+    textAlign: 'center',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    height: '100%'
   },
   iconBox: {
     fontSize: '2.5rem',

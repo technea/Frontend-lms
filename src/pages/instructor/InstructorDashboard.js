@@ -271,9 +271,9 @@ const InstructorDashboard = () => {
           ) : activeTab === 'my-courses' ? (
             <div className="dashboard-anim">
               <h2 style={styles.sectionTitle}>Your Published <span className="gradient-text">Courses</span></h2>
-              <div style={styles.grid}>
+              <div style={styles.grid} className="grid-1-mobile grid-2-tablet">
                 {myCourses.map(course => (
-                  <div key={course._id} style={styles.courseCard}>
+                   <div key={course._id} className="playful-card dashboard-anim" style={styles.courseCard}>
                     <div style={{ flex: 1 }}>
                       <h4 style={styles.cardTitle}>{course.title}</h4>
                       <p style={styles.cardInfo}>{course.category} • ${course.price}</p>

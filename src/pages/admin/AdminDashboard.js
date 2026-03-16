@@ -119,18 +119,18 @@ const AdminDashboard = () => {
               
               {activeTab === 'overview' && (
                 <>
-                  <div style={styles.statsGrid} className="grid-responsive">
-                    <div style={styles.statCard} className="stat-card-anim">
+                  <div style={styles.statsGrid} className="grid-responsive grid-1-mobile grid-3-desktop">
+                    <div style={styles.statCard} className="stat-card-anim playful-card">
                         <p style={styles.statLabel}>Users</p>
                         <h2 style={{...styles.statValue, color: '#4f46e5'}}>{stats.totalUsers}</h2>
                         <div style={styles.roleStats}>{stats.roleBreakdown.students} St. / {stats.roleBreakdown.instructors} Inst.</div>
                     </div>
-                    <div style={styles.statCard}>
+                    <div style={styles.statCard} className="stat-card-anim playful-card">
                         <p style={styles.statLabel}>Courses</p>
                         <h2 style={{...styles.statValue, color: '#a855f7'}}>{stats.totalCourses}</h2>
                         <p style={{fontSize: '0.8rem', color: '#94a3b8'}}>Active on platform</p>
                     </div>
-                    <div style={styles.statCard}>
+                    <div style={styles.statCard} className="stat-card-anim playful-card">
                         <p style={styles.statLabel}>Enrollments</p>
                         <h2 style={{...styles.statValue, color: '#f59e0b'}}>{stats.totalEnrollments}</h2>
                         <p style={{fontSize: '0.8rem', color: '#94a3b8'}}>Total student reach</p>
