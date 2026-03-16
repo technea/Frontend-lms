@@ -131,17 +131,20 @@ const Home = () => {
     });
 
     // Features Animations
-    gsap.from('.feature-card-anim', {
-      scrollTrigger: {
-        trigger: '.features-grid',
-        start: 'top 85%'
-      },
-      opacity: 0,
-      y: 40,
-      stagger: 0.2,
-      duration: 1,
-      ease: 'power3.out'
-    });
+    if (featuresRef.current) {
+      gsap.from('.feature-card-anim', {
+        scrollTrigger: {
+          trigger: featuresRef.current,
+          start: 'top 85%'
+        },
+        opacity: 0,
+        y: 40,
+        stagger: 0.2,
+        duration: 1,
+        ease: 'power3.out',
+        clearProps: "all"
+      });
+    }
 
     return () => ScrollTrigger.getAll().forEach(t => t.kill());
   }, []);
@@ -203,7 +206,7 @@ const Home = () => {
         <h2 className="section-heading page-title-responsive mobile-text-center" style={styles.sectionHeading}>
           Why Choose <span className="gradient-text">NexLearn</span>?
         </h2>
-        <div className="features-grid grid-1-mobile" style={styles.featuresGrid}>
+        <div className="features-grid-responsive" style={styles.featuresGrid}>
           <div className="feature-card feature-card-anim playful-card" style={styles.featureCard}>
             <div style={styles.iconBox}>🚀</div>
             <h3 style={styles.featureTitle}>Self-Paced Learning</h3>
@@ -335,9 +338,10 @@ const styles = {
   },
   featuresGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(3, 1fr)',
     gap: '30px',
-    alignItems: 'stretch'
+    alignItems: 'stretch',
+    maxWidth: '1200px',
+    margin: '0 auto'
   },
   featureCard: {
     padding: '40px 30px',

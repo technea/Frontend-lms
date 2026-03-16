@@ -411,6 +411,21 @@ img {
 }
 
 /* Smooth transitions for all cards */
-.playful-card {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+/* --- Features Grid Responsive --- */
+.features-grid-responsive {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  width: 100%;
+}
+
+@media (max-width: 991px) {
+  .features-grid-responsive {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .features-grid-responsive {
+    grid-template-columns: 1fr !important;
+  }
 }
