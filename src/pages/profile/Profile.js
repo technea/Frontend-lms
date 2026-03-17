@@ -22,6 +22,10 @@ const Profile = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [twoFactorQR, setTwoFactorQR] = useState('');
+  const [twoFactorCode, setTwoFactorCode] = useState('');
+  const [showQR, setShowQR] = useState(false);
+  const [is2FAEnabled, setIs2FAEnabled] = useState(user?.isTwoFactorEnabled || false);
 
   useEffect(() => {
     if (!user) {
@@ -70,6 +74,49 @@ const Profile = () => {
       setSuccess('Visual identity updated!');
     } catch (err) {
       setError(err.message || 'Avatar sync failed');
+    } finally { setLoading(false); }
+  };
+
+  const handleSetup2FA = async () => {
+    setLoading(true); setError(''); setSuccess('');
+    try {
+      const res = await authService.setup2FA();
+      setTwoFactorQR(res.qrCodeUrl);
+      setShowQR(true);
+    } catch (err) {
+      setError(err.message || 'Failed to setup 2FA');
+    } finally { setLoading(false); }
+  };
+
+  const handleVerifyEnable2FA = async (e) => {
+    e.preventDefault();
+    setLoading(true); setError(''); setSuccess('');
+    try {
+      await authService.verifyAndEnable2FA(twoFactorCode);
+      setSuccess('2FA enabled successfully!');
+      setIs2FAEnabled(true);
+      setShowQR(false);
+      // Update local storage user
+      const updatedUser = { ...user, isTwoFactorEnabled: true };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      setUser(updatedUser);
+    } catch (err) {
+      setError(err.message || 'Verification failed');
+    } finally { setLoading(false); }
+  };
+
+  const handleDisable2FA = async () => {
+    if (!window.confirm('Are you sure you want to disable 2FA? This will reduce your account security.')) return;
+    setLoading(true); setError(''); setSuccess('');
+    try {
+      await authService.disable2FA();
+      setSuccess('2FA disabled successfully');
+      setIs2FAEnabled(false);
+      const updatedUser = { ...user, isTwoFactorEnabled: false };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      setUser(updatedUser);
+    } catch (err) {
+      setError(err.message || 'Failed to disable 2FA');
     } finally { setLoading(false); }
   };
 
@@ -168,6 +215,54 @@ const Profile = () => {
                         {loading ? 'Encrypting...' : 'Update Security'}
                       </button>
                    </form>
+                </div>
+
+                <div className="edu-profile-section" style={{background: is2FAEnabled ? '#EBF6F1' : 'var(--cardBg)'}}>
+                   <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'20px'}}>
+                      <h3 style={{fontSize:'16px', fontWeight:600, margin:0}}>Two-Factor Authentication (2FA)</h3>
+                      <span className={`edu-tag ${is2FAEnabled ? 'edu-tag-blue' : ''}`} style={{background: is2FAEnabled ? '#1C7A52' : '#9B9890', color:'white'}}>
+                         {is2FAEnabled ? 'Active' : 'Inactive'}
+                      </span>
+                   </div>
+                   
+                   {!is2FAEnabled ? (
+                      !showQR ? (
+                         <div>
+                            <p style={{fontSize:'13px', color:'#6B6962', marginBottom:'16px'}}>Add an extra layer of security to your account by requiring a verification code from your authenticator app.</p>
+                            <button className="edu-btn edu-btn-primary" onClick={handleSetup2FA} disabled={loading}>
+                               Setup 2FA
+                            </button>
+                         </div>
+                      ) : (
+                         <div style={{textAlign:'center', padding:'20px', background:'white', borderRadius:12}}>
+                            <p style={{fontSize:'14px', fontWeight:600, marginBottom:'15px'}}>Scan this QR code with your Authenticator App</p>
+                            <img src={twoFactorQR} alt="2FA QR Code" style={{width:'180px', height:'180px', marginBottom:'20px'}} />
+                            <form onSubmit={handleVerifyEnable2FA}>
+                               <label className="edu-auth-label">Enter 6-digit code to verify</label>
+                               <input 
+                                  className="edu-auth-input" 
+                                  placeholder="000000" 
+                                  value={twoFactorCode} 
+                                  onChange={e => setTwoFactorCode(e.target.value)} 
+                                  style={{maxWidth:'200px', textAlign:'center', margin:'0 auto 15px', display:'block', fontSize:'20px', letterSpacing:'4px'}}
+                                  maxLength="6"
+                                  required
+                               />
+                               <div style={{display:'flex', gap:'12px', justifyContent:'center'}}>
+                                  <button type="button" className="edu-btn edu-btn-outline" onClick={() => setShowQR(false)}>Cancel</button>
+                                  <button type="submit" className="edu-btn edu-btn-primary" disabled={loading}>Verify & Enable</button>
+                               </div>
+                            </form>
+                         </div>
+                      )
+                   ) : (
+                      <div>
+                         <p style={{fontSize:'13px', color:'#6B6962', marginBottom:'16px'}}>Your account is protected with Two-Factor Authentication. You will be asked for a code during login.</p>
+                         <button className="edu-btn edu-btn-outline" style={{borderColor:'#E85D2A', color:'#E85D2A'}} onClick={handleDisable2FA} disabled={loading}>
+                            Disable 2FA
+                         </button>
+                      </div>
+                   )}
                 </div>
 
                 <div className="edu-card" style={{border:'1px solid #FDF0EB', background:'#FDF0EB33'}}>

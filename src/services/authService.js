@@ -91,6 +91,46 @@ const authService = {
     } catch (error) {
       throw error.response?.data || error.message;
     }
+  },
+
+  setup2FA: async () => {
+    try {
+      const response = await api.get('/users/2fa/setup');
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  },
+
+  verifyAndEnable2FA: async (token) => {
+    try {
+      const response = await api.post('/users/2fa/verify', { token });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  },
+
+  loginWith2FA: async (userId, token) => {
+    try {
+      const response = await api.post('/users/2fa/login', { userId, token });
+      if (response.data.token) {
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+      }
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  },
+
+  disable2FA: async () => {
+    try {
+      const response = await api.post('/users/2fa/disable');
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
   }
 };
 
