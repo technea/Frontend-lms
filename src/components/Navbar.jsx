@@ -1,148 +1,97 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import authService from '../services/authService';
-import { useTheme } from '../context/ThemeContext';
-import { FaGithub, FaLinkedinIn, FaTimes, FaBars } from 'react-icons/fa';
+import gsap from 'gsap';
+import '../styles/EduFlow.css';
 
-const CustomNavbar = () => {
-    const [user, setUser] = useState(null);
-    const [mobileOpen, setMobileOpen] = useState(false);
-    const { isDark, toggleTheme } = useTheme();
+const Navbar = () => {
+  const [user, setUser] = useState(authService.getCurrentUser());
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
-    const API_URL = process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://127.0.0.1:5000';
+  useEffect(() => {
+    gsap.from('.edu-navbar', { y: -100, opacity: 0, duration: 1, ease: 'power4.out' });
+  }, []);
 
-    useEffect(() => {
-        setUser(authService.getCurrentUser());
-    }, []);
+  const handleLogout = () => {
+    authService.logout();
+    setUser(null);
+    navigate('/login');
+  };
 
-    const handleLogout = () => {
-        authService.logout();
-        window.location.reload();
-    };
+  const navLinks = [
+    { name: 'Home', path: '/' },
+    { name: 'Courses', path: '/courses' },
+    { name: 'About', path: '/about' },
+  ];
 
-    const toggleMobile = () => setMobileOpen(!mobileOpen);
+  return (
+    <nav className="edu-navbar">
+      <div className="edu-navbar-container">
+        <Link to="/" className="edu-navbar-brand">
+          <div className="brand-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          </div>
+          <span className="brand-name">NexLearn</span>
+        </Link>
 
-    return (
-        <>
-            {/* Desktop & Main Nav Bar */}
-            <nav className={`main-navbar ${isDark ? 'dark' : 'light'}`}>
-                <div className="nav-container">
-                    <Link to="/" className="nav-logo">
-                        Nex<span>Learn</span>
-                    </Link>
-
-                    <div className="nav-links-desktop">
-                        <Link to="/courses">Courses</Link>
-                        <Link to="/about">About</Link>
-                        {user && <Link to="/dashboard">Dashboard</Link>}
-                        {user && <Link to="/my-courses">My Courses</Link>}
-                        {user?.role === 'admin' && <Link to="/admin">Admin</Link>}
-                        {(user?.role === 'instructor' || user?.role === 'admin') && (
-                            <Link to="/instructor">Instructor</Link>
-                        )}
-                    </div>
-
-                    <div className="nav-actions">
-                        <div className="theme-toggle" onClick={toggleTheme}>
-                            {isDark ? '🌙' : '☀️'}
-                        </div>
-
-                        {user ? (
-                            <div className="user-profile-nav">
-                                <Link to="/profile" className="avatar-link">
-                                    <div className="avatar-circle">
-                                        {user.avatar ? (
-                                            <img src={`${API_URL}${user.avatar}`} alt="Avatar" />
-                                        ) : (
-                                            (user.name || 'U').charAt(0).toUpperCase()
-                                        )}
-                                    </div>
-                                    <span className="user-name-desktop">{user.name}</span>
-                                </Link>
-                                <button className="logout-btn-nav" onClick={handleLogout}>Logout</button>
-                            </div>
-                        ) : (
-                            <Link to="/login" className="login-btn-nav">Login</Link>
-                        )}
-
-                        {/* Hamburger Button */}
-                        <button className="hamburger-trigger" onClick={toggleMobile}>
-                            <FaBars />
-                        </button>
-                    </div>
-                </div>
-            </nav>
-
-            {/* Premium Mobile Menu Overlay */}
-            <div className={`mobile-menu-premium ${mobileOpen ? 'open' : ''}`}>
-                <div className="mobile-menu-header">
-                    <div className="mobile-brand">Nex<span>Learn</span></div>
-                    <button className="mobile-close" onClick={toggleMobile}>
-                        <FaTimes />
-                    </button>
-                </div>
-
-                <div className="mobile-links-container">
-                    {user && (
-                        <div style={styles.mobileUserHeader}>
-                            <div className="avatar-circle" style={{ width: '60px', height: '60px', fontSize: '1.5rem' }}>
-                                {user.avatar ? (
-                                    <img src={`${API_URL}${user.avatar}`} alt="Avatar" />
-                                ) : (
-                                    (user.name || 'U').charAt(0).toUpperCase()
-                                )}
-                            </div>
-                            <div style={{ textAlign: 'center' }}>
-                                <div style={{ fontSize: '1.2rem', fontWeight: '800' }}>{user.name}</div>
-                                <div style={{ fontSize: '0.8rem', opacity: 0.7, textTransform: 'uppercase' }}>{user.role}</div>
-                            </div>
-                        </div>
-                    )}
-                    
-                    <Link to="/" onClick={toggleMobile}>Home</Link>
-                    <Link to="/about" onClick={toggleMobile}>About</Link>
-                    <Link to="/courses" onClick={toggleMobile}>Courses</Link>
-                    {user && <Link to="/my-courses" onClick={toggleMobile}>My Courses</Link>}
-                    {user && <Link to="/dashboard" onClick={toggleMobile} style={{ color: '#64ffda', fontWeight: '800' }}>Dashboard</Link>}
-                    {user && <Link to="/profile" onClick={toggleMobile}>Profile</Link>}
-                    
-                    <div className="mobile-auth-section">
-                        {user ? (
-                            <button className="mobile-logout-btn" onClick={() => { handleLogout(); toggleMobile(); }}>
-                                Logout Account
-                            </button>
-                        ) : (
-                            <Link to="/login" className="mobile-login-btn" onClick={toggleMobile}>
-                                Login to Account
-                            </Link>
-                        )}
-                    </div>
-                </div>
-
-                <div className="mobile-socials">
-                    <a href="https://linkedin.com" target="_blank" rel="noreferrer"><FaLinkedinIn /></a>
-                    <a href="https://github.com" target="_blank" rel="noreferrer"><FaGithub /></a>
-                </div>
+        {/* Desktop Links */}
+        <div className="edu-navbar-desktop">
+          {navLinks.map(link => (
+            <Link 
+              key={link.path} 
+              to={link.path} 
+              className={`nav-item ${location.pathname === link.path ? 'active' : ''}`}
+            >
+              {link.name}
+            </Link>
+          ))}
+          
+          <div className="nav-divider"></div>
+          
+          {user ? (
+            <div className="nav-user-actions">
+              <Link to="/dashboard" className="edu-btn edu-btn-outline" style={{padding: '8px 16px', fontSize: '13px'}}>Dashboard</Link>
+              <button onClick={handleLogout} className="edu-btn edu-btn-primary" style={{padding: '8px 16px', fontSize: '13px'}}>Logout</button>
             </div>
-        </>
-    );
+          ) : (
+            <div className="nav-auth-actions">
+              <Link to="/login" className="nav-item">Login</Link>
+              <Link to="/register" className="edu-btn edu-btn-primary" style={{padding: '8px 16px', fontSize: '13px', textDecoration:'none'}}>Join Free</Link>
+            </div>
+          )}
+        </div>
+
+        {/* Mobile Toggle */}
+        <button className="edu-mobile-toggle" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d={mobileMenuOpen ? "M18 6L6 18M6 6l12 12" : "M3 12h18M3 6h18M3 18h18"}/></svg>
+        </button>
+      </div>
+
+      {/* Mobile Menu */}
+      {mobileMenuOpen && (
+        <div className="edu-mobile-menu">
+           {navLinks.map(link => (
+              <Link key={link.path} to={link.path} onClick={() => setMobileMenuOpen(false)} className="mobile-nav-item">{link.name}</Link>
+           ))}
+           <div className="mobile-divider"></div>
+           {user ? (
+             <>
+               <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)} className="mobile-nav-item">Dashboard</Link>
+               <Link to="/profile" onClick={() => setMobileMenuOpen(false)} className="mobile-nav-item">My Profile</Link>
+               <button onClick={handleLogout} className="edu-btn edu-btn-primary" style={{margin:'10px 20px'}}>Logout</button>
+             </>
+           ) : (
+             <>
+               <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="mobile-nav-item">Login</Link>
+               <Link to="/register" onClick={() => setMobileMenuOpen(false)} className="edu-btn edu-btn-primary" style={{margin:'10px 20px', textDecoration:'none', textAlign:'center'}}>Sign Up</Link>
+             </>
+           )}
+        </div>
+      )}
+    </nav>
+  );
 };
 
-const styles = {
-    mobileUserHeader: {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: '12px',
-        padding: '25px 20px',
-        background: 'rgba(255, 255, 255, 0.1)',
-        borderRadius: '28px',
-        width: '100%',
-        marginBottom: '15px',
-        border: '1px solid rgba(255, 255, 255, 0.15)',
-        backdropFilter: 'blur(10px)',
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)'
-    }
-};
-
-export default CustomNavbar;
+export default Navbar;

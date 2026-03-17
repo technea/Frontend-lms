@@ -5,7 +5,7 @@ import gsap from 'gsap';
 const AIChatbot = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState([
-        { role: 'model', parts: [{ text: "Hello! I'm your AI Tutor. How can I help you today?" }] }
+        { role: 'model', parts: [{ text: "Greetings! I'm your NexLearn Intelligence Guide. How can I assist your learning journey today?" }] }
     ]);
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
@@ -51,7 +51,7 @@ const AIChatbot = () => {
             console.error(err);
             setMessages(prev => [...prev, { 
                 role: 'model', 
-                parts: [{ text: "Sorry, I'm having a bit of a headache. Please check if the API key is set or try again later!" }] 
+                parts: [{ text: "I'm currently recalibrating my neural circuits. Please stand by or check your connection!" }] 
             }]);
         } finally {
             setLoading(false);
@@ -66,10 +66,10 @@ const AIChatbot = () => {
                 <div ref={chatRef} style={styles.chatWindow} className="ai-chat-window">
                     <div style={styles.header}>
                         <div style={styles.headerLeft}>
-                            <div style={styles.botIcon}>🤖</div>
+                            <div style={styles.botIcon}>🪄</div>
                             <div>
-                                <h4 style={styles.headerTitle}>AI Assistant</h4>
-                                <span style={styles.onlineStatus}>Online</span>
+                                <h4 style={styles.headerTitle}>NexLearn Guide</h4>
+                                <span style={styles.onlineStatus}>Neural Link Active</span>
                             </div>
                         </div>
                         <button onClick={() => setIsOpen(false)} style={styles.closeBtn}>×</button>
@@ -80,15 +80,16 @@ const AIChatbot = () => {
                             <div key={idx} style={{
                                 ...styles.messageBubble,
                                 alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start',
-                                backgroundColor: msg.role === 'user' ? '#6366f1' : '#f1f5f9',
-                                color: msg.role === 'user' ? '#fff' : '#0f172a',
-                                borderRadius: msg.role === 'user' ? '18px 18px 0 18px' : '18px 18px 18px 0'
+                                backgroundColor: msg.role === 'user' ? '#2D5BE3' : '#fff',
+                                color: msg.role === 'user' ? '#fff' : '#1A1916',
+                                borderRadius: msg.role === 'user' ? '18px 18px 0 18px' : '0 18px 18px 18px',
+                                border: msg.role === 'user' ? 'none' : '1px solid #E2E0D8'
                             }}>
                                 {msg.parts[0].text}
                             </div>
                         ))}
                         {loading && (
-                            <div style={{...styles.messageBubble, alignSelf: 'flex-start', backgroundColor: '#f1f5f9'}}>
+                            <div style={{...styles.messageBubble, alignSelf: 'flex-start', backgroundColor: '#fff', border:'1px solid #E2E0D8', borderRadius:'0 18px 18px 18px'}}>
                                 <div className="typing-dots">
                                     <span>.</span><span>.</span><span>.</span>
                                 </div>
@@ -102,7 +103,7 @@ const AIChatbot = () => {
                             type="text"
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
-                            placeholder="Type a message..."
+                            placeholder="Ask anything about NexLearn..."
                             style={styles.input}
                         />
                         <button type="submit" disabled={loading} style={styles.sendBtn}>
@@ -120,7 +121,7 @@ const AIChatbot = () => {
                     transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)'
                 }}
             >
-                {isOpen ? '×' : '🤖'}
+                {isOpen ? '×' : '🪄'}
             </button>
 
             <style>{`
@@ -128,6 +129,7 @@ const AIChatbot = () => {
                     animation: blink 1.4s infinite both;
                     font-size: 1.5rem;
                     line-height: 0;
+                    color: #2D5BE3;
                 }
                 .typing-dots span:nth-child(2) { animation-delay: .2s; }
                 .typing-dots span:nth-child(3) { animation-delay: .4s; }
@@ -164,84 +166,87 @@ const styles = {
         width: '60px',
         height: '60px',
         borderRadius: '50%',
-        backgroundColor: '#6366f1',
+        backgroundColor: '#2D5BE3',
         color: '#fff',
         border: 'none',
         fontSize: '1.8rem',
         cursor: 'pointer',
-        boxShadow: '0 4px 20px rgba(99, 102, 241, 0.4)',
+        boxShadow: '0 8px 30px rgba(45, 91, 227, 0.4)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
     },
     chatWindow: {
         width: '380px',
         height: '500px',
-        backgroundColor: '#fff',
+        backgroundColor: '#F9F8F4',
         borderRadius: '24px',
-        boxShadow: '0 10px 40px rgba(0,0,0,0.15)',
+        boxShadow: '0 20px 50px rgba(26, 25, 22, 0.15)',
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
-        border: '1px solid #e2e8f0'
+        border: '1px solid #E2E0D8'
     },
     header: {
         padding: '20px',
-        background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
+        background: '#1A1916',
         color: '#fff',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center'
     },
     headerLeft: { display: 'flex', alignItems: 'center', gap: '12px' },
-    botIcon: { fontSize: '1.5rem', backgroundColor: 'rgba(255,255,255,0.2)', padding: '5px', borderRadius: '10px' },
-    headerTitle: { margin: 0, fontSize: '1.1rem', fontWeight: '700' },
-    onlineStatus: { fontSize: '0.75rem', opacity: 0.9 },
-    closeBtn: { background: 'none', border: 'none', color: '#fff', fontSize: '1.8rem', cursor: 'pointer' },
+    botIcon: { fontSize: '1.4rem', backgroundColor: 'rgba(255,255,255,0.1)', width:'40px', height:'40px', display:'flex', alignItems:'center', justifyContent:'center', borderRadius: '12px' },
+    headerTitle: { margin: 0, fontSize: '0.95rem', fontWeight: '700', letterSpacing:'0.5px', textTransform:'uppercase' },
+    onlineStatus: { fontSize: '0.7rem', opacity: 0.6, display:'flex', alignItems:'center', gap:'5px' },
+    closeBtn: { background: 'none', border: 'none', color: '#fff', fontSize: '1.8rem', cursor: 'pointer', opacity:0.6 },
     messagesArea: {
         flex: 1,
         padding: '20px',
         overflowY: 'auto',
         display: 'flex',
         flexDirection: 'column',
-        gap: '12px',
-        backgroundColor: '#f8fafc'
+        gap: '16px',
+        backgroundColor: '#F9F8F4'
     },
     messageBubble: {
-        maxWidth: '80%',
-        padding: '12px 16px',
-        fontSize: '0.95rem',
-        lineHeight: '1.4',
-        boxShadow: '0 2px 5px rgba(0,0,0,0.05)'
+        maxWidth: '85%',
+        padding: '14px 18px',
+        fontSize: '0.9rem',
+        lineHeight: '1.5',
+        boxShadow: '0 4px 12px rgba(26, 25, 22, 0.03)',
+        fontFamily: "'Inter', sans-serif"
     },
     inputArea: {
-        padding: '15px',
-        borderTop: '1px solid #e2e8f0',
+        padding: '18px',
+        borderTop: '1px solid #E2E0D8',
         display: 'flex',
-        gap: '10px',
+        gap: '12px',
         backgroundColor: '#fff'
     },
     input: {
         flex: 1,
-        padding: '12px 16px',
-        borderRadius: '12px',
-        border: '1px solid #e2e8f0',
+        padding: '12px 18px',
+        borderRadius: '14px',
+        border: '1px solid #E2E0D8',
         outline: 'none',
-        fontSize: '0.95rem'
+        fontSize: '0.9rem',
+        backgroundColor: '#F9F8F4'
     },
     sendBtn: {
-        width: '45px',
-        height: '45px',
-        borderRadius: '12px',
-        backgroundColor: '#6366f1',
+        width: '48px',
+        height: '48px',
+        borderRadius: '14px',
+        backgroundColor: '#2D5BE3',
         color: '#fff',
         border: 'none',
         cursor: 'pointer',
-        fontSize: '1.2rem',
+        fontSize: '1rem',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        transition: 'transform 0.2s'
     }
 };
 

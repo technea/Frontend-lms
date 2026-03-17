@@ -4,12 +4,22 @@ import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import api from '../../services/api';
 import gsap from 'gsap';
+import '../../styles/EduFlow.css';
+
+const courseEmojis = { 'Technology': '💻', 'Design': '🎨', 'Business': '📈', 'Marketing': '📊', 'Data Science': '🤖' };
+const getCourseEmoji = (cat) => courseEmojis[cat] || '📚';
+const thumbColors = ['t1', 't2', 't3', 't4'];
 
 const CourseList = () => {
   const [courses, setCourses] = useState([]);
   const [filteredCourses, setFilteredCourses] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeCategory, setActiveCategory] = useState('All');
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    gsap.from('.edu-page-header', { opacity: 0, scale: 0.9, duration: 1, ease: 'back.out(1.7)' });
+  }, []);
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -27,92 +37,98 @@ const CourseList = () => {
   }, []);
 
   useEffect(() => {
-    const filtered = courses.filter(course => 
-      course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      course.category.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    setFilteredCourses(filtered);
-  }, [searchQuery, courses]);
-
-  useEffect(() => {
-    if (!loading) {
-      gsap.from('.course-card', {
-        opacity: 0,
-        y: 40,
-        stagger: 0.1,
-        duration: 0.8,
-        ease: 'power3.out',
-        overwrite: 'auto'
-      });
+    let filtered = courses;
+    if (activeCategory !== 'All') {
+      filtered = filtered.filter(c => c.category === activeCategory);
     }
-  }, [loading, filteredCourses]);
+    if (searchQuery) {
+      filtered = filtered.filter(course => 
+        course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        course.category.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+    setFilteredCourses(filtered);
+    
+    // Animate grid items
+    gsap.fromTo('.edu-course-item', 
+      { opacity: 0, y: 30 },
+      { opacity: 1, y: 0, stagger: 0.1, duration: 0.5, ease: 'power2.out' }
+    );
+  }, [searchQuery, courses, activeCategory]);
+
+  const categories = ['All', 'Technology', 'Design', 'Business', 'Marketing', 'Data Science'];
 
   return (
-    <div style={styles.container}>
+    <div className="edu-page">
       <Navbar />
-      <main style={styles.main} className="section-padding-responsive">
-        <header style={styles.header}>
-          <h1 style={styles.title} className="page-title-responsive">Explore <span className="gradient-text">Our Courses</span></h1>
-          <p style={styles.subtitle} className="mobile-text-center">Start your learning journey with world-class curriculum curated by industry experts.</p>
+      
+      <div className="container py-5 mt-5">
+        <header className="edu-page-header text-center mb-5">
+          <h1 className="display-4 fw-bold">NexLearn Universe</h1>
+          <p className="lead border-bottom pb-4">Accelerate your growth with our elite curriculum engineered for impact.</p>
           
-          <div style={styles.searchContainer} className="search-bar-responsive">
-            <span style={styles.searchIcon}>🔍</span>
-            <input 
-              type="text" 
-              placeholder="Search by course name or category..." 
-              style={styles.searchInput}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+          <div className="row justify-content-center mt-4">
+            <div className="col-md-6">
+              <div className="edu-search-wrap shadow-sm">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                <input 
+                  type="text" 
+                  className="form-control form-control-lg border-0 bg-light"
+                  placeholder="Search NexLearn curriculum..." 
+                  style={{paddingLeft: '45px'}}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="d-flex flex-wrap justify-content-center gap-2 mt-4">
+            {categories.map(cat => (
+              <button 
+                key={cat} 
+                onClick={() => setActiveCategory(cat)}
+                className={`btn ${activeCategory === cat ? 'btn-primary' : 'btn-outline-secondary'} rounded-pill px-4 shadow-sm`}
+              >
+                {cat}
+              </button>
+            ))}
           </div>
         </header>
 
         {loading ? (
-          <div style={styles.loading}>Loading amazing courses for you...</div>
+          <div style={{textAlign: 'center', padding: '100px', color: '#9B9890'}}>Loading amazing courses for you...</div>
         ) : (
           <>
             {filteredCourses.length > 0 ? (
-              <div style={styles.grid}>
-                {filteredCourses.map((course) => (
-                  <div key={course._id} className="course-card playful-card" style={styles.card}>
-                    {course.thumbnail && (
-                      <div style={styles.thumbnailContainer}>
-                        <img src={course.thumbnail} alt={course.title} style={styles.thumbnail} />
+              <div className="edu-courses-list">
+                {filteredCourses.map((course, idx) => (
+                  <Link to={`/course/${course._id}`} key={course._id} className="edu-course-item">
+                    <div className={`c-thumb ${thumbColors[idx % 4]}`}>
+                      {getCourseEmoji(course.category)}
+                    </div>
+                    <div className="c-body">
+                      <div style={{display: 'flex', gap: '8px', marginBottom: '5px'}}>
+                        <span className="c-cat">{course.category}</span>
+                        {course.isExternal && <span className="edu-tag edu-tag-orange" style={{padding: '1px 8px', fontSize: '9px'}}>{course.source}</span>}
                       </div>
-                    )}
-                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                      <div style={styles.categoryBadge}>{course.category}</div>
-                      {course.isExternal && (
-                        <div style={styles.sourceBadge}>{course.source}</div>
-                      )}
+                      <h3 className="c-title">{course.title}</h3>
+                      <p className="c-desc">{course.description ? course.description.substring(0, 100) + '...' : 'No description available.'}</p>
+                      <div className="c-footer">
+                        <span className="c-price">{course.price === 0 ? 'FREE' : `$${course.price}`}</span>
+                        <span className="edu-btn edu-btn-primary" style={{padding: '6px 14px', fontSize: '11px'}}>View Details</span>
+                      </div>
                     </div>
-                    <h3 style={styles.courseTitle}>{course.title}</h3>
-                    <p style={styles.courseDesc}>{course.description.substring(0, 100)}...</p>
-                    <div style={styles.footer}>
-                      <span style={styles.price}>{course.price === 0 ? 'FREE' : `$${course.price}`}</span>
-                      {course.isExternal ? (
-                        <a 
-                          href={course.externalLink} 
-                          target="_blank" 
-                          rel="noopener noreferrer" 
-                          style={styles.enrollBtn}
-                        >
-                          Enroll Now ➜
-                        </a>
-                      ) : (
-                        <Link to={`/course/${course._id}`} style={styles.viewBtn}>View Details</Link>
-                      )}
-                    </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             ) : (
-              <div style={styles.noResults}>
-                <h3>No courses found matching "{searchQuery}"</h3>
-                <p>Try searching for different keywords or categories.</p>
+              <div style={{textAlign: 'center', padding: '60px', background: '#fff', borderRadius: '14px', border: '1px solid #E2E0D8'}}>
+                <h3 style={{marginBottom: '10px'}}>No courses found matching "{searchQuery}"</h3>
+                <p style={{color: '#6B6962', fontSize: '14px', marginBottom: '20px'}}>Try searching for different keywords or categories.</p>
                 <button 
                   onClick={() => setSearchQuery('')}
-                  style={styles.resetBtn}
+                  className="edu-btn edu-btn-outline"
                 >
                   Clear Search
                 </button>
@@ -120,193 +136,10 @@ const CourseList = () => {
             )}
           </>
         )}
-      </main>
+      </div>
       <Footer />
     </div>
   );
-};
-
-const styles = {
-  container: {
-    backgroundColor: 'var(--bg)',
-    color: 'var(--text)',
-    minHeight: '100vh',
-    display: 'flex',
-    flexDirection: 'column'
-  },
-  main: {
-    marginTop: '80px',
-    flex: 1,
-    maxWidth: '1200px',
-    margin: '80px auto 0 auto',
-    padding: '60px 20px',
-    width: '100%'
-  },
-  header: {
-    textAlign: 'center',
-    marginBottom: '60px'
-  },
-  title: {
-    fontSize: '3rem',
-    fontWeight: '800',
-    marginBottom: '15px'
-  },
-  subtitle: {
-    color: 'var(--textSecondary)',
-    fontSize: '1.1rem'
-  },
-  loading: {
-    textAlign: 'center',
-    padding: '100px',
-    fontSize: '1.2rem',
-    color: 'var(--textMuted)'
-  },
-  grid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-    gap: '35px',
-    width: '100%'
-  },
-  card: {
-    backgroundColor: 'var(--cardBg)',
-    borderRadius: '20px',
-    padding: '30px',
-    border: '1px solid var(--cardBorder)',
-    boxShadow: 'var(--cardShadow)',
-    position: 'relative',
-    display: 'flex',
-    flexDirection: 'column',
-    transition: 'transform 0.3s ease'
-  },
-  categoryBadge: {
-    display: 'inline-block',
-    padding: '6px 16px',
-    background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
-    color: '#fff',
-    borderRadius: '100px',
-    fontSize: '0.8rem',
-    fontWeight: '700',
-    marginBottom: '15px',
-    width: 'fit-content',
-    boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
-  },
-  courseTitle: {
-    fontSize: '1.4rem',
-    fontWeight: '700',
-    marginBottom: '12px',
-    lineHeight: '1.3'
-  },
-  courseDesc: {
-    color: 'var(--textSecondary)',
-    fontSize: '0.95rem',
-    lineHeight: '1.5',
-    marginBottom: '20px',
-    flex: 1
-  },
-  footer: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 'auto',
-    paddingTop: '20px',
-    borderTop: '1px solid var(--sectionBorder)'
-  },
-  price: {
-    fontSize: '1.5rem',
-    fontWeight: '800',
-    color: 'var(--text)'
-  },
-  viewBtn: {
-    background: 'linear-gradient(135deg, #4f46e5, #9333ea)',
-    color: 'white',
-    padding: '12px 24px',
-    borderRadius: '14px',
-    textDecoration: 'none',
-    fontWeight: '700',
-    fontSize: '0.95rem',
-    transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-    boxShadow: '0 4px 12px rgba(79, 70, 229, 0.2)'
-  },
-  enrollBtn: {
-    background: 'linear-gradient(135deg, #10b981, #059669)',
-    color: 'white',
-    padding: '12px 24px',
-    borderRadius: '14px',
-    textDecoration: 'none',
-    fontWeight: '700',
-    fontSize: '0.95rem',
-    transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-    boxShadow: '0 4px 12px rgba(16, 185, 129, 0.2)'
-  },
-  thumbnailContainer: {
-    width: '100%',
-    height: '180px',
-    borderRadius: '15px',
-    overflow: 'hidden',
-    marginBottom: '20px',
-    border: '1px solid var(--cardBorder)'
-  },
-  thumbnail: {
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover'
-  },
-  sourceBadge: {
-    display: 'inline-block',
-    padding: '6px 16px',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    color: 'var(--text)',
-    borderRadius: '100px',
-    fontSize: '0.8rem',
-    fontWeight: '700',
-    marginBottom: '15px',
-    border: '1px solid var(--cardBorder)',
-    width: 'fit-content'
-  },
-  searchContainer: {
-    maxWidth: '600px',
-    margin: '30px auto 0',
-    position: 'relative',
-    display: 'flex',
-    alignItems: 'center'
-  },
-  searchIcon: {
-    position: 'absolute',
-    left: '20px',
-    fontSize: '1.2rem',
-    opacity: 0.6
-  },
-  searchInput: {
-    width: '100%',
-    padding: '16px 20px 16px 55px',
-    borderRadius: '100px',
-    border: '2px solid var(--cardBorder)',
-    backgroundColor: 'var(--cardBg)',
-    color: 'var(--text)',
-    fontSize: '1rem',
-    fontFamily: 'inherit',
-    outline: 'none',
-    transition: 'all 0.3s ease',
-    boxShadow: '0 4px 15px rgba(0,0,0,0.05)'
-  },
-  noResults: {
-    textAlign: 'center',
-    padding: '60px 20px',
-    backgroundColor: 'var(--bgSecondary)',
-    borderRadius: '24px',
-    marginTop: '40px'
-  },
-  resetBtn: {
-    marginTop: '20px',
-    padding: '12px 24px',
-    backgroundColor: 'var(--accent)',
-    color: 'white',
-    border: 'none',
-    borderRadius: '12px',
-    fontWeight: '700',
-    cursor: 'pointer',
-    transition: 'transform 0.2s ease'
-  }
 };
 
 export default CourseList;

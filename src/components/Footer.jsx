@@ -1,100 +1,57 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import '../styles/EduFlow.css';
 
 const Footer = () => {
   return (
-    <footer style={styles.footer}>
-      <div style={styles.container}>
-        <div style={styles.grid}>
-          <div style={styles.brandSection}>
-            <h3 style={styles.logo}>
-              Nex<span className="gradient-text">Learn</span>
-            </h3>
-            <p style={styles.description}>
-              Empowering learners worldwide with state-of-the-art educational tools and expert-led curriculum.
+    <footer className="edu-footer">
+      <div className="edu-navbar-container" style={{flexDirection: 'column', padding: '60px 32px 30px'}}>
+        <div className="footer-grid">
+          <div className="footer-brand">
+            <Link to="/" className="edu-navbar-brand" style={{marginBottom: '16px'}}>
+              <div className="brand-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+              </div>
+              <span className="brand-name">NexLearn</span>
+            </Link>
+            <p className="footer-desc">
+              Empowering the next generation of digital leaders through world-class education and industry-leading mentorship.
             </p>
           </div>
-          <div style={styles.linkSection}>
-            <h4 style={styles.linkHeading}>Quick Links</h4>
-            <Link to="/" style={styles.link}>Courses</Link>
-            <Link to="/login" style={styles.link}>Login</Link>
-            <Link to="/register" style={styles.link}>Sign Up</Link>
-          </div>
-          <div style={styles.linkSection}>
-            <h4 style={styles.linkHeading}>Support</h4>
-            <Link to="/" style={styles.link}>Help Center</Link>
-            <Link to="/" style={styles.link}>Privacy Policy</Link>
-            <Link to="/" style={styles.link}>Terms of Service</Link>
+          
+          <div className="footer-links-group">
+            <div className="footer-col">
+              <h4>Platform</h4>
+              <Link to="/courses">Courses</Link>
+              <Link to="/about">About Us</Link>
+              <Link to="/dashboard">Dashboard</Link>
+            </div>
+            <div className="footer-col">
+              <h4>Support</h4>
+              <Link to="/">Help Center</Link>
+              <Link to="/">Terms of Service</Link>
+              <Link to="/">Privacy Policy</Link>
+            </div>
+            <div className="footer-col">
+              <h4>Connect</h4>
+              <a href="https://twitter.com" target="_blank" rel="noreferrer">Twitter</a>
+              <a href="https://linkedin.com" target="_blank" rel="noreferrer">LinkedIn</a>
+              <a href="https://github.com" target="_blank" rel="noreferrer">GitHub</a>
+            </div>
           </div>
         </div>
-        <div style={styles.bottomBar}>
-          <p style={styles.copyright}>© 2026 NexLearn. All rights reserved.</p>
+        
+        <div className="footer-bottom">
+          <p>© 2026 NexLearn LMS. All rights reserved.</p>
+          <div className="footer-social-dots">
+            <span className="dot"></span>
+            <span className="dot"></span>
+            <span className="dot"></span>
+          </div>
         </div>
       </div>
     </footer>
   );
-};
-
-const styles = {
-  footer: {
-    backgroundColor: 'var(--footerBg)',
-    borderTop: '1px solid var(--footerBorder)',
-    padding: '60px 0 30px 0',
-    color: 'var(--text)',
-    fontFamily: '"Outfit", sans-serif'
-  },
-  container: {
-    maxWidth: '1200px',
-    margin: '0 auto',
-    padding: '0 20px'
-  },
-  grid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-    gap: '40px',
-    marginBottom: '40px'
-  },
-  brandSection: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '15px'
-  },
-  logo: {
-    fontSize: '24px',
-    fontWeight: '800',
-    margin: 0,
-    color: 'var(--text)'
-  },
-  description: {
-    color: 'var(--textSecondary)',
-    lineHeight: '1.6',
-    fontSize: '0.95rem'
-  },
-  linkSection: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '12px'
-  },
-  linkHeading: {
-    fontSize: '1.1rem',
-    fontWeight: '600',
-    marginBottom: '8px',
-    color: 'var(--text)'
-  },
-  link: {
-    color: 'var(--textSecondary)',
-    textDecoration: 'none',
-    fontSize: '0.9rem'
-  },
-  bottomBar: {
-    borderTop: '1px solid var(--footerBorder)',
-    paddingTop: '30px',
-    textAlign: 'center'
-  },
-  copyright: {
-    color: 'var(--textMuted)',
-    fontSize: '0.85rem'
-  }
 };
 
 export default Footer;

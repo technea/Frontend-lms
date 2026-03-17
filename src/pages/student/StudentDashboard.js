@@ -3,7 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import DashboardSidebar from '../../components/DashboardSidebar';
 import authService from '../../services/authService';
 import api from '../../services/api';
-import '../../styles/StudentDashboard.css';
+import '../../styles/EduFlow.css';
+import gsap from 'gsap';
 
 const StudentDashboard = () => {
   const navigate = useNavigate();
@@ -23,6 +24,49 @@ const StudentDashboard = () => {
     setUser(currentUser);
     fetchData();
   }, [navigate]);
+
+  useEffect(() => {
+    if (!loading && user) {
+      // Entrance Animation
+      const tl = gsap.timeline();
+      
+      tl.from(".edu-hero", { 
+        y: 50, 
+        opacity: 0, 
+        duration: 1, 
+        ease: "power4.out" 
+      })
+      .from(".edu-stat-card", { 
+        y: 30, 
+        opacity: 0, 
+        stagger: 0.1, 
+        duration: 0.8, 
+        ease: "back.out(1.7)" 
+      }, "-=0.6")
+      .from(".edu-section-header", { 
+        opacity: 0, 
+        x: -20, 
+        duration: 0.5 
+      }, "-=0.4")
+      .from(".edu-course-card", { 
+        scale: 0.8, 
+        opacity: 0, 
+        stagger: 0.1, 
+        duration: 0.6, 
+        ease: "power2.out" 
+      }, "-=0.3");
+    }
+  }, [loading, user]);
+
+  const handleStatHover = (e, isEnter) => {
+    gsap.to(e.currentTarget, {
+      scale: isEnter ? 1.05 : 1,
+      y: isEnter ? -5 : 0,
+      borderColor: isEnter ? "#2D5BE3" : "#E2E0D8",
+      duration: 0.3,
+      ease: "power2.out"
+    });
+  };
 
   const fetchData = async () => {
     try {
@@ -107,7 +151,7 @@ const StudentDashboard = () => {
         {/* CONTENT */}
         <div className="edu-content">
           {loading ? (
-            <div style={{textAlign:'center', padding:'100px', color:'var(--edu-text3)'}}>Loading dashboard...</div>
+            <div style={{textAlign:'center', padding:'100px', color:'var(--edu-text3)'}}>Loading NexLearn dashboard...</div>
           ) : (
             <>
               {/* HERO */}
@@ -146,7 +190,11 @@ const StudentDashboard = () => {
 
               {/* STAT CARDS */}
               <div className="edu-stats-row">
-                <div className="edu-stat-card">
+                <div 
+                  className="edu-stat-card"
+                  onMouseEnter={(e) => handleStatHover(e, true)}
+                  onMouseLeave={(e) => handleStatHover(e, false)}
+                >
                   <div className="edu-stat-icon blue">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
                   </div>
@@ -157,7 +205,11 @@ const StudentDashboard = () => {
                     Enrolled
                   </div>
                 </div>
-                <div className="edu-stat-card">
+                <div 
+                  className="edu-stat-card"
+                  onMouseEnter={(e) => handleStatHover(e, true)}
+                  onMouseLeave={(e) => handleStatHover(e, false)}
+                >
                   <div className="edu-stat-icon orange">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
                   </div>
@@ -168,7 +220,11 @@ const StudentDashboard = () => {
                     Keep going!
                   </div>
                 </div>
-                <div className="edu-stat-card">
+                <div 
+                  className="edu-stat-card"
+                  onMouseEnter={(e) => handleStatHover(e, true)}
+                  onMouseLeave={(e) => handleStatHover(e, false)}
+                >
                   <div className="edu-stat-icon green">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
                   </div>
@@ -179,7 +235,11 @@ const StudentDashboard = () => {
                     Certificates
                   </div>
                 </div>
-                <div className="edu-stat-card">
+                <div 
+                  className="edu-stat-card"
+                  onMouseEnter={(e) => handleStatHover(e, true)}
+                  onMouseLeave={(e) => handleStatHover(e, false)}
+                >
                   <div className="edu-stat-icon amber">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                   </div>

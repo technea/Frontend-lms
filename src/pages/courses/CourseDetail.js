@@ -4,8 +4,7 @@ import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import api from '../../services/api';
 import authService from '../../services/authService';
-import PlayfulButton from '../../components/PlayfulButton';
-import gsap from 'gsap';
+import '../../styles/EduFlow.css';
 
 const CourseDetail = () => {
   const { id } = useParams();
@@ -20,7 +19,7 @@ const CourseDetail = () => {
       try {
         const [courseRes, enrollRes] = await Promise.all([
           api.get(`/courses/${id}`),
-          api.get('/my-courses')
+          api.get('/my-courses').catch(() => ({ data: [] }))
         ]);
         setCourse(courseRes.data);
         const enrolled = enrollRes.data.some(e => e.course?._id === id);
@@ -33,18 +32,6 @@ const CourseDetail = () => {
     };
     fetchData();
   }, [id]);
-
-  useEffect(() => {
-    if (!loading) {
-      gsap.from('.course-reveal', {
-        opacity: 0,
-        y: 50,
-        duration: 1,
-        stagger: 0.2,
-        ease: 'power3.out'
-      });
-    }
-  }, [loading]);
 
   const handleEnroll = async () => {
     const user = authService.getCurrentUser();
@@ -62,73 +49,83 @@ const CourseDetail = () => {
     }
   };
 
-  if (loading) return <div style={styles.loading}><Navbar />Loading Details...<Footer /></div>;
-  if (!course) return <div style={styles.error}><Navbar />Course Not Found<Footer /></div>;
+  if (loading) return <div className="edu-page"><Navbar /><div className="edu-page-content" style={{textAlign:'center', padding:'100px'}}>Loading Details...</div><Footer /></div>;
+  if (!course) return <div className="edu-page"><Navbar /><div className="edu-page-content" style={{textAlign:'center', padding:'100px'}}>Course Not Found</div><Footer /></div>;
 
   return (
-    <div style={styles.container}>
+    <div className="edu-page">
       <Navbar />
-      <main style={styles.main}>
-        <div style={styles.detailGrid}>
+      <div className="edu-page-content">
+        <div className="edu-detail-grid">
           
-          <div className="course-reveal" style={styles.infoSection}>
-            <div style={styles.badge}>{course.category}</div>
-            <h1 style={styles.title}>{course.title}</h1>
-            <p style={styles.instructor}>Created by <span style={{ color: 'var(--accent)', fontWeight: 'bold' }}>NexLearn Elite Instructor</span></p>
+          <div className="edu-detail-main">
+            <span className="edu-tag edu-tag-blue d-badge">{course.category}</span>
+            <h1>{course.title}</h1>
+            <p className="d-instructor">Curated by <span style={{ color: '#2D5BE3', fontWeight: 'bold' }}>NexLearn Faculty</span> · Protocol Updated March 2026</p>
             
-            <div style={styles.descriptionSection}>
-              <h3 style={{ marginBottom: '20px' }}>What you'll learn</h3>
-              <p style={styles.text}>{course.description}</p>
+            <div className="d-desc">
+              <h3>What you'll learn</h3>
+              <p>{course.description}</p>
+              
+              <div className="edu-grid-2" style={{marginTop: '32px'}}>
+                <div style={{display: 'flex', gap: '12px'}}>
+                  <span style={{fontSize: '20px'}}>✅</span>
+                  <div>
+                    <h5 style={{fontSize: '14px', marginBottom: '4px'}}>Industry Standard Skills</h5>
+                    <p style={{fontSize: '12px', color: '#6B6962'}}>Get hands-on experience with the latest technologies.</p>
+                  </div>
+                </div>
+                <div style={{display: 'flex', gap: '12px'}}>
+                  <span style={{fontSize: '20px'}}>✅</span>
+                  <div>
+                    <h5 style={{fontSize: '14px', marginBottom: '4px'}}>Project-Based Learning</h5>
+                    <p style={{fontSize: '12px', color: '#6B6962'}}>Build real-world applications for your portfolio.</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="course-reveal" style={styles.sidebar}>
-            <div style={styles.priceCard}>
-              <h2 style={styles.price}>{isEnrolled ? 'Enrolled' : `$${course.price}`}</h2>
+          <div className="edu-detail-sidebar">
+            <div className="edu-detail-price-card">
+              <h2>{isEnrolled ? 'Enrolled' : course.price === 0 ? 'FREE' : `$${course.price}`}</h2>
               
               {isEnrolled ? (
-                <PlayfulButton onClick={() => navigate(`/course/${course._id}/lesson`)}>
+                <button 
+                  className="edu-auth-btn" 
+                  onClick={() => navigate(`/course/${course._id}/lesson`)}
+                >
                   Start Learning
-                </PlayfulButton>
+                </button>
               ) : (
-                <div onClick={handleEnroll} style={{ width: '100%', cursor: 'pointer' }}>
-                  <PlayfulButton disabled={enrolling}>
-                    {enrolling ? 'Enrolling...' : 'Enroll Now'}
-                  </PlayfulButton>
-                </div>
+                <button 
+                  className="edu-auth-btn" 
+                  disabled={enrolling}
+                  onClick={handleEnroll}
+                >
+                  {enrolling ? 'Enrolling...' : 'Enroll Now'}
+                </button>
               )}
 
-              <ul style={styles.featuresList}>
-                <li>🎬 High Quality Videos</li>
-                <li>🏅 Digital Certificate</li>
-                <li>📱 Access on any device</li>
-                <li>💬 Expert Discord Community</li>
+              <ul>
+                <li>🎬 {course.lessons?.length || 0} Video Lessons</li>
+                <li>🏅 Digital Certificate on Completion</li>
+                <li>📱 Access on mobile and desktop</li>
+                <li>💬 Private Discord Community</li>
+                <li>♾️ Lifetime Access to Materials</li>
               </ul>
+              
+              <div style={{marginTop: '24px', paddingTop: '20px', borderTop: '1px solid #E2E0D8'}}>
+                <p style={{fontSize: '11px', color: '#9B9890'}}>30-Day Money-Back Guarantee</p>
+              </div>
             </div>
           </div>
 
         </div>
-      </main>
+      </div>
       <Footer />
     </div>
   );
-};
-
-const styles = {
-  container: { backgroundColor: 'var(--bg)', color: 'var(--text)', minHeight: '100vh', display: 'flex', flexDirection: 'column' },
-  loading: { height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text)' },
-  error: { height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' },
-  main: { marginTop: '80px', flex: 1, maxWidth: '1200px', margin: '80px auto 0 auto', padding: '60px 20px', width: '100%' },
-  detailGrid: { display: 'grid', gridTemplateColumns: '1fr 380px', gap: '60px', alignItems: 'start' },
-  badge: { display: 'inline-block', padding: '6px 16px', backgroundColor: 'var(--badgeBg)', color: 'var(--badgeText)', borderRadius: '100px', fontSize: '0.9rem', fontWeight: '700', marginBottom: '20px' },
-  title: { fontSize: '3.5rem', fontWeight: '800', lineHeight: '1.2', marginBottom: '20px' },
-  instructor: { fontSize: '1.1rem', color: 'var(--textSecondary)', marginBottom: '40px' },
-  descriptionSection: { padding: '40px', backgroundColor: 'var(--cardBg)', borderRadius: '24px', border: '1px solid var(--cardBorder)', boxShadow: 'var(--cardShadow)' },
-  text: { fontSize: '1.15rem', lineHeight: '1.8', color: 'var(--textSecondary)' },
-  sidebar: { position: 'sticky', top: '120px' },
-  priceCard: { backgroundColor: 'var(--cardBg)', padding: '40px', borderRadius: '30px', border: '1px solid var(--cardBorder)', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)', textAlign: 'center' },
-  price: { fontSize: '3rem', fontWeight: '800', marginBottom: '30px' },
-  featuresList: { listStyle: 'none', padding: 0, marginTop: '30px', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: '15px', color: 'var(--textSecondary)', fontSize: '0.95rem' }
 };
 
 export default CourseDetail;

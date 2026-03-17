@@ -1,259 +1,119 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import PlayfulButton from '../../components/PlayfulButton';
 import authService from '../../services/authService';
 import gsap from 'gsap';
+import '../../styles/EduFlow.css';
 
 const Register = () => {
-  const cardRef = useRef(null);
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    age: '',
-    role: 'student'
-  });
+  const [formData, setFormData] = useState({ name: '', email: '', password: '', confirmPassword: '', age: '', role: 'student' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!cardRef.current) return;
-    gsap.from(cardRef.current, {
-      scale: 0.8,
-      opacity: 0,
-      duration: 1.2,
-      ease: "elastic.out(1, 0.5)"
-    });
+    gsap.from('.edu-auth-left', { x: -100, opacity: 0, duration: 1, ease: 'power4.out' });
+    gsap.from('.edu-auth-card', { x: 100, opacity: 0, duration: 1, delay: 0.2, ease: 'power4.out' });
+    gsap.from('.edu-auth-stat', { y: 20, opacity: 0, stagger: 0.1, duration: 0.8, delay: 0.5 });
   }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-
-    // Validation
-    if (formData.name.length < 4) {
-      return setError('Name must be at least 4 characters long');
-    }
-
-    if (parseInt(formData.age) < 16) {
-      return setError('Age must be at least 16');
-    }
-
-    if (formData.password.length < 8) {
-      return setError('Password must be at least 8 characters long');
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      return setError('Passwords do not match');
-    }
+    if (formData.name.length < 4) return setError('Name must be at least 4 characters long');
+    if (parseInt(formData.age) < 16) return setError('Age must be at least 16');
+    if (formData.password.length < 8) return setError('Password must be at least 8 characters long');
+    if (formData.password !== formData.confirmPassword) return setError('Passwords do not match');
 
     setLoading(true);
-
     try {
       const { confirmPassword, ...registerData } = formData;
-      console.log('Sending register data to server:', registerData);
-      const res = await authService.register(registerData);
-      console.log('Registration success response:', res);
-      
+      await authService.register(registerData);
       alert('Registration Successful! Please check your email for the OTP.');
-      navigate('/verify-otp', { state: { email: formData.email } }); // Redirect to OTP verification
+      navigate('/verify-otp', { state: { email: formData.email } });
     } catch (err) {
-      console.error('Registration error on frontend:', err);
-      // Handle backend validation error message
-      const errorMsg = err.message || (typeof err === 'string' ? err : 'Registration failed. Please try again.');
-      setError(errorMsg);
+      setError(err.message || (typeof err === 'string' ? err : 'Registration failed.'));
     } finally {
       setLoading(false);
     }
-
   };
 
   return (
-    <div style={styles.container}>
-      <div ref={cardRef} style={styles.card} className="mobile-full-width">
-        <div style={styles.glassEffect}></div>
-        <div style={styles.content}>
-          <h2 style={styles.heading}>Create Account</h2>
-          <p style={styles.subtext}>Join NexLearn and start your journey today</p>
-          
-          {error && <div style={styles.error}>{error}</div>}
-          
-          <form style={styles.form} onSubmit={handleSubmit}>
-            <div style={styles.inputGroup}>
-              <input 
-                type="text" 
-                placeholder="Full Name" 
-                style={styles.input} 
-                value={formData.name}
-                onChange={(e) => setFormData({...formData, name: e.target.value})}
-                required
-              />
+    <div className="edu-auth-page">
+      <div className="edu-auth-left">
+        <div className="edu-auth-brand">
+          <div className="edu-auth-brand-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          </div>
+           <h1>NexLearn</h1>
+          <p>Join the elite collective of creators architecting the digital future.</p>
+        </div>
+        <div className="edu-auth-stats">
+          <div className="edu-auth-stat">
+            <div className="edu-auth-stat-num">150+</div>
+            <div className="edu-auth-stat-label">Courses</div>
+          </div>
+          <div className="edu-auth-stat">
+            <div className="edu-auth-stat-num">10K+</div>
+            <div className="edu-auth-stat-label">Students</div>
+          </div>
+          <div className="edu-auth-stat">
+            <div className="edu-auth-stat-num">24/7</div>
+            <div className="edu-auth-stat-label">Support</div>
+          </div>
+        </div>
+      </div>
+
+      <div className="edu-auth-right">
+        <div className="edu-auth-card">
+           <h2>Initialize Journey</h2>
+          <p className="edu-auth-sub">Enter the NexLearn ecosystem and accelerate your growth</p>
+
+          {error && <div className="edu-auth-error">{error}</div>}
+
+          <form className="edu-auth-form" onSubmit={handleSubmit}>
+            <div>
+              <label className="edu-auth-label">Full Name</label>
+              <input type="text" className="edu-auth-input" placeholder="John Doe" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} required />
             </div>
-            <div style={styles.inputGroup}>
-              <input 
-                type="email" 
-                placeholder="Email Address" 
-                style={styles.input} 
-                value={formData.email}
-                onChange={(e) => setFormData({...formData, email: e.target.value})}
-                required
-              />
+            <div>
+              <label className="edu-auth-label">Email Address</label>
+              <input type="email" className="edu-auth-input" placeholder="you@example.com" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} required />
             </div>
-            <div style={styles.row}>
-              <div style={{...styles.inputGroup, flex: 1}}>
-                <input 
-                  type="number" 
-                  placeholder="Age" 
-                  style={styles.input} 
-                  value={formData.age}
-                  onChange={(e) => setFormData({...formData, age: e.target.value})}
-                  required
-                />
+            <div className="edu-auth-row">
+              <div>
+                <label className="edu-auth-label">Age</label>
+                <input type="number" className="edu-auth-input" placeholder="18" value={formData.age} onChange={(e) => setFormData({...formData, age: e.target.value})} required />
               </div>
-              <div style={{...styles.inputGroup, flex: 1}}>
-                <select 
-                  style={styles.input} 
-                  value={formData.role}
-                  onChange={(e) => setFormData({...formData, role: e.target.value})}
-                  required
-                >
-                  <option value="student">I am a Student</option>
-                  <option value="instructor">I am a Teacher</option>
+              <div>
+                <label className="edu-auth-label">I am a</label>
+                <select className="edu-auth-input" value={formData.role} onChange={(e) => setFormData({...formData, role: e.target.value})}>
+                  <option value="student">Student</option>
+                  <option value="instructor">Teacher</option>
                 </select>
               </div>
             </div>
-            <div style={styles.inputGroup}>
-              <input 
-                type="password" 
-                placeholder="Password" 
-                style={styles.input} 
-                value={formData.password}
-                onChange={(e) => setFormData({...formData, password: e.target.value})}
-                required
-              />
+            <div>
+              <label className="edu-auth-label">Password</label>
+              <input type="password" className="edu-auth-input" placeholder="Min 8 characters" value={formData.password} onChange={(e) => setFormData({...formData, password: e.target.value})} required />
             </div>
-            <div style={styles.inputGroup}>
-              <input 
-                type="password" 
-                placeholder="Confirm Password" 
-                style={styles.input} 
-                value={formData.confirmPassword}
-                onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
-                required
-              />
+            <div>
+              <label className="edu-auth-label">Confirm Password</label>
+              <input type="password" className="edu-auth-input" placeholder="Re-enter password" value={formData.confirmPassword} onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})} required />
             </div>
-            <PlayfulButton type="submit" className="w-100 mt-3" disabled={loading}>
+            <button type="submit" className="edu-auth-btn" disabled={loading}>
               {loading ? 'Creating Account...' : 'Sign Up'}
-            </PlayfulButton>
+            </button>
           </form>
-          <div style={styles.footer}>
-            <p style={{ color: '#475569', fontSize: '0.9rem' }}>
-              Already have an account? <Link to="/login" style={styles.link}>Login</Link>
-            </p>
-            <Link to="/" style={styles.backLink}>← Back to Home</Link>
+
+          <div className="edu-auth-footer">
+            Already have an account? <Link to="/login">Login</Link>
+            <br/>
+            <Link to="/" style={{color:'#9B9890', fontSize:'12px', marginTop:'12px', display:'inline-block'}}>← Back to Home</Link>
           </div>
         </div>
       </div>
     </div>
   );
-};
-
-const styles = {
-  container: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '100vh',
-    background: 'linear-gradient(135deg, #e0e7ff 0%, #f1f5f9 100%)',
-    fontFamily: '"Outfit", sans-serif'
-  },
-  card: {
-    position: 'relative',
-    width: '100%',
-    maxWidth: '500px',
-    borderRadius: '24px',
-    overflow: 'hidden',
-    boxShadow: '0 20px 40px -15px rgba(0, 0, 0, 0.1)',
-    backgroundColor: '#fff'
-  },
-  glassEffect: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    background: 'rgba(255, 255, 255, 0.7)',
-    backdropFilter: 'blur(10px)',
-    border: '1px solid rgba(0, 0, 0, 0.05)',
-    zIndex: 1
-  },
-  content: {
-    position: 'relative',
-    zIndex: 2,
-    padding: '40px 50px',
-    textAlign: 'center'
-  },
-  heading: {
-    fontSize: '2.5rem',
-    fontWeight: '700',
-    color: '#0f172a',
-    marginBottom: '10px'
-  },
-  subtext: {
-    color: '#475569',
-    marginBottom: '30px',
-    fontSize: '0.95rem'
-  },
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '15px'
-  },
-  inputGroup: {
-    position: 'relative'
-  },
-  input: {
-    width: '100%',
-    padding: '14px 20px',
-    background: '#f8fafc',
-    border: '1px solid #e2e8f0',
-    borderRadius: '10px',
-    color: '#0f172a',
-    fontSize: '0.95rem',
-    outline: 'none',
-    transition: 'all 0.3s ease'
-  },
-  error: {
-    backgroundColor: '#fee2e2',
-    color: '#b91c1c',
-    padding: '12px',
-    borderRadius: '10px',
-    marginBottom: '20px',
-    fontSize: '0.9rem',
-    border: '1px solid #fecaca'
-  },
-  footer: {
-    marginTop: '25px'
-  },
-  link: {
-    color: '#4f46e5',
-    textDecoration: 'none',
-    fontWeight: '600',
-    marginLeft: '5px'
-  },
-  backLink: {
-    display: 'block',
-    marginTop: '15px',
-    color: '#64748b',
-    textDecoration: 'none',
-    fontSize: '0.85rem'
-  },
-  row: {
-    display: 'flex',
-    gap: '15px'
-  }
 };
 
 export default Register;

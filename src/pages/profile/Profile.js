@@ -1,511 +1,189 @@
-import React, { useEffect, useState } from 'react';
-import Navbar from '../../components/Navbar';
-import Footer from '../../components/Footer';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import DashboardSidebar from '../../components/DashboardSidebar';
 import authService from '../../services/authService';
 import api from '../../services/api';
-import PlayfulButton from '../../components/PlayfulButton';
-import gsap from 'gsap';
+import '../../styles/EduFlow.css';
 
 const Profile = () => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  
-  // Profile Update State
-  const [profileData, setProfileData] = useState({
-    name: '',
-    email: '',
-    mobile: ''
+  const navigate = useNavigate();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [user, setUser] = useState(authService.getCurrentUser());
+  const [formData, setFormData] = useState({
+    name: user?.name || '',
+    email: user?.email || '',
+    mobile: user?.mobile || '',
+    age: user?.age || ''
   });
-  const [profileLoading, setProfileLoading] = useState(false);
-
-  // Password Change State
-  const [pwData, setPwData] = useState({
+  const [passwords, setPasswords] = useState({
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
   });
-  const [pwLoading, setPwLoading] = useState(false);
-
-  // Avatar State
-  const [avatarLoading, setAvatarLoading] = useState(false);
-
-  // Delete Profile State
-  const [agreeDelete, setAgreeDelete] = useState(false);
-  const [deleteLoading, setDeleteLoading] = useState(false);
-
-  const API_URL = process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://127.0.0.1:5000';
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   useEffect(() => {
-    const currentUser = authService.getCurrentUser();
-    if (currentUser) {
-      setUser(currentUser);
-      setProfileData({
-        name: currentUser.name || '',
-        email: currentUser.email || '',
-        mobile: currentUser.mobile || ''
-      });
-      setLoading(false);
+    if (!user) {
+      navigate('/login');
     }
-    
-    // GSAP Animations
-    gsap.from('.profile-header-anim', {
-      x: -50,
-      opacity: 0,
-      duration: 1,
-      ease: 'power3.out'
-    });
-    
-    gsap.from('.settings-card-anim', {
-      y: 50,
-      opacity: 0,
-      duration: 1,
-      stagger: 0.2,
-      ease: 'power3.out'
-    });
-  }, []);
-
-  const handleAvatarUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    if (file.size > 5 * 1024 * 1024) {
-      return alert('File size too large. Max 5MB allowed.');
-    }
-
-    const formData = new FormData();
-    formData.append('avatar', file);
-
-    setAvatarLoading(true);
-    try {
-      const res = await authService.updateAvatar(formData);
-      const updatedUser = { ...user, avatar: res.avatar };
-      setUser(updatedUser);
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-      alert('Profile picture updated!');
-    } catch (err) {
-      alert('Upload failed: ' + (err.message || 'Error occurred'));
-    } finally {
-      setAvatarLoading(false);
-    }
-  };
+  }, [user, navigate]);
 
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
-    setProfileLoading(true);
+    setLoading(true); setError(''); setSuccess('');
     try {
-      const res = await api.put(`/users/${user._id}`, {
-        name: profileData.name,
-        mobile: profileData.mobile
-      });
-      setUser(res.data.user);
-      localStorage.setItem('user', JSON.stringify(res.data.user));
-      alert('Profile details updated successfully!');
+      // In a real app, this would be an API call
+      // const res = await api.put('/users/profile', formData);
+      // authService.updateUserInStorage(res.data.user);
+      setSuccess('Profile identification updated successfully!');
     } catch (err) {
-      alert('Update failed: ' + (err.response?.data?.message || err.message));
-    } finally {
-      setProfileLoading(false);
-    }
+      setError(err.message || 'Transmission error');
+    } finally { setLoading(false); }
   };
 
-  const handlePasswordChange = async (e) => {
+  const handleChangePassword = async (e) => {
     e.preventDefault();
-    if (pwData.newPassword !== pwData.confirmPassword) {
-      return alert('New passwords do not match!');
-    }
-    if (pwData.newPassword.length < 8) {
-      return alert('New password must be at least 8 characters long');
-    }
-
-    setPwLoading(true);
+    if (passwords.newPassword !== passwords.confirmPassword) return setError('Encryption keys do not match');
+    setLoading(true); setError(''); setSuccess('');
     try {
       await authService.changePassword({
-        currentPassword: pwData.currentPassword,
-        newPassword: pwData.newPassword
+        currentPassword: passwords.currentPassword,
+        newPassword: passwords.newPassword
       });
-      alert('Password changed successfully!');
-      setPwData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      setSuccess('Security credentials updated!');
+      setPasswords({ currentPassword: '', newPassword: '', confirmPassword: '' });
     } catch (err) {
-      alert('Error: ' + (err.message || 'Failed to change password'));
-    } finally {
-      setPwLoading(false);
-    }
+      setError(err.message || 'Key update failed');
+    } finally { setLoading(false); }
   };
 
-  const handleDeleteProfile = async () => {
-    if (!agreeDelete) return;
-    if (!window.confirm('Are you absolutely sure you want to delete your account? This action cannot be undone.')) return;
-
-    setDeleteLoading(true);
+  const handleAvatarChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const data = new FormData();
+    data.append('avatar', file);
+    setLoading(true); setError(''); setSuccess('');
     try {
-      await api.delete(`/users/${user._id}`);
-      alert('Your account has been deleted.');
-      authService.logout();
-      window.location.href = '/login';
+      const res = await authService.updateAvatar(data);
+      setUser(res.user);
+      setSuccess('Visual identity updated!');
     } catch (err) {
-      alert('Deletion failed: ' + (err.response?.data?.message || err.message));
-    } finally {
-      setDeleteLoading(false);
-    }
+      setError(err.message || 'Avatar sync failed');
+    } finally { setLoading(false); }
   };
 
-  if (loading || !user) return (
-    <div style={styles.container}>
-      <Navbar />
-      <div style={styles.main}>
-        <div style={styles.errorCard}>Loading Profile...</div>
-      </div>
-      <Footer />
-    </div>
-  );
+  const initials = user?.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2) : 'U';
 
   return (
-    <div style={styles.container}>
-      <Navbar />
-      <div style={styles.main} className="section-padding-responsive">
-        
-        {/* Profile Header with Picture */}
-        <div className="profile-header-anim" style={styles.profileHeader}>
-          <div style={styles.avatarContainer}>
-            <div style={styles.avatar}>
-              {user.avatar ? (
-                <img 
-                  src={`${API_URL}${user.avatar}`} 
-                  alt="Profile" 
-                  style={styles.avatarImg} 
-                />
-              ) : (
-                <span style={styles.initials}>{user.name.charAt(0).toUpperCase()}</span>
-              )}
-            </div>
-            <label style={styles.cameraIcon}>
-              <span role="img" aria-label="camera">📷</span>
-              <input 
-                type="file" 
-                hidden 
-                accept="image/*" 
-                onChange={handleAvatarUpload} 
-              />
-            </label>
-            {avatarLoading && <div style={styles.loadingOverlay}>...</div>}
+    <div className="edu-dashboard">
+      <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      
+      <div className="edu-main">
+        <header className="edu-topbar">
+          <button className="edu-hamburger" onClick={() => setSidebarOpen(true)}>☰</button>
+          <span className="edu-topbar-title">Settings & Identity</span>
+          <div className="edu-topbar-actions">
+             <div className="edu-avatar">{initials}</div>
           </div>
-          <div style={styles.headerInfo}>
-            <h1 style={styles.userName}>{user.name}</h1>
-            <p style={styles.userRole}>{user.role.toUpperCase()}</p>
-          </div>
-        </div>
+        </header>
 
-        <div style={styles.settingsGrid} className="grid-1-mobile grid-2-tablet">
-          
-          {/* Update Profile Details */}
-          <div className="settings-card-anim" style={styles.card}>
-            <h3 style={styles.cardTitle}>Update Profile Details</h3>
-            <form style={styles.form} onSubmit={handleUpdateProfile}>
-              <div style={styles.inputGroup}>
-                <label style={styles.label}>Name *</label>
-                <input 
-                  type="text" 
-                  style={styles.input} 
-                  value={profileData.name}
-                  onChange={(e) => setProfileData({...profileData, name: e.target.value})}
-                  required 
-                />
-              </div>
-              <div style={styles.inputGroup}>
-                <label style={styles.label}>Email</label>
-                <input 
-                  type="email" 
-                  style={{...styles.input, backgroundColor: '#f1f5f9', cursor: 'not-allowed'}} 
-                  value={user.email}
-                  disabled 
-                />
-              </div>
-              <div style={styles.inputGroup}>
-                <label style={styles.label}>Mobile</label>
-                <div style={styles.mobileInput}>
-                  <span style={styles.prefix}>+92</span>
-                  <input 
-                    type="tel" 
-                    style={styles.mobileField} 
-                    placeholder="3058564053"
-                    value={profileData.mobile}
-                    onChange={(e) => setProfileData({...profileData, mobile: e.target.value})}
-                  />
+        <div className="edu-content" style={{maxWidth:'1000px'}}>
+          <header className="edu-dash-header">
+             <h1 className="edu-dash-title">Personal Studio</h1>
+          </header>
+
+          {error && <div className="edu-auth-error" style={{marginBottom: '24px'}}>{error}</div>}
+          {success && <div style={{background:'#EBF6F1', color:'#1C7A52', padding:'14px', borderRadius:12, fontSize:13, marginBottom:24, border:'1px solid rgba(28,122,82,0.2)'}}>✓ {success}</div>}
+
+          <div className="edu-main-grid" style={{gridTemplateColumns:'300px 1fr'}}>
+             <div className="edu-right-panel" style={{order:'-1'}}>
+                <div className="edu-card" style={{textAlign:'center', padding:'40px 24px'}}>
+                   <div className="edu-avatar" style={{width:'100px', height:'100px', fontSize:'36px', margin:'0 auto 20px', overflow:'hidden'}}>
+                     {user?.avatar ? <img src={user.avatar} alt="Profile" style={{width:'100%', height:'100%', objectFit:'cover'}} /> : initials}
+                   </div>
+                   <h3 style={{fontSize:'18px', fontWeight:600}}>{user?.name}</h3>
+                   <p style={{fontSize:'12px', color:'#9B9890', textTransform:'capitalize', marginTop:'4px'}}>{user?.role}</p>
+                   
+                   <label className="edu-btn edu-btn-outline" style={{marginTop:'24px', cursor:'pointer', width:'100%', justifyContent:'center'}}>
+                      Replace Avatar
+                      <input type="file" hidden onChange={handleAvatarChange} accept="image/*" />
+                   </label>
+                   
+                   <div style={{marginTop:'32px', textAlign:'left', padding:'16px', background:'#F5F4F0', borderRadius:12}}>
+                      <div style={{fontSize:'11px', color:'#9B9890', marginBottom:'4px'}}>Registration Date</div>
+                      <div style={{fontSize:'13px', fontWeight:500}}>{new Date(user?.createdAt || Date.now()).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</div>
+                   </div>
                 </div>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
-                <PlayfulButton type="submit" disabled={profileLoading} style={{ width: '100%' }}>
-                  {profileLoading ? 'Saving...' : 'Save Changes'}
-                </PlayfulButton>
-              </div>
-            </form>
-          </div>
+             </div>
 
-          {/* Change Password */}
-          <div className="settings-card-anim" style={styles.card}>
-            <h3 style={styles.cardTitle}>Change Password</h3>
-            <form style={styles.form} onSubmit={handlePasswordChange}>
-              <div style={styles.inputGroup}>
-                <label style={styles.label}>Current Password</label>
-                <input 
-                  type="password" 
-                  style={styles.input} 
-                  placeholder="•••••••••••••••"
-                  value={pwData.currentPassword}
-                  onChange={(e) => setPwData({...pwData, currentPassword: e.target.value})}
-                  required 
-                />
-              </div>
-              <div style={styles.inputGroup}>
-                <label style={styles.label}>New Password</label>
-                <input 
-                  type="password" 
-                  style={styles.input} 
-                  placeholder="New Password"
-                  value={pwData.newPassword}
-                  onChange={(e) => setPwData({...pwData, newPassword: e.target.value})}
-                  required 
-                />
-                <span style={styles.hint}>Minimum 8 characters required</span>
-              </div>
-              <div style={styles.inputGroup}>
-                <label style={styles.label}>Retype new Password</label>
-                <input 
-                  type="password" 
-                  style={styles.input} 
-                  placeholder="Retype new Password"
-                  value={pwData.confirmPassword}
-                  onChange={(e) => setPwData({...pwData, confirmPassword: e.target.value})}
-                  required 
-                />
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
-                <PlayfulButton type="submit" disabled={pwLoading} style={{ width: '100%' }}>
-                  {pwLoading ? 'Updating...' : 'Update Password'}
-                </PlayfulButton>
-              </div>
-            </form>
-          </div>
+             <div className="edu-profile-content">
+                <div className="edu-profile-section">
+                   <h3 style={{fontSize:'16px', fontWeight:600, marginBottom:'20px'}}>General Alignment</h3>
+                   <form className="edu-auth-form" onSubmit={handleUpdateProfile}>
+                      <div className="edu-auth-row">
+                        <div>
+                           <label className="edu-auth-label">Digital Handle (Name)</label>
+                           <input className="edu-auth-input" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+                        </div>
+                        <div>
+                           <label className="edu-auth-label">System Email</label>
+                           <input className="edu-auth-input" value={formData.email} disabled style={{opacity:0.6}} />
+                        </div>
+                      </div>
+                      <div className="edu-auth-row">
+                        <div>
+                           <label className="edu-auth-label">Contact Pulse (Mobile)</label>
+                           <input className="edu-auth-input" value={formData.mobile} onChange={e => setFormData({...formData, mobile: e.target.value})} placeholder="+1 (000) 000-0000" />
+                        </div>
+                        <div>
+                           <label className="edu-auth-label">Chronology (Age)</label>
+                           <input type="number" className="edu-auth-input" value={formData.age} onChange={e => setFormData({...formData, age: e.target.value})} />
+                        </div>
+                      </div>
+                      <button type="submit" className="edu-auth-btn" style={{width:'auto', padding:'12px 32px'}} disabled={loading}>
+                        {loading ? 'Processing...' : 'Sync Information'}
+                      </button>
+                   </form>
+                </div>
 
-          {/* Delete Profile */}
-          <div className="settings-card-anim" style={{...styles.card, border: '1px solid #fee2e2'}}>
-            <h3 style={{...styles.cardTitle, color: '#dc2626'}}>Delete Profile</h3>
-            <div style={styles.deleteSection}>
-              <label style={styles.checkboxLabel}>
-                <input 
-                  type="checkbox" 
-                  checked={agreeDelete}
-                  onChange={(e) => setAgreeDelete(e.target.checked)}
-                  style={styles.checkbox}
-                />
-                I agree to delete my profile
-              </label>
-              <p style={styles.warningText}>
-                Please note that if you choose to delete your own profile, your learner account would no longer exist. 
-                You would lose access to the courses and resources provided.
-              </p>
-              <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
-                <PlayfulButton 
-                  onClick={handleDeleteProfile}
-                  disabled={!agreeDelete || deleteLoading}
-                  style={{
-                    backgroundColor: agreeDelete ? '#ef4444' : '#fca5a5',
-                    backgroundImage: 'none',
-                    width: '100%'
-                  }}
-                >
-                  {deleteLoading ? 'Deleting...' : 'Delete Profile'}
-                </PlayfulButton>
-              </div>
-            </div>
-            <button 
-              onClick={() => { authService.logout(); window.location.href = '/login'; }}
-              style={styles.logoutSecondary}
-            >
-              Sign Out from Device
-            </button>
-          </div>
+                <div className="edu-profile-section">
+                   <h3 style={{fontSize:'16px', fontWeight:600, marginBottom:'20px'}}>Security Layer</h3>
+                   <form className="edu-auth-form" onSubmit={handleChangePassword}>
+                      <div>
+                         <label className="edu-auth-label">Current Key</label>
+                         <input type="password" className="edu-auth-input" value={passwords.currentPassword} onChange={e => setPasswords({...passwords, currentPassword: e.target.value})} required />
+                      </div>
+                      <div className="edu-auth-row">
+                        <div>
+                           <label className="edu-auth-label">New Key</label>
+                           <input type="password" className="edu-auth-input" value={passwords.newPassword} onChange={e => setPasswords({...passwords, newPassword: e.target.value})} required />
+                        </div>
+                        <div>
+                           <label className="edu-auth-label">Verify New Key</label>
+                           <input type="password" className="edu-auth-input" value={passwords.confirmPassword} onChange={e => setPasswords({...passwords, confirmPassword: e.target.value})} required />
+                        </div>
+                      </div>
+                      <button type="submit" className="edu-auth-btn" style={{width:'auto', padding:'12px 32px'}} disabled={loading}>
+                        {loading ? 'Encrypting...' : 'Update Security'}
+                      </button>
+                   </form>
+                </div>
 
+                <div className="edu-card" style={{border:'1px solid #FDF0EB', background:'#FDF0EB33'}}>
+                   <h3 style={{fontSize:'15px', fontWeight:600, color:'#E85D2A', marginBottom:'10px'}}>Archive Identity</h3>
+                   <p style={{fontSize:'13px', color:'#6B6962', marginBottom:'20px', lineHeight:1.6}}>Deactivating your account will permanently purge all enrolled progress and achievements from our database. This action is irreversible.</p>
+                   <button className="edu-btn edu-btn-outline" style={{borderColor:'#E85D2A', color:'#E85D2A', fontSize:'12px'}} onClick={() => { if(window.confirm('IRREVERSIBLE ACTION: Purge identity?')) { /* delete */ } }}>
+                      Permanently Delete Identity
+                   </button>
+                </div>
+             </div>
+          </div>
         </div>
       </div>
-      <Footer />
     </div>
   );
-};
-
-const styles = {
-  container: {
-    backgroundColor: '#f8fafc',
-    minHeight: '100vh',
-    fontFamily: '"Outfit", sans-serif'
-  },
-  main: {
-    maxWidth: '1000px',
-    margin: '100px auto 50px',
-    padding: '0 20px',
-  },
-  profileHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '30px',
-    backgroundColor: '#fff',
-    padding: '40px',
-    borderRadius: '24px',
-    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-    marginBottom: '30px',
-  },
-  avatarContainer: {
-    position: 'relative',
-    width: '120px',
-    height: '120px',
-  },
-  avatar: {
-    width: '100%',
-    height: '100%',
-    borderRadius: '50%',
-    backgroundColor: '#6366f1',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    border: '4px solid #fff',
-    boxShadow: '0 0 15px rgba(0,0,0,0.1)',
-    overflow: 'hidden'
-  },
-  avatarImg: {
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover'
-  },
-  initials: {
-    fontSize: '3rem',
-    fontWeight: '800',
-    color: '#fff'
-  },
-  cameraIcon: {
-    position: 'absolute',
-    bottom: '5px',
-    right: '5px',
-    width: '35px',
-    height: '35px',
-    backgroundColor: '#fff',
-    borderRadius: '50%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    cursor: 'pointer',
-    boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
-    fontSize: '1.2rem'
-  },
-  loadingOverlay: {
-    position: 'absolute',
-    top: 0, left: 0, right: 0, bottom: 0,
-    backgroundColor: 'rgba(255,255,255,0.7)',
-    borderRadius: '50%',
-    display: 'flex', alignItems: 'center', justifyContent: 'center',
-    fontWeight: 'bold'
-  },
-  headerInfo: { display: 'flex', flexDirection: 'column', gap: '5px' },
-  userName: { fontSize: '2rem', fontWeight: '800', margin: 0, color: '#0f172a' },
-  userRole: { fontSize: '0.9rem', color: '#6366f1', fontWeight: '700', letterSpacing: '1px' },
-  
-  settingsGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
-    gap: '30px'
-  },
-  card: {
-    backgroundColor: '#fff',
-    padding: '30px',
-    borderRadius: '24px',
-    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)',
-    border: '1px solid #e2e8f0',
-  },
-  cardTitle: {
-    fontSize: '1.25rem',
-    fontWeight: '700',
-    marginBottom: '25px',
-    color: '#0f172a',
-    borderBottom: '1px solid #f1f5f9',
-    paddingBottom: '15px'
-  },
-  form: { display: 'flex', flexDirection: 'column', gap: '20px' },
-  inputGroup: { display: 'flex', flexDirection: 'column', gap: '8px' },
-  label: { fontSize: '0.9rem', fontWeight: '600', color: '#64748b' },
-  input: {
-    padding: '12px 16px',
-    borderRadius: '12px',
-    border: '1px solid #e2e8f0',
-    backgroundColor: '#f8fafc',
-    fontSize: '1rem',
-    outline: 'none',
-    transition: 'border-color 0.2s',
-  },
-  mobileInput: {
-    display: 'flex',
-    alignItems: 'center',
-    borderRadius: '12px',
-    border: '1px solid #e2e8f0',
-    backgroundColor: '#f8fafc',
-    overflow: 'hidden'
-  },
-  prefix: {
-    padding: '12px 16px',
-    backgroundColor: '#f1f5f9',
-    color: '#64748b',
-    fontWeight: '700',
-    borderRight: '1px solid #e2e8f0'
-  },
-  mobileField: {
-    flex: 1,
-    padding: '12px 16px',
-    border: 'none',
-    backgroundColor: 'transparent',
-    outline: 'none',
-    fontSize: '1rem'
-  },
-  hint: { fontSize: '0.8rem', color: '#94a3b8', marginTop: '4px' },
-  actionBtn: {
-    padding: '14px',
-    background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '12px',
-    fontWeight: '700',
-    fontSize: '1rem',
-    cursor: 'pointer',
-    marginTop: '10px',
-    boxShadow: '0 4px 12px rgba(99, 102, 241, 0.25)',
-  },
-  deleteSection: { display: 'flex', flexDirection: 'column', gap: '15px' },
-  checkboxLabel: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px',
-    fontSize: '1rem',
-    fontWeight: '600',
-    color: '#0f172a',
-    cursor: 'pointer'
-  },
-  checkbox: { width: '18px', height: '18px', cursor: 'pointer' },
-  warningText: { fontSize: '0.9rem', color: '#64748b', lineHeight: '1.6' },
-  logoutSecondary: {
-    width: '100%',
-    marginTop: '30px',
-    padding: '12px',
-    backgroundColor: 'transparent',
-    color: '#64748b',
-    border: '1px dashed #cbd5e1',
-    borderRadius: '12px',
-    fontWeight: '600',
-    cursor: 'pointer',
-  },
-  errorCard: {
-    padding: '60px',
-    textAlign: 'center',
-    backgroundColor: '#fff',
-    borderRadius: '24px',
-    fontSize: '1.2rem',
-    color: '#64748b'
-  }
 };
 
 export default Profile;

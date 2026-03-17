@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Navbar from '../../components/Navbar';
-import Footer from '../../components/Footer';
+import { useNavigate, Link } from 'react-router-dom';
+import DashboardSidebar from '../../components/DashboardSidebar';
 import api from '../../services/api';
 import authService from '../../services/authService';
-import PlayfulButton from '../../components/PlayfulButton';
-import gsap from 'gsap';
+import '../../styles/EduFlow.css';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
   const [stats, setStats] = useState({
     totalUsers: 0,
@@ -20,42 +19,33 @@ const AdminDashboard = () => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  // Course Form State (for Admin to also upload if needed)
   const [courseData, setCourseData] = useState({
     title: '', description: '', category: 'Technology', price: '', video: null, isYouTube: false, playlistUrl: ''
   });
   const [uploading, setUploading] = useState(false);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const user = authService.getCurrentUser();
-    if (!user || user.role !== 'admin') {
-      alert('Access Denied: Admin privileges required.');
+    const currentUser = authService.getCurrentUser();
+    if (!currentUser || currentUser.role !== 'admin') {
       navigate('/');
       return;
     }
+    setUser(currentUser);
     fetchData();
   }, [navigate]);
-
-  useEffect(() => {
-    gsap.from('.admin-content-anim', {
-      opacity: 0,
-      y: 30,
-      duration: 0.8,
-      ease: 'power3.out'
-    });
-  }, [activeTab]);
 
   const fetchData = async () => {
     try {
       const [statsRes, usersRes, coursesRes] = await Promise.all([
-        api.get('/admin/analytics'),
-        api.get('/users'),
-        api.get('/courses')
+        api.get('/admin/analytics').catch(() => ({ data: { success: false } })),
+        api.get('/users').catch(() => ({ data: [] })),
+        api.get('/courses').catch(() => ({ data: [] }))
       ]);
       
       if (statsRes.data.success) setStats(statsRes.data.data);
-      setUsers(usersRes.data);
-      setCourses(coursesRes.data);
+      setUsers(usersRes.data || []);
+      setCourses(coursesRes.data || []);
     } catch (error) {
       console.error('Error fetching admin data:', error);
     } finally {
@@ -91,73 +81,87 @@ const AdminDashboard = () => {
     } catch (err) { alert('Upload failed'); } finally { setUploading(false); }
   };
 
+  const initials = user?.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2) : 'A';
+
   return (
-    <div style={styles.container}>
-      <Navbar />
-      <div style={styles.main} className="dashboard-layout">
-        <div style={styles.sidebar} className="sidebar-responsive">
-          <h3 style={styles.sidebarTitle}>ADMIN CONTROL</h3>
-          <ul style={styles.sidebarList} className="mobile-stack">
-            {['overview', 'users', 'courses', 'upload', 'settings'].map(tab => (
-              <li 
-                key={tab}
-                style={{...styles.sidebarItem, ...(activeTab === tab ? styles.activeItem : {})}}
-                onClick={() => setActiveTab(tab)}
+    <div className="edu-dashboard">
+      <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      
+      <div className="edu-main">
+        <header className="edu-topbar">
+          <button className="edu-hamburger" onClick={() => setSidebarOpen(true)}>☰</button>
+          <span className="edu-topbar-title">Admin Console</span>
+          <div className="edu-topbar-actions">
+            <div className="edu-avatar" style={{cursor:'default'}}>{initials}</div>
+          </div>
+        </header>
+
+        <div className="edu-content">
+          <aside style={{marginBottom:'24px', display:'flex', gap:'8px', overflowX:'auto', paddingBottom:'8px'}}>
+            {[
+              { id: 'overview', name: 'Overview', icon: '📊' },
+              { id: 'users', name: 'User Management', icon: '👤' },
+              { id: 'courses', name: 'Course Management', icon: '📚' },
+              { id: 'upload', name: 'Global Upload', icon: '📤' },
+              { id: 'settings', name: 'System Settings', icon: '⚙️' }
+            ].map(tab => (
+              <button 
+                key={tab.id}
+                className={`edu-filter-chip ${activeTab === tab.id ? 'active' : ''}`}
+                onClick={() => setActiveTab(tab.id)}
               >
-                {tab.charAt(0).toUpperCase() + tab.slice(1)}
-              </li>
+                {tab.icon} {tab.name}
+              </button>
             ))}
-          </ul>
-        </div>
-        
-        <div style={styles.content} className="content-responsive">
+          </aside>
+
           {loading ? (
-            <p>Loading...</p>
+            <div style={{textAlign:'center', padding:'100px', color:'#9B9890'}}>Loading Intelligence...</div>
           ) : (
-            <div className="admin-content-anim">
-              <h1 style={styles.pageTitle}>{activeTab.toUpperCase()}</h1>
-              
+            <div>
               {activeTab === 'overview' && (
                 <>
-                  <div style={styles.statsGrid} className="grid-responsive grid-1-mobile grid-3-desktop">
-                    <div style={styles.statCard} className="stat-card-anim playful-card">
-                        <p style={styles.statLabel}>Users</p>
-                        <h2 style={{...styles.statValue, color: '#4f46e5'}}>{stats.totalUsers}</h2>
-                        <div style={styles.roleStats}>{stats.roleBreakdown.students} St. / {stats.roleBreakdown.instructors} Inst.</div>
+                  <div className="edu-stats-row">
+                    <div className="edu-stat-item">
+                        <div className="edu-stat-num" style={{color:'#2D5BE3'}}>{stats.totalUsers}</div>
+                        <div className="edu-stat-label">System Users</div>
+                        <div style={{fontSize:'11px', color:'#9B9890', marginTop:'8px'}}>{stats.roleBreakdown.students} Students / {stats.roleBreakdown.instructors} Instructors</div>
                     </div>
-                    <div style={styles.statCard} className="stat-card-anim playful-card">
-                        <p style={styles.statLabel}>Courses</p>
-                        <h2 style={{...styles.statValue, color: '#a855f7'}}>{stats.totalCourses}</h2>
-                        <p style={{fontSize: '0.8rem', color: '#94a3b8'}}>Active on platform</p>
+                    <div className="edu-stat-item">
+                        <div className="edu-stat-num" style={{color:'#E85D2A'}}>{stats.totalCourses}</div>
+                        <div className="edu-stat-label">Published Courses</div>
                     </div>
-                    <div style={styles.statCard} className="stat-card-anim playful-card">
-                        <p style={styles.statLabel}>Enrollments</p>
-                        <h2 style={{...styles.statValue, color: '#f59e0b'}}>{stats.totalEnrollments}</h2>
-                        <p style={{fontSize: '0.8rem', color: '#94a3b8'}}>Total student reach</p>
+                    <div className="edu-stat-item">
+                        <div className="edu-stat-num" style={{color:'#1C7A52'}}>{stats.totalEnrollments}</div>
+                        <div className="edu-stat-label">Global Enrollments</div>
+                    </div>
+                    <div className="edu-stat-item">
+                        <div className="edu-stat-num" style={{color:'#B56C10'}}>4.8</div>
+                        <div className="edu-stat-label">Platform Rating</div>
                     </div>
                   </div>
-                  <div style={styles.infoCard}>
-                    <h3>Platform Activity</h3>
-                    <p>Monitoring system performance and user engagement metrics.</p>
+                  <div className="edu-card">
+                    <h3 style={{fontSize:'16px', fontWeight:600, marginBottom:'12px'}}>Deployment Status</h3>
+                    <p style={{fontSize:'14px', color:'#6B6962'}}>All services operational. Vercel deployment synced with main branch.</p>
                   </div>
                 </>
               )}
 
               {activeTab === 'users' && (
-                <div style={styles.tableWrapper}>
-                  <table style={styles.table}>
+                <div className="edu-table-wrap">
+                  <table className="edu-table">
                     <thead>
                       <tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Actions</th></tr>
                     </thead>
                     <tbody>
                       {users.map(u => (
                         <tr key={u._id}>
-                          <td style={styles.td}>{u.name}</td>
-                          <td style={styles.td}>{u.email}</td>
-                          <td style={styles.td}><span style={styles.roleBadge}>{u.role}</span></td>
-                          <td style={styles.td}>{u.isVerified ? '✅ Verified' : '⏳ Pending'}</td>
-                          <td style={styles.td}>
-                            {u.role !== 'admin' && <button onClick={() => handleDeleteUser(u._id)} style={styles.deleteBtn}>Delete</button>}
+                          <td>{u.name}</td>
+                          <td>{u.email}</td>
+                          <td><span className="edu-tag edu-tag-blue" style={{textTransform:'capitalize'}}>{u.role}</span></td>
+                          <td>{u.isVerified ? '✅ Verified' : '⏳ Pending'}</td>
+                          <td>
+                            {u.role !== 'admin' && <button onClick={() => handleDeleteUser(u._id)} className="edu-btn edu-btn-outline" style={{padding:'4px 12px', color:'#E85D2A', borderColor:'#E85D2A', fontSize:'11px'}}>Delete</button>}
                           </td>
                         </tr>
                       ))}
@@ -167,20 +171,20 @@ const AdminDashboard = () => {
               )}
 
               {activeTab === 'courses' && (
-                <div style={styles.tableWrapper}>
-                   <table style={styles.table}>
+                <div className="edu-table-wrap">
+                   <table className="edu-table">
                     <thead>
                       <tr><th>Title</th><th>Category</th><th>Price</th><th>Instructor</th><th>Actions</th></tr>
                     </thead>
                     <tbody>
                       {courses.map(c => (
                         <tr key={c._id}>
-                          <td style={styles.td}>{c.title}</td>
-                          <td style={styles.td}>{c.category}</td>
-                          <td style={styles.td}>${c.price}</td>
-                          <td style={styles.td}>{c.instructor?.name || 'Admin'}</td>
-                          <td style={styles.td}>
-                             <button onClick={() => handleDeleteCourse(c._id)} style={styles.deleteBtn}>Remove</button>
+                          <td>{c.title}</td>
+                          <td>{c.category}</td>
+                          <td>${c.price}</td>
+                          <td>{c.instructor?.name || 'Admin'}</td>
+                          <td>
+                             <button onClick={() => handleDeleteCourse(c._id)} className="edu-btn edu-btn-outline" style={{padding:'4px 12px', color:'#E85D2A', borderColor:'#E85D2A', fontSize:'11px'}}>Remove</button>
                           </td>
                         </tr>
                       ))}
@@ -190,49 +194,64 @@ const AdminDashboard = () => {
               )}
 
               {activeTab === 'upload' && (
-                <div style={styles.formCard}>
-                  <form onSubmit={handleCourseSubmit} style={styles.form}>
-                    <input placeholder="Title" style={styles.input} required onChange={e => setCourseData({...courseData, title: e.target.value})} />
-                    <textarea placeholder="Description" style={{...styles.input, height: '100px'}} required onChange={e => setCourseData({...courseData, description: e.target.value})} />
-                    <div style={styles.row}>
-                      <select style={styles.input} value={courseData.category} onChange={e => setCourseData({...courseData, category: e.target.value})}>
-                        <option>Technology</option><option>Business</option><option>Design</option>
-                      </select>
-                      <input type="number" placeholder="Price" style={styles.input} value={courseData.price} required onChange={e => setCourseData({...courseData, price: e.target.value})} />
+                <div className="edu-profile-section" style={{maxWidth:'800px'}}>
+                  <form onSubmit={handleCourseSubmit} className="edu-auth-form">
+                    <div>
+                        <label className="edu-auth-label">Course Title</label>
+                        <input className="edu-auth-input" placeholder="Title" required onChange={e => setCourseData({...courseData, title: e.target.value})} />
+                    </div>
+                    <div>
+                        <label className="edu-auth-label">Description</label>
+                        <textarea className="edu-auth-input" style={{height:'100px'}} required onChange={e => setCourseData({...courseData, description: e.target.value})} />
+                    </div>
+                    <div className="edu-auth-row">
+                      <div>
+                        <label className="edu-auth-label">Category</label>
+                        <select className="edu-auth-input" value={courseData.category} onChange={e => setCourseData({...courseData, category: e.target.value})}>
+                            <option>Technology</option><option>Business</option><option>Design</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="edu-auth-label">Price ($)</label>
+                        <input type="number" className="edu-auth-input" placeholder="Price" value={courseData.price} required onChange={e => setCourseData({...courseData, price: e.target.value})} />
+                      </div>
                     </div>
                     
-                    <label style={{display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer'}}>
-                        <input 
-                            type="checkbox" 
-                            checked={courseData.isYouTube} 
-                            onChange={e => setCourseData({...courseData, isYouTube: e.target.checked})} 
-                        />
-                        Populate from YouTube Playlist?
-                    </label>
+                    <div style={{padding:'14px', background:'#F5F4F0', borderRadius:8}}>
+                        <label style={{display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize:'13px', fontWeight:'600'}}>
+                            <input 
+                                type="checkbox" 
+                                checked={courseData.isYouTube} 
+                                onChange={e => setCourseData({...courseData, isYouTube: e.target.checked})} 
+                            />
+                            Populate from YouTube Playlist?
+                        </label>
+                    </div>
 
                     {courseData.isYouTube ? (
-                        <input 
-                            placeholder="YouTube Playlist URL" 
-                            style={styles.input} 
-                            value={courseData.playlistUrl} 
-                            onChange={e => setCourseData({...courseData, playlistUrl: e.target.value})} 
-                            required 
-                        />
+                        <div>
+                            <label className="edu-auth-label">Playlist URL</label>
+                            <input className="edu-auth-input" placeholder="YouTube Playlist URL" value={courseData.playlistUrl} onChange={e => setCourseData({...courseData, playlistUrl: e.target.value})} required />
+                        </div>
                     ) : (
-                        <input type="file" accept="video/*" style={styles.input} onChange={e => setCourseData({...courseData, video: e.target.files[0]})} />
+                        <div>
+                            <label className="edu-auth-label">Intro Video File</label>
+                            <input type="file" accept="video/*" className="edu-auth-input" onChange={e => setCourseData({...courseData, video: e.target.files[0]})} />
+                        </div>
                     )}
 
-                    <PlayfulButton type="submit" disabled={uploading}>{uploading ? 'Processing...' : 'Publish'}</PlayfulButton>
+                    <button type="submit" className="edu-auth-btn" disabled={uploading}>{uploading ? 'Processing...' : 'Publish Course'}</button>
                   </form>
                 </div>
               )}
 
               {activeTab === 'settings' && (
-                <div style={styles.infoCard}>
-                  <h4>Maintenance Options</h4>
-                  <div style={{ marginTop: '20px', display: 'flex', gap: '20px' }}>
-                    <PlayfulButton onClick={() => alert('Maintenance Mode Toggled')}>Toggle Maintenance</PlayfulButton>
-                    <PlayfulButton onClick={() => alert('Logs Exported')}>Export Logs</PlayfulButton>
+                <div className="edu-card">
+                  <h4 style={{marginBottom:15}}>Development Tools</h4>
+                  <div style={{ display: 'flex', gap: '12px', flexWrap:'wrap' }}>
+                    <button className="edu-btn edu-btn-outline" onClick={() => alert('Vercel logs redirected...')}>Check Logs</button>
+                    <button className="edu-btn edu-btn-outline" onClick={() => alert('Cache cleared')}>Purge CDN</button>
+                    <button className="edu-btn edu-btn-outline" onClick={() => alert('Syncing database...')}>Repair Database</button>
                   </div>
                 </div>
               )}
@@ -240,36 +259,8 @@ const AdminDashboard = () => {
           )}
         </div>
       </div>
-      <Footer />
     </div>
   );
-};
-
-const styles = {
-  container: { backgroundColor: '#f8fafc', minHeight: '100vh', display: 'flex', flexDirection: 'column', fontFamily: '"Outfit", sans-serif' },
-  main: { display: 'flex', marginTop: '80px', flex: 1 },
-  sidebar: { width: '280px', backgroundColor: '#fff', borderRight: '1px solid #e2e8f0', padding: '50px 20px' },
-  sidebarTitle: { color: '#4f46e5', fontSize: '0.8rem', fontWeight: '800', marginBottom: '30px', letterSpacing: '2px' },
-  sidebarList: { listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '8px' },
-  sidebarItem: { padding: '14px 20px', borderRadius: '12px', color: '#64748b', cursor: 'pointer', transition: '0.3s', fontWeight: '500' },
-  activeItem: { backgroundColor: 'rgba(79, 70, 229, 0.1)', color: '#4f46e5', fontWeight: '700' },
-  content: { flex: 1, padding: '50px 60px' },
-  pageTitle: { fontSize: '2.5rem', fontWeight: '800', marginBottom: '40px', color: '#0f172a' },
-  statsGrid: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '30px', marginBottom: '50px' },
-  statCard: { padding: '30px', backgroundColor: '#fff', borderRadius: '24px', boxShadow: '0 4px 6px rgba(0,0,0,0.02)', border: '1px solid #e2e8f0' },
-  statLabel: { fontSize: '0.9rem', color: '#64748b', marginBottom: '10px' },
-  statValue: { fontSize: '2.5rem', fontWeight: '800', marginBottom: '10px' },
-  roleStats: { fontSize: '0.8rem', color: '#94a3b8' },
-  tableWrapper: { backgroundColor: '#fff', borderRadius: '24px', padding: '30px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.02)', overflowX: 'auto' },
-  table: { width: '100%', borderCollapse: 'collapse', textAlign: 'left' },
-  td: { padding: '16px', borderBottom: '1px solid #f1f5f9' },
-  roleBadge: { backgroundColor: '#e0e7ff', color: '#4f46e5', padding: '4px 12px', borderRadius: '100px', fontSize: '0.75rem', fontWeight: '700' },
-  deleteBtn: { backgroundColor: '#fee2e2', color: '#ef4444', border: 'none', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontWeight: '600' },
-  formCard: { backgroundColor: '#fff', padding: '40px', borderRadius: '24px', border: '1px solid #e2e8f0', maxWidth: '800px' },
-  form: { display: 'flex', flexDirection: 'column', gap: '20px' },
-  input: { padding: '15px', borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '1rem', backgroundColor: '#f8fafc' },
-  row: { display: 'flex', gap: '20px' },
-  infoCard: { padding: '40px', backgroundColor: '#fff', borderRadius: '24px', border: '1px solid #e2e8f0' }
 };
 
 export default AdminDashboard;

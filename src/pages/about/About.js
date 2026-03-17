@@ -1,139 +1,81 @@
 import React, { useEffect } from 'react';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
-import PlayfulButton from '../../components/PlayfulButton';
+import { Link } from 'react-router-dom';
 import gsap from 'gsap';
+import '../../styles/EduFlow.css';
 
 const About = () => {
   useEffect(() => {
-    gsap.from('.about-content', {
-      opacity: 0,
-      y: 30,
-      duration: 1,
-      ease: 'power3.out',
-      stagger: 0.2
-    });
+    gsap.from('.edu-page-header', { opacity: 0, y: 30, duration: 1, ease: 'power3.out' });
+    gsap.from('.edu-about-card', { opacity: 0, scale: 0.9, stagger: 0.2, duration: 0.8, delay: 0.3 });
+    gsap.from('.edu-about-cta', { opacity: 0, y: 40, duration: 1, delay: 0.6 });
   }, []);
 
   return (
-    <div style={styles.container}>
+    <div className="edu-page">
       <Navbar />
-      <main style={styles.main} className="section-padding-responsive">
-        <section style={styles.heroSection}>
-          <h1 className="about-content gradient-text page-title-responsive" style={styles.title}>About NexLearn</h1>
-          <p className="about-content mobile-text-center" style={styles.subtitle}>
-            Empowering the next generation of digital leaders through world-class education.
-          </p>
-        </section>
+      
+      <div className="edu-page-content">
+        <header className="edu-page-header">
+          <h1>About NexLearn</h1>
+          <p>Architecting the future of intelligence through immersive digital education.</p>
+        </header>
 
-        <section style={styles.contentSection}>
-          <div style={styles.grid}>
-            <div className="about-content" style={styles.card}>
-              <h2 style={styles.cardTitle}>Our Mission</h2>
-              <p style={styles.cardText}>
-                To make high-quality education accessible to everyone, everywhere. We believe that learning shouldn't be limited by geography or resources.
-              </p>
-            </div>
-            <div className="about-content" style={styles.card}>
-              <h2 style={styles.cardTitle}>Our Vision</h2>
-              <p style={styles.cardText}>
-                To build a global community of skilled professionals who are ready to tackle the challenges of the modern digital economy.
-              </p>
-            </div>
-          </div>
-
-          <div className="about-content" style={styles.teamSection}>
-            <h2 style={styles.sectionHeading}>Why We Started</h2>
-            <p style={styles.text}>
-              NexLearn was founded by a group of educators and developers who noticed a gap between traditional university curriculum and the demands of the tech industry. We built this LMS to bridge that gap with hands-on, project-based learning.
+        <section className="edu-about-grid">
+          <div className="edu-about-card">
+            <span style={{fontSize: '2rem', marginBottom: '15px', display: 'block'}}>🎯</span>
+            <h3>Our Mission</h3>
+            <p>
+              To make high-quality education accessible to everyone, everywhere. We believe that learning shouldn't be limited by geography or resources. Our platform is designed to provide equal opportunities for all.
             </p>
-            <div style={{ marginTop: '30px', display: 'flex', justifyContent: 'center' }}>
-               <PlayfulButton onClick={() => window.location.href='/register'}>Join Our Community</PlayfulButton>
-            </div>
+          </div>
+          <div className="edu-about-card">
+            <span style={{fontSize: '2rem', marginBottom: '15px', display: 'block'}}>👁️</span>
+            <h3>Our Vision</h3>
+            <p>
+              To build a global community of skilled professionals who are ready to tackle the challenges of the modern digital economy. We aim to be the bridge between traditional education and industry requirements.
+            </p>
           </div>
         </section>
-      </main>
+
+        <section className="edu-about-cta">
+          <h3>The Origin Of Flow</h3>
+          <p>
+            NexLearn was conceived by a collective of visionaries who recognized the friction between academic theory and industry velocity. We engineered this ecosystem to dissolve those barriers through hyper-focused, result-oriented learning.
+          </p>
+          <p style={{marginTop: '20px'}}>
+            We don't just teach fragments of code; we cultivate the mindset of a builder. Our curriculum is an evolving intelligence, curated to keep you ahead of the curve.
+          </p>
+          <div style={{marginTop: '32px'}}>
+            <Link to="/register" className="edu-btn edu-btn-primary" style={{textDecoration: 'none'}}>Begin Your Evolution</Link>
+          </div>
+        </section>
+
+        <div className="edu-page-header" style={{marginTop: '80px'}}>
+          <h1>Core Principles</h1>
+          <p>The philosophical foundation that drives our innovation.</p>
+        </div>
+
+        <div className="edu-features-grid">
+          <div className="edu-card">
+            <h4 className="edu-card-title">Innovation</h4>
+            <p className="edu-card-text">We constantly push the boundaries of what's possible in online education.</p>
+          </div>
+          <div className="edu-card">
+            <h4 className="edu-card-title">Accessibility</h4>
+            <p className="edu-card-text">Education should be available to everyone, regardless of their background.</p>
+          </div>
+          <div className="edu-card">
+            <h4 className="edu-card-title">Community</h4>
+            <p className="edu-card-text">Learning is better together. We foster a supportive environment for all.</p>
+          </div>
+        </div>
+      </div>
+
       <Footer />
     </div>
   );
-};
-
-const styles = {
-  container: {
-    backgroundColor: 'var(--bg)',
-    color: 'var(--text)',
-    minHeight: '100vh',
-    display: 'flex',
-    flexDirection: 'column'
-  },
-  main: {
-    marginTop: '80px',
-    flex: 1,
-    padding: '60px 20px',
-    maxWidth: '1200px',
-    margin: '80px auto 0 auto'
-  },
-  heroSection: {
-    textAlign: 'center',
-    marginBottom: '60px'
-  },
-  title: {
-    fontSize: '3.5rem',
-    fontWeight: '800',
-    marginBottom: '20px'
-  },
-  subtitle: {
-    fontSize: '1.2rem',
-    color: 'var(--textSecondary)',
-    maxWidth: '800px',
-    margin: '0 auto'
-  },
-  contentSection: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '40px'
-  },
-  grid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-    gap: '30px'
-  },
-  card: {
-    backgroundColor: 'var(--cardBg)',
-    padding: '40px',
-    borderRadius: '24px',
-    border: '1px solid var(--cardBorder)',
-    boxShadow: 'var(--cardShadow)'
-  },
-  cardTitle: {
-    fontSize: '1.8rem',
-    fontWeight: '700',
-    marginBottom: '20px',
-    color: 'var(--text)'
-  },
-  cardText: {
-    lineHeight: '1.7',
-    color: 'var(--textSecondary)'
-  },
-  teamSection: {
-    textAlign: 'center',
-    padding: '60px 40px',
-    backgroundColor: 'var(--bgSecondary)',
-    borderRadius: '30px',
-    border: '1px solid var(--sectionBorder)'
-  },
-  sectionHeading: {
-    fontSize: '2.5rem',
-    fontWeight: '800',
-    marginBottom: '30px'
-  },
-  text: {
-    fontSize: '1.1rem',
-    lineHeight: '1.8',
-    color: 'var(--textSecondary)',
-    maxWidth: '900px',
-    margin: '0 auto'
-  }
 };
 
 export default About;
