@@ -1,10 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
 import api from '../services/api';
 import gsap from 'gsap';
 
 const AIChatbot = () => {
-    const location = useLocation();
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState([
         { role: 'model', parts: [{ text: "Hello! I'm your AI Tutor. How can I help you today?" }] }
