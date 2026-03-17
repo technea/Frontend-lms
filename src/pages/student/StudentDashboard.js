@@ -16,7 +16,7 @@ const StudentDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState('All');
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [events, setEvents] = useState([]); // Currently empty as requested
+  const [events] = useState([]); // Currently empty as requested
 
   useEffect(() => {
     const currentUser = authService.getCurrentUser();
