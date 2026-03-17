@@ -15,6 +15,7 @@ import CourseDetail from '../pages/courses/CourseDetail';
 import LessonPlayer from '../pages/courses/LessonPlayer';
 import MyCourses from '../pages/student/MyCourses';
 import StudentDashboard from '../pages/student/StudentDashboard';
+import QuizList from '../pages/student/QuizList';
 import ProtectedRoute from '../components/ProtectedRoute';
 
 const AppRoutes = () => {
@@ -60,6 +61,14 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={['student', 'instructor', 'admin']}>
             <MyCourses />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/quizzes" 
+        element={
+          <ProtectedRoute allowedRoles={['student', 'instructor', 'admin']}>
+            <QuizList />
           </ProtectedRoute>
         } 
       />
