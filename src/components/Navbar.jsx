@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import authService from '../services/authService';
-import gsap from 'gsap';
 import '../styles/EduFlow.css';
 
 const Navbar = () => {
@@ -10,9 +9,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  useEffect(() => {
-    gsap.from('.edu-navbar', { y: -100, opacity: 0, duration: 1, ease: 'power4.out' });
-  }, []);
+
 
   const handleLogout = () => {
     authService.logout();

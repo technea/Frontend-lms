@@ -14,6 +14,8 @@ const StudentDashboard = () => {
   const [allCourses, setAllCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState('All');
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [events, setEvents] = useState([]); // Currently empty as requested
 
   useEffect(() => {
     const currentUser = authService.getCurrentUser();
@@ -107,16 +109,50 @@ const StudentDashboard = () => {
   const getThumbColor = (idx) => thumbColors[idx % thumbColors.length];
   const getCourseEmoji = (cat) => courseEmojis[cat] || '📚';
 
-  // Calendar data for March 2026
-  const calendarDays = [
-    { day: 23, other: true }, { day: 24, other: true }, { day: 25, other: true },
-    { day: 26, other: true }, { day: 27, other: true }, { day: 28, other: true }, { day: 1 },
-    { day: 2 }, { day: 3 }, { day: 4 }, { day: 5, event: true }, { day: 6 }, { day: 7 }, { day: 8 },
-    { day: 9 }, { day: 10, event: true }, { day: 11 }, { day: 12 }, { day: 13, event: true }, { day: 14 }, { day: 15 },
-    { day: 16 }, { day: 17, today: true }, { day: 18, event: true }, { day: 19 }, { day: 20 }, { day: 21, event: true }, { day: 22 },
-    { day: 23 }, { day: 24 }, { day: 25, event: true }, { day: 26 }, { day: 27 }, { day: 28 }, { day: 29 },
-    { day: 30 }, { day: 31 },
-  ];
+  // Dynamic Calendar Logic
+  const daysInMonth = (month, year) => new Date(year, month + 1, 0).getDate();
+  const firstDayOfMonth = (month, year) => new Date(year, month, 1).getDay();
+
+  const generateCalendar = () => {
+    const month = currentDate.getMonth();
+    const year = currentDate.getFullYear();
+    const days = [];
+    
+    // Previous month padding
+    const prevMonthDays = daysInMonth(month - 1, year);
+    const firstDay = firstDayOfMonth(month, year);
+    for (let i = firstDay - 1; i >= 0; i--) {
+      days.push({ day: prevMonthDays - i, other: true });
+    }
+
+    // Current month days
+    const totalDays = daysInMonth(month, year);
+    const today = new Date();
+    for (let i = 1; i <= totalDays; i++) {
+      days.push({ 
+        day: i, 
+        today: i === today.getDate() && month === today.getMonth() && year === today.getFullYear() 
+      });
+    }
+
+    // Next month padding
+    const remaining = 42 - days.length;
+    for (let i = 1; i <= remaining; i++) {
+      days.push({ day: i, other: true });
+    }
+    return days;
+  };
+
+  const handlePrevMonth = () => {
+    setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() - 1)));
+  };
+
+  const handleNextMonth = () => {
+    setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() + 1)));
+  };
+
+  const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const calendarDays = generateCalendar();
 
   return (
     <div className="edu-dashboard">
@@ -368,12 +404,12 @@ const StudentDashboard = () => {
                 {/* RIGHT COLUMN */}
                 <div className="edu-right-panel">
                   {/* CALENDAR */}
-                  <div className="edu-calendar-card">
+                    <div className="edu-calendar-card">
                     <div className="edu-cal-header">
-                      <span className="edu-cal-month">March 2026</span>
+                      <span className="edu-cal-month">{monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}</span>
                       <div className="edu-cal-nav">
-                        <button>‹</button>
-                        <button>›</button>
+                        <button onClick={handlePrevMonth}>‹</button>
+                        <button onClick={handleNextMonth}>›</button>
                       </div>
                     </div>
                     <div className="edu-cal-grid">
@@ -395,41 +431,27 @@ const StudentDashboard = () => {
                   <div className="edu-calendar-card">
                     <div className="edu-section-header" style={{marginBottom: 12}}>
                       <span className="edu-section-title">Upcoming Events</span>
-                      <span className="edu-see-all" style={{fontSize: 11}}>+ Add</span>
+                      <span className="edu-see-all" style={{fontSize: 11, cursor: 'pointer'}} onClick={() => alert('Event initialization module loading...')}>+ Add</span>
                     </div>
-                    <div className="edu-event-item">
-                      <div className="edu-event-date-box">
-                        <div className="edu-event-day">18</div>
-                        <div className="edu-event-month">Mar</div>
+                    {events.length > 0 ? (
+                      events.map((event, idx) => (
+                        <div key={idx} className="edu-event-item">
+                          <div className="edu-event-date-box">
+                            <div className="edu-event-day">{event.day}</div>
+                            <div className="edu-event-month">{event.month}</div>
+                          </div>
+                          <div className="edu-event-info">
+                            <div className="edu-event-title">{event.title}</div>
+                            <div className="edu-event-sub">{event.time} · {event.type}</div>
+                          </div>
+                          <div className={`edu-event-dot edu-dot-${event.color}`}></div>
+                        </div>
+                      ))
+                    ) : (
+                      <div style={{textAlign: 'center', padding: '20px 0', color: '#9B9890', fontSize: '13px'}}>
+                        No upcoming events scheduled. Click + Add to create one.
                       </div>
-                      <div className="edu-event-info">
-                        <div className="edu-event-title">Live Q&A: React Patterns</div>
-                        <div className="edu-event-sub">3:00 PM · Instructor Session</div>
-                      </div>
-                      <div className="edu-event-dot edu-dot-blue"></div>
-                    </div>
-                    <div className="edu-event-item">
-                      <div className="edu-event-date-box">
-                        <div className="edu-event-day">21</div>
-                        <div className="edu-event-month">Mar</div>
-                      </div>
-                      <div className="edu-event-info">
-                        <div className="edu-event-title">Design Sprint Workshop</div>
-                        <div className="edu-event-sub">10:00 AM · Workshop</div>
-                      </div>
-                      <div className="edu-event-dot edu-dot-orange"></div>
-                    </div>
-                    <div className="edu-event-item">
-                      <div className="edu-event-date-box">
-                        <div className="edu-event-day">25</div>
-                        <div className="edu-event-month">Mar</div>
-                      </div>
-                      <div className="edu-event-info">
-                        <div className="edu-event-title">Assignment Deadline</div>
-                        <div className="edu-event-sub">11:59 PM · Submission</div>
-                      </div>
-                      <div className="edu-event-dot edu-dot-green"></div>
-                    </div>
+                    )}
                   </div>
 
                   {/* LEADERBOARD */}
