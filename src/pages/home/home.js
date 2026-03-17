@@ -27,13 +27,14 @@ const Home = () => {
     fetchCourses();
 
     // GSAP Animations
-    gsap.from('.hero-title', { y: 100, opacity: 0, duration: 1.2, ease: 'power4.out' });
-    gsap.from('.hero-sub', { y: 50, opacity: 0, duration: 1, delay: 0.3, ease: 'power3.out' });
+    gsap.from('.hero-title', { y: 30, opacity: 0, duration: 0.8, ease: 'power2.out' });
+    gsap.from('.hero-sub', { y: 20, opacity: 0, duration: 0.8, delay: 0.2, ease: 'power2.out' });
     gsap.from('.edu-feature-card', { 
-      scale: 0.8, 
+      y: 30, 
       opacity: 0, 
-      stagger: 0.2, 
-      duration: 1, 
+      stagger: 0.1, 
+      duration: 0.8, 
+      ease: 'power2.out', 
       scrollTrigger: {
         trigger: '.edu-features-grid',
         start: 'top 80%'
