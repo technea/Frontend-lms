@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import authService from '../../services/authService';
 import gsap from 'gsap';
 import '../../styles/EduFlow.css';
@@ -28,7 +29,7 @@ const Register = () => {
     try {
       const { confirmPassword, ...registerData } = formData;
       await authService.register(registerData);
-      alert('Registration Successful! Please check your email for the OTP.');
+      toast.success('Registration Successful! Please check your email for the OTP.');
       navigate('/verify-otp', { state: { email: formData.email } });
     } catch (err) {
       setError(err.message || (typeof err === 'string' ? err : 'Registration failed.'));

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import authService from '../services/authService';
 
 /**
@@ -19,7 +20,7 @@ const ProtectedRoute = ({ allowedRoles, children }) => {
   // 2. Check if user has required role (Authorization)
   if (allowedRoles && !allowedRoles.includes(user.role)) {
     // If not authorized, redirect to home with an alert (handled in Home if needed)
-    alert('You do not have permission to access this page.');
+    toast.error('You do not have permission to access this page.');
     return <Navigate to="/" replace />;
   }
 

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import DashboardSidebar from '../../components/DashboardSidebar';
 import api from '../../services/api';
 import authService from '../../services/authService';
@@ -74,11 +75,11 @@ const AdminDashboard = () => {
     Object.keys(courseData).forEach(key => formData.append(key, courseData[key]));
     try {
       await api.post('/courses', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
-      alert('Course Published!');
+      toast.success('Course Published!');
       setCourseData({ title: '', description: '', category: 'Technology', price: '', video: null, isYouTube: false, playlistUrl: '' });
       setActiveTab('overview');
       fetchData();
-    } catch (err) { alert('Upload failed'); } finally { setUploading(false); }
+    } catch (err) { toast.error('Upload failed'); } finally { setUploading(false); }
   };
 
   const initials = user?.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2) : 'A';
@@ -249,9 +250,9 @@ const AdminDashboard = () => {
                 <div className="edu-card">
                   <h4 style={{marginBottom:15}}>Development Tools</h4>
                   <div style={{ display: 'flex', gap: '12px', flexWrap:'wrap' }}>
-                    <button className="edu-btn edu-btn-outline" onClick={() => alert('Vercel logs redirected...')}>Check Logs</button>
-                    <button className="edu-btn edu-btn-outline" onClick={() => alert('Cache cleared')}>Purge CDN</button>
-                    <button className="edu-btn edu-btn-outline" onClick={() => alert('Syncing database...')}>Repair Database</button>
+                    <button className="edu-btn edu-btn-outline" onClick={() => toast.info('Vercel logs redirected...')}>Check Logs</button>
+                    <button className="edu-btn edu-btn-outline" onClick={() => toast.success('Cache cleared')}>Purge CDN</button>
+                    <button className="edu-btn edu-btn-info" onClick={() => toast.loading('Syncing database...')}>Repair Database</button>
                   </div>
                 </div>
               )}

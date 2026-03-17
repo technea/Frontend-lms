@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import DashboardSidebar from '../../components/DashboardSidebar';
 import authService from '../../services/authService';
 import api from '../../services/api';
@@ -431,7 +432,7 @@ const StudentDashboard = () => {
                   <div className="edu-calendar-card">
                     <div className="edu-section-header" style={{marginBottom: 12}}>
                       <span className="edu-section-title">Upcoming Events</span>
-                      <span className="edu-see-all" style={{fontSize: 11, cursor: 'pointer'}} onClick={() => alert('Event initialization module loading...')}>+ Add</span>
+                      <span className="edu-see-all" style={{fontSize: 11, cursor: 'pointer'}} onClick={() => toast.info('Event initialization module loading...')}>+ Add</span>
                     </div>
                     {events.length > 0 ? (
                       events.map((event, idx) => (

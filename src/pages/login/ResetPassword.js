@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import authService from '../../services/authService';
 import gsap from 'gsap';
 import '../../styles/EduFlow.css';
@@ -22,7 +23,7 @@ const ResetPassword = () => {
     setLoading(true); setError('');
     try {
       await authService.resetPassword({ code: formData.code, password: formData.password });
-      alert('Password reset successful! You can now login.');
+      toast.success('Password reset successful! You can now login.');
       navigate('/login');
     } catch (err) { setError(err.message || 'Reset failed'); }
     finally { setLoading(false); }

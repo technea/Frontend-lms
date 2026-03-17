@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import api from '../../services/api';
@@ -40,10 +41,10 @@ const CourseDetail = () => {
     setEnrolling(true);
     try {
       await api.post('/enroll', { courseId: course._id });
-      alert('Enrolled successfully!');
+      toast.success('Enrolled successfully!');
       setIsEnrolled(true);
     } catch (err) {
-      alert(err.response?.data?.message || 'Enrollment failed');
+      toast.error(err.response?.data?.message || 'Enrollment failed');
     } finally {
       setEnrolling(false);
     }

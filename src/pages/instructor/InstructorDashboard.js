@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import DashboardSidebar from '../../components/DashboardSidebar';
 import api from '../../services/api';
 import authService from '../../services/authService';
@@ -65,19 +66,19 @@ const InstructorDashboard = () => {
     try {
       if (isEditing) {
         await api.put(`/courses/${editCourseId}`, { ...courseData, video: undefined }); 
-        alert('Course Updated!');
+        toast.success('Course Updated!');
       } else {
         await api.post('/courses', formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
-        alert('Course Created!');
+        toast.success('Course Created!');
       }
       setCourseData({ title: '', description: '', category: 'Technology', price: '', video: null, isYouTube: false, playlistUrl: '' });
       setIsEditing(false);
       setActiveTab('my-courses');
       fetchMyCourses();
     } catch (err) {
-      alert('Action failed: ' + (err.response?.data?.message || err.message));
+      toast.error('Action failed: ' + (err.response?.data?.message || err.message));
     } finally {
       setUploading(false);
     }
@@ -103,7 +104,7 @@ const InstructorDashboard = () => {
       try {
         await api.delete(`/courses/${id}`);
         fetchMyCourses();
-      } catch (err) { alert('Delete failed'); }
+      } catch (err) { toast.error('Delete failed'); }
     }
   };
 
@@ -140,10 +141,10 @@ const InstructorDashboard = () => {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       setLessonData({ title: '', content: '', videoUrl: '', video: null });
-      alert('Lesson Added!');
+      toast.success('Lesson Added!');
       openLessons(selectedCourse);
     } catch (err) {
-      alert('Failed to add lesson: ' + (err.response?.data?.message || err.message));
+      toast.error('Failed to add lesson: ' + (err.response?.data?.message || err.message));
     } finally {
       setLessonUploading(false);
     }
@@ -154,7 +155,7 @@ const InstructorDashboard = () => {
       try {
         await api.delete(`/lessons/${id}`);
         openLessons(selectedCourse);
-      } catch (err) { alert('Delete failed'); }
+      } catch (err) { toast.error('Delete failed'); }
     }
   };
 

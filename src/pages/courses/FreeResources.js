@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import api from '../../services/api';
@@ -44,7 +45,7 @@ const FreeResources = () => {
 
     const copyToClipboard = (text) => {
         navigator.clipboard.writeText(text);
-        alert('Coupon code copied: ' + text);
+        toast.success('Coupon code copied: ' + text);
     };
 
     return (
