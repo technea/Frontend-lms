@@ -425,6 +425,9 @@ img {
   .features-grid-responsive {
     grid-template-columns: repeat(2, 1fr) !important;
   }
+  .user-name-desktop {
+    display: none !important;
+  }
 }
 
 @media (max-width: 768px) {
@@ -439,6 +442,39 @@ img {
     letter-spacing: 0.5px !important;
     margin: 5px !important;
     border-radius: 10px !important;
+  }
+
+  /* --- Dashboard & Navbar Mobile Adjustments --- */
+  .dashboard-layout {
+    flex-direction: column !important;
+  }
+  .sidebar-responsive {
+    width: 100% !important;
+    padding: 20px !important;
+    border-right: none !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    position: sticky;
+    top: 80px;
+    z-index: 100;
+  }
+  .sidebar-responsive ul.mobile-stack {
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+    gap: 15px !important;
+    padding-bottom: 10px !important;
+  }
+  .sidebar-responsive ul.mobile-stack li {
+    flex-shrink: 0;
+  }
+  .content-responsive {
+    padding: 20px 15px !important;
+  }
+  
+  /* Hide desktop buttons when on mobile (handled by hamburger menu) */
+  .user-profile-nav .logout-btn-nav,
+  .login-btn-nav {
+    display: none !important;
   }
 }
 
