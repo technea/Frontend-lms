@@ -14,6 +14,7 @@ import CourseList from '../pages/courses/CourseList';
 import CourseDetail from '../pages/courses/CourseDetail';
 import LessonPlayer from '../pages/courses/LessonPlayer';
 import MyCourses from '../pages/student/MyCourses';
+import StudentDashboard from '../pages/student/StudentDashboard';
 import ProtectedRoute from '../components/ProtectedRoute';
 
 const AppRoutes = () => {
@@ -30,6 +31,14 @@ const AppRoutes = () => {
       <Route path="/reset-password" element={<ResetPassword />} />
       
       {/* Protected Routes */}
+      <Route 
+        path="/dashboard" 
+        element={
+          <ProtectedRoute allowedRoles={['student', 'instructor', 'admin']}>
+            <StudentDashboard />
+          </ProtectedRoute>
+        } 
+      />
       <Route 
         path="/admin" 
         element={

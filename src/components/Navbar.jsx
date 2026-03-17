@@ -34,6 +34,7 @@ const CustomNavbar = () => {
                     <div className="nav-links-desktop">
                         <Link to="/courses">Courses</Link>
                         <Link to="/about">About</Link>
+                        {user && <Link to="/dashboard">Dashboard</Link>}
                         {user && <Link to="/my-courses">My Courses</Link>}
                         {user?.role === 'admin' && <Link to="/admin">Admin</Link>}
                         {(user?.role === 'instructor' || user?.role === 'admin') && (
@@ -102,7 +103,8 @@ const CustomNavbar = () => {
                     <Link to="/about" onClick={toggleMobile}>About</Link>
                     <Link to="/courses" onClick={toggleMobile}>Courses</Link>
                     {user && <Link to="/my-courses" onClick={toggleMobile}>My Courses</Link>}
-                    {user && <Link to="/profile" onClick={toggleMobile} style={{ color: '#64ffda', fontWeight: '800' }}>Dashboard / Profile</Link>}
+                    {user && <Link to="/dashboard" onClick={toggleMobile} style={{ color: '#64ffda', fontWeight: '800' }}>Dashboard</Link>}
+                    {user && <Link to="/profile" onClick={toggleMobile}>Profile</Link>}
                     
                     <div className="mobile-auth-section">
                         {user ? (
