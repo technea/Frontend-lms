@@ -13,7 +13,6 @@ import About from '../pages/about/About';
 import CourseList from '../pages/courses/CourseList';
 import CourseDetail from '../pages/courses/CourseDetail';
 import LessonPlayer from '../pages/courses/LessonPlayer';
-import FreeResources from '../pages/courses/FreeResources';
 import MyCourses from '../pages/student/MyCourses';
 import StudentDashboard from '../pages/student/StudentDashboard';
 import ProtectedRoute from '../components/ProtectedRoute';

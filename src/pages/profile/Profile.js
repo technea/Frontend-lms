@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardSidebar from '../../components/DashboardSidebar';
 import authService from '../../services/authService';
-import api from '../../services/api';
 import '../../styles/EduFlow.css';
 
 const Profile = () => {
