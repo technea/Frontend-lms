@@ -60,8 +60,6 @@ const AIChatbot = () => {
         }
     };
 
-    // Only show on Home page (/)
-    if (location.pathname !== '/') return null;
 
     return (
         <div style={styles.container}>
