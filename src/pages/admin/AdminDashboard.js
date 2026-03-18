@@ -428,22 +428,46 @@ const AdminDashboard = () => {
 
       <style>{`
         .admin-dashboard-v2 { font-family: 'Inter', sans-serif; }
-        .form-group-v2 { margin-bottom: 20px; }
-        .form-group-v2 label { display: block; font-size: 13px; font-weight: 700; color: #1A1916; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .admin-side-nav button { transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); }
+        .admin-side-nav button:hover { transform: translateX(5px); background: rgba(232,93,42,0.1) !important; color: #E85D2A !important; }
+        
+        .form-group-v2 { margin-bottom: 25px; }
+        .form-group-v2 label { display: block; font-size: 11px; font-weight: 800; color: #1A1916; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.7; }
         .form-group-v2 input, .form-group-v2 textarea, .form-group-v2 select { 
-          width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #E2E0D8; 
-          background: #fff; font-size: 14px; color: #1A1916; transition: 0.3s;
+          width: 100%; padding: 16px; border-radius: 16px; border: 1px solid #E2E0D8; 
+          background: #fff; font-size: 15px; color: #1A1916; transition: all 0.3s;
         }
-        .form-group-v2 input:focus { outline: none; border-color: #E85D2A; box-shadow: 0 0 0 3px rgba(232, 93, 42, 0.05); }
-        .edu-table.v2 th { padding: 18px 25px; color: #6B6962; font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; border: none; }
-        .edu-table.v2 td { padding: 18px 25px; font-size: 14px; vertical-align: middle; border: none; }
+        .form-group-v2 input:focus { outline: none; border-color: #1A1916; box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.03); }
+        
+        .edu-btn-primary { 
+          background: #1A1916 !important; color: #fff !important; border: none !important; 
+          box-shadow: 0 15px 30px rgba(0,0,0,0.15); transition: all 0.4s !important;
+          font-weight: 700 !important; letter-spacing: 0.5px;
+        }
+        .edu-btn-primary:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 20px 40px rgba(0,0,0,0.2) !important; background: #E85D2A !important; }
+        .edu-btn-primary:active { transform: translateY(0); }
+
+        .edu-table.v2 th { padding: 20px 25px; color: #9B9890; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; border-bottom: 1px solid #E2E0D8; }
+        .edu-table.v2 td { padding: 20px 25px; font-size: 14px; vertical-align: middle; border: none; }
+        
         .admin-tool-box { 
-          padding: 25px; background: #fff; border: 1px solid #E2E0D8; border-radius: 20px; 
-          cursor: pointer; transition: 0.3s; display: flex; flexDirection: column; alignItems: center;
+          padding: 30px; background: #fff; border: 1px solid #E2E0D8; border-radius: 24px; 
+          cursor: pointer; transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1); 
+          display: flex; flex-direction: column; align-items: center; justify-content: center;
+          gap: 15px;
         }
-        .admin-tool-box:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); border-color: #E85D2A; }
+        .admin-tool-box:hover { 
+          transform: translateY(-10px) scale(1.03); 
+          border-color: #E85D2A; 
+          box-shadow: 0 30px 60px rgba(232, 93, 42, 0.1); 
+        }
+        
         .edu-spinner { border: 4px solid #E2E0D8; border-top: 4px solid #E85D2A; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* V2 Card Glassmorphism */
+        .edu-admin-stat-card { transition: all 0.4s ease; }
+        .edu-admin-stat-card:hover { transform: translateY(-8px); border-color: #E85D2A; box-shadow: 0 25px 50px rgba(0,0,0,0.08) !important; }
       `}</style>
     </div>
   );

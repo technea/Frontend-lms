@@ -29,59 +29,79 @@ const DashboardSidebar = ({ isOpen, onClose }) => {
   return (
     <>
       <div className={`edu-sidebar-overlay ${isOpen ? 'show' : ''}`} onClick={onClose} />
-      <aside className={`edu-sidebar ${isOpen ? 'open' : ''}`}>
-        <Link to="/" className="edu-logo" style={{textDecoration:'none'}}>
-          <div className="edu-logo-mark">
-            <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      <aside className={`edu-sidebar ${isOpen ? 'open' : ''}`} style={{
+        background: '#1A1916', 
+        color: '#fff', 
+        borderRight: '1px solid #252420',
+        padding: '30px 20px'
+      }}>
+        <Link to="/" className="edu-logo" style={{textDecoration:'none', marginBottom: '40px', padding: '0 10px'}}>
+          <div className="edu-logo-mark" style={{background: '#E85D2A'}}>
+            <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" fill="white"/></svg>
           </div>
-          <span className="edu-logo-text">NexLearn</span>
+          <span className="edu-logo-text" style={{color: '#fff', fontFamily: '"Playfair Display", serif', fontSize: '22px'}}>NexLearn</span>
         </Link>
-
-        <nav className="edu-nav-section">
-          <div className="edu-nav-label">Main</div>
-          {mainLinks.map(link => (
-            <Link
-              key={link.path}
-              to={link.path}
-              className={`edu-nav-item ${location.pathname === link.path ? 'active' : ''}`}
-              onClick={onClose}
+ 
+        <div style={{flexGrow: 1, overflowY: 'auto'}}>
+          <nav className="edu-nav-section mb-4">
+            <div className="edu-nav-label" style={{color: '#E85D2A', letterSpacing: '2px', fontWeight: 800, fontSize: '10px', padding: '0 10px 15px'}}>ECOSYSTEM</div>
+            {mainLinks.map(link => (
+              <Link
+                key={link.path}
+                to={link.path}
+                className={`edu-nav-item ${location.pathname === link.path ? 'active' : ''}`}
+                onClick={onClose}
+                style={{
+                  color: location.pathname === link.path ? '#E85D2A' : '#9B9890',
+                  background: location.pathname === link.path ? 'rgba(232, 93, 42, 0.1)' : 'transparent',
+                  padding: '12px 15px',
+                  borderRadius: '12px',
+                  marginBottom: '5px',
+                  transition: '0.3s'
+                }}
+              >
+                {link.icon}
+                <span style={{fontWeight: location.pathname === link.path ? 700 : 400}}>{link.label}</span>
+                {link.badge && <span className="edu-nav-badge" style={{background: '#E85D2A'}}>{link.badge}</span>}
+              </Link>
+            ))}
+          </nav>
+ 
+          <nav className="edu-nav-section">
+            <div className="edu-nav-label" style={{color: '#9B9890', letterSpacing: '2px', fontWeight: 800, fontSize: '10px', padding: '0 10px 15px'}}>PERSONAL</div>
+            {accountLinks.map(link => (
+              <Link
+                key={link.path}
+                to={link.path}
+                className={`edu-nav-item ${location.pathname === link.path ? 'active' : ''}`}
+                onClick={onClose}
+                style={{
+                  color: '#9B9890', padding: '12px 15px', borderRadius: '12px', marginBottom: '5px'
+                }}
+              >
+                {link.icon}
+                {link.label}
+              </Link>
+            ))}
+            <button
+              className="edu-nav-item"
+              onClick={() => { authService.logout(); window.location.href = '/'; }}
+              style={{color: '#9B9890', padding: '12px 15px', border: 'none', background: 'transparent', width: '100%', textAlign: 'left'}}
             >
-              {link.icon}
-              {link.label}
-              {link.badge && <span className="edu-nav-badge">{link.badge}</span>}
-            </Link>
-          ))}
-        </nav>
-
-        <nav className="edu-nav-section">
-          <div className="edu-nav-label">Account</div>
-          {accountLinks.map(link => (
-            <Link
-              key={link.path}
-              to={link.path}
-              className={`edu-nav-item ${location.pathname === link.path ? 'active' : ''}`}
-              onClick={onClose}
-            >
-              {link.icon}
-              {link.label}
-            </Link>
-          ))}
-          <button
-            className="edu-nav-item"
-            onClick={() => { authService.logout(); window.location.href = '/'; }}
-          >
-            <LogoutIcon />
-            Logout
-          </button>
-        </nav>
-
-        <Link to="/profile" className="edu-sidebar-user" onClick={onClose}>
-          <div className="edu-avatar">{initials}</div>
-          <div>
-            <div className="edu-user-name">{user?.name || 'User'}</div>
-            <div className="edu-user-role" style={{textTransform:'capitalize'}}>{user?.role || 'Student'}</div>
+              <LogoutIcon />
+              Logout
+            </button>
+          </nav>
+        </div>
+ 
+        <Link to="/profile" className="edu-sidebar-user" onClick={onClose} style={{
+          background: '#252420', padding: '15px', borderRadius: '16px', border: '1px solid #333'
+        }}>
+          <div className="edu-avatar" style={{background: '#1A1916', border: '1px solid #444'}}>{initials}</div>
+          <div style={{marginLeft: '10px'}}>
+            <div className="edu-user-name" style={{color: '#fff', fontSize: '14px', fontWeight: 700}}>{user?.name || 'User'}</div>
+            <div className="edu-user-role" style={{fontSize: '11px', color: '#E85D2A', textTransform: 'uppercase', fontWeight: 800}}>{user?.role || 'Student'} TIER</div>
           </div>
-          <svg style={{marginLeft:'auto',width:14,height:14,color:'var(--edu-text3)'}} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6"/></svg>
         </Link>
       </aside>
     </>
