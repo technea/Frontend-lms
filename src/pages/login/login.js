@@ -29,7 +29,12 @@ const Login = () => {
         setShow2FA(true);
         setTempUserId(data.userId);
       } else if (data.token) {
-        navigate('/dashboard');
+        if (data.user?.role === 'admin') {
+          toast.info('Admin detected. Redirecting to Management Console...');
+          navigate('/admin');
+        } else {
+          navigate('/dashboard');
+        }
       }
     } catch (err) {
       const errorMsg = err.message || (typeof err === 'string' ? err : 'Login failed.');
@@ -51,7 +56,13 @@ const Login = () => {
     setLoading(true);
     try {
       const data = await authService.loginWith2FA(tempUserId, twoFactorToken);
-      if (data.token) navigate('/dashboard');
+      if (data.token) {
+        if (data.user?.role === 'admin') {
+          navigate('/admin');
+        } else {
+          navigate('/dashboard');
+        }
+      }
     } catch (err) {
       setError(err.message || '2FA verification failed');
     } finally {

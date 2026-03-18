@@ -7,6 +7,7 @@ import VerifyOTP from '../pages/register/VerifyOTP';
 import ForgotPassword from '../pages/login/ForgotPassword';
 import ResetPassword from '../pages/login/ResetPassword';
 import AdminDashboard from '../pages/admin/AdminDashboard';
+import AdminLogin from '../pages/admin/AdminLogin';
 import InstructorDashboard from '../pages/instructor/InstructorDashboard';
 import Profile from '../pages/profile/Profile';
 import About from '../pages/about/About';
@@ -26,6 +27,7 @@ const AppRoutes = () => {
       <Route path="/courses" element={<CourseList />} />
       <Route path="/course/:id" element={<CourseDetail />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/admin/login" element={<AdminLogin />} />
       <Route path="/register" element={<Register />} />
       <Route path="/verify-otp" element={<VerifyOTP />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />

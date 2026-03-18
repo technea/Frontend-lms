@@ -14,7 +14,8 @@ const ProtectedRoute = ({ allowedRoles, children }) => {
 
   // 1. Check if user is authenticated
   if (!user || !token) {
-    return <Navigate to="/login" replace />;
+    const isOnlyAdmin = allowedRoles && allowedRoles.length === 1 && allowedRoles[0] === 'admin';
+    return <Navigate to={isOnlyAdmin ? "/admin/login" : "/login"} replace />;
   }
 
   // 2. Check if user has required role (Authorization)
