@@ -20,6 +20,7 @@ import QuizList from '../pages/student/QuizList';
 import ProtectedRoute from '../components/ProtectedRoute';
 
 const AppRoutes = () => {
+  console.log('AppRoutes: rendering');
   return (
     <Routes>
       <Route path="/" element={<Home />} />

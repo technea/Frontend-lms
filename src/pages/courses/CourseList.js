@@ -123,14 +123,42 @@ const CourseList = () => {
                 ))}
               </div>
             ) : (
-              <div style={{textAlign: 'center', padding: '60px', background: '#fff', borderRadius: '14px', border: '1px solid #E2E0D8'}}>
-                <h3 style={{marginBottom: '10px'}}>No courses found matching "{searchQuery}"</h3>
-                <p style={{color: '#6B6962', fontSize: '14px', marginBottom: '20px'}}>Try searching for different keywords or categories.</p>
+              <div className="edu-empty-vault" style={{
+                textAlign: 'center', 
+                padding: '80px 40px', 
+                background: 'rgba(255,255,255,0.7)', 
+                backdropFilter: 'blur(10px)',
+                borderRadius: '24px', 
+                border: '1px solid #E2E0D8',
+                boxShadow: '0 20px 40px rgba(0,0,0,0.05)',
+                maxWidth: '600px',
+                margin: '40px auto'
+              }}>
+                <div style={{fontSize: '60px', marginBottom: '20px', opacity: 0.8}}>📦</div>
+                <h2 style={{
+                  fontFamily: '"Playfair Display", serif',
+                  fontSize: '32px',
+                  fontWeight: 700,
+                  marginBottom: '15px'
+                }}>The Vault is Empty</h2>
+                <p style={{
+                  color: '#6B6962', 
+                  fontSize: '16px', 
+                  lineHeight: 1.6,
+                  marginBottom: '30px'
+                }}>
+                  We couldn't find any NexLearn curriculum matching your search "{searchQuery}". <br/>
+                  Try clearing your filters to see our full catalogue.
+                </p>
                 <button 
-                  onClick={() => setSearchQuery('')}
-                  className="edu-btn edu-btn-outline"
+                  onClick={() => {
+                    setSearchQuery('');
+                    setActiveCategory('All');
+                  }}
+                  className="edu-btn edu-btn-primary"
+                  style={{padding: '12px 30px', borderRadius: '30px'}}
                 >
-                  Clear Search
+                  Unlock All Courses
                 </button>
               </div>
             )}

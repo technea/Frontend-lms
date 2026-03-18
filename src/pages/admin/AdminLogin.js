@@ -6,6 +6,7 @@ import gsap from 'gsap';
 import '../../styles/EduFlow.css';
 
 const AdminLogin = () => {
+  console.log('AdminLogin: rendering');
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
