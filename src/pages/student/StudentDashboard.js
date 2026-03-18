@@ -461,12 +461,12 @@ const StudentDashboard = () => {
                       <span className="edu-section-title">Leaderboard</span>
                       <span className="edu-see-all" style={{fontSize: 11}}>Personal Progress</span>
                     </div>
-                    <div className="edu-leader-row edu-leader-highlight">
-                      <span className="edu-leader-rank" style={{color:'var(--edu-accent)'}}>1</span>
+                    <div className="edu-leader-row edu-leader-highlight" style={{border: '1px solid #D4A017'}}>
+                      <span className="edu-leader-rank edu-rank-gold" style={{fontSize: '18px'}}>1</span>
                       <div className="edu-leader-avatar" style={{background:'linear-gradient(135deg, #6B8DD6, #2D5BE3)', color:'white'}}>{initials}</div>
                       <span className="edu-leader-name">You</span>
                       <span className="edu-leader-xp">{totalEnrolled * 240} XP</span>
-                      <span style={{fontSize:11,color:'var(--edu-accent)',fontWeight:500, marginLeft:'auto'}}>Global Rank #1</span>
+                      <span style={{fontSize:12,color:'#D4A017',fontWeight:700, marginLeft:'auto'}}>#1 GLOBAL</span>
                     </div>
                     <div style={{textAlign: 'center', padding: '15px 0', borderTop: '1px solid #E2E0D8', marginTop: '10px'}}>
                       <p style={{fontSize: '12px', color: '#9B9890', margin: 0}}>Complete more courses to climb higher!</p>
