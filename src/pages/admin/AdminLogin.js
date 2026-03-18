@@ -70,23 +70,50 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="edu-auth-page admin-access">
-      <div className="edu-auth-right" style={{width: '100%', maxWidth: '100%'}}>
-        <div className="edu-auth-card" style={{margin: '0 auto', maxWidth: '450px', border: '1px solid #E85D2A'}}>
-          <div className="edu-admin-lock" style={{textAlign:'center', marginBottom: '20px', fontSize: '40px'}}>
-             🕵️‍♂️
+    <div className="edu-auth-page admin-access" style={{background: '#FAF9F6'}}>
+      <div className="edu-auth-right" style={{width: '100%', maxWidth: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+        <div className="edu-auth-card shadow-lg" style={{
+          margin: '0 auto', 
+          maxWidth: '480px', 
+          border: '1px solid #E2E0D8',
+          borderRadius: '32px',
+          padding: '50px',
+          background: '#fff',
+          position: 'relative'
+        }}>
+          <div style={{
+            position: 'absolute', top: '-40px', left: '50%', transform: 'translateX(-50%)',
+            width: '80px', height: '80px', background: '#1A1916', borderRadius: '24px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#E85D2A',
+            fontSize: '32px', border: '4px solid #fff', boxShadow: '0 15px 35px rgba(0,0,0,0.1)'
+          }} className="edu-admin-lock">
+             🛡️
           </div>
           
+          <div style={{height: '30px'}}></div>
+
           {!show2FA ? (
             <>
-              <h2 style={{color: '#1A1916'}}>Admin Protocol</h2>
-              <p className="edu-auth-sub">Restricted access area. Unauthorized entry is prohibited.</p>
+              <div className="text-center mb-5">
+                <h2 style={{
+                  fontFamily: '"Playfair Display", serif', 
+                  fontSize: '32px', 
+                  fontWeight: 900, 
+                  color: '#1A1916',
+                  letterSpacing: '-0.5px'
+                }}>Central Command</h2>
+                <p className="edu-auth-sub" style={{fontSize: '14px', color: '#6B6962', marginTop: '10px'}}>
+                  Enter administrative credentials to access NexLearn core protocols.
+                </p>
+              </div>
 
-              {error && <div className="edu-auth-error">{error}</div>}
+              {error && <div className="edu-auth-error mb-4" style={{
+                background: '#FEF2F2', color: '#EF4444', padding: '12px', borderRadius: '12px', fontSize: '13px', textAlign: 'center'
+              }}>{error}</div>}
 
               <form className="edu-auth-form" onSubmit={handleSubmit}>
-                <div>
-                  <label className="edu-auth-label">Administrator ID (Email)</label>
+                <div className="mb-4">
+                  <label className="edu-auth-label" style={{fontSize: '12px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px', color: '#9B9890', marginBottom: '8px', display: 'block'}}>ADMINISTRATOR ID</label>
                   <input
                     type="email"
                     className="edu-auth-input"
@@ -94,10 +121,13 @@ const AdminLogin = () => {
                     value={formData.email}
                     onChange={(e) => setFormData({...formData, email: e.target.value})}
                     required
+                    style={{
+                      height: '56px', border: '1px solid #E2E0D8', borderRadius: '16px', padding: '0 20px', fontSize: '15px'
+                    }}
                   />
                 </div>
-                <div>
-                  <label className="edu-auth-label">Security Key (Password)</label>
+                <div className="mb-5">
+                  <label className="edu-auth-label" style={{fontSize: '12px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px', color: '#9B9890', marginBottom: '8px', display: 'block'}}>SECURITY PASSKEY</label>
                   <input
                     type="password"
                     className="edu-auth-input"
@@ -105,43 +135,66 @@ const AdminLogin = () => {
                     value={formData.password}
                     onChange={(e) => setFormData({...formData, password: e.target.value})}
                     required
+                    style={{
+                      height: '56px', border: '1px solid #E2E0D8', borderRadius: '16px', padding: '0 20px', fontSize: '15px'
+                    }}
                   />
                 </div>
-                <button type="submit" className="edu-auth-btn" style={{background: '#1A1916', borderColor: '#1A1916'}} disabled={loading}>
-                  {loading ? 'Authenticating...' : 'Enter System'}
+                <button type="submit" className="edu-auth-btn" style={{
+                  background: '#1A1916', 
+                  color: '#fff',
+                  border: 'none',
+                  height: '60px',
+                  borderRadius: '16px',
+                  fontSize: '16px',
+                  fontWeight: 700,
+                  width: '100%',
+                  boxShadow: '0 20px 40px rgba(0,0,0,0.15)',
+                  transition: '0.3s'
+                }} disabled={loading}>
+                  {loading ? 'AUTHENTICATING...' : 'AUTHORIZE LOGIN'}
                 </button>
               </form>
             </>
           ) : (
             <>
-              <h2>Verify Identity</h2>
-              <p className="edu-auth-sub">Please enter the 6-digit administrative bypass code</p>
+              <div className="text-center mb-5">
+                <h2 style={{fontFamily: '"Playfair Display", serif', fontSize: '30px', fontWeight: 900}}>2FA Required</h2>
+                <p className="edu-auth-sub">Enter the 6-digit administrative bypass code sent to your device.</p>
+              </div>
 
-              {error && <div className="edu-auth-error">{error}</div>}
+              {error && <div className="edu-auth-error mb-4">{error}</div>}
 
               <form className="edu-auth-form" onSubmit={handle2FASubmit}>
-                <div>
-                  <label className="edu-auth-label">6-Digit Admin Key</label>
+                <div className="mb-5">
+                  <label className="edu-auth-label">VERIFICATION CODE</label>
                   <input
                     type="text"
-                    className="edu-auth-input"
-                    placeholder="000000"
+                    className="edu-auth-input text-center"
+                    placeholder="000 000"
                     maxLength="6"
                     value={twoFactorToken}
                     onChange={(e) => setTwoFactorToken(e.target.value)}
                     required
-                    style={{letterSpacing: '8px', textAlign: 'center', fontSize: '24px'}}
+                    style={{
+                      letterSpacing: '12px', fontSize: '28px', fontWeight: 800, 
+                      height: '70px', borderRadius: '20px', border: '2px solid #E85D2A'
+                    }}
                   />
                 </div>
-                <button type="submit" className="edu-auth-btn" style={{background: '#1A1916'}} disabled={loading}>
-                  {loading ? 'Verifying...' : 'Authorize Access'}
+                <button type="submit" className="edu-auth-btn" style={{
+                  background: '#E85D2A', height: '60px', borderRadius: '16px', fontSize: '16px', fontWeight: 700, width: '100%', color: '#fff', border: 'none'
+                }} disabled={loading}>
+                  {loading ? 'VERIFYING...' : 'CONFIRM IDENTITY'}
                 </button>
               </form>
             </>
           )}
 
-          <div className="edu-auth-footer">
-            <Link to="/login" style={{color:'#9B9890', fontSize:'12px', marginTop:'12px', display:'inline-block'}}>← Standard User Login</Link>
+          <div className="edu-auth-footer text-center mt-5">
+            <Link to="/login" style={{color:'#9B9890', fontSize:'13px', textDecoration: 'none', fontWeight: 600}}>
+               ← RETURN TO STANDARD ACCESS
+            </Link>
           </div>
         </div>
       </div>
