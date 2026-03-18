@@ -459,41 +459,17 @@ const StudentDashboard = () => {
                   <div className="edu-leaderboard-card">
                     <div className="edu-section-header" style={{marginBottom: 12}}>
                       <span className="edu-section-title">Leaderboard</span>
-                      <span className="edu-see-all" style={{fontSize: 11}}>This Week</span>
-                    </div>
-                    <div className="edu-leader-row">
-                      <span className="edu-leader-rank edu-rank-gold">1</span>
-                      <div className="edu-leader-avatar edu-lav-b">JK</div>
-                      <span className="edu-leader-name">Jake Chen</span>
-                      <span className="edu-leader-xp">6,240 XP</span>
-                      <span className="edu-leader-badge">🏆</span>
-                    </div>
-                    <div className="edu-leader-row">
-                      <span className="edu-leader-rank edu-rank-silver">2</span>
-                      <div className="edu-leader-avatar edu-lav-e">MR</div>
-                      <span className="edu-leader-name">Maya Reyes</span>
-                      <span className="edu-leader-xp">5,810 XP</span>
-                      <span className="edu-leader-badge">🥈</span>
-                    </div>
-                    <div className="edu-leader-row">
-                      <span className="edu-leader-rank edu-rank-bronze">3</span>
-                      <div className="edu-leader-avatar edu-lav-c">TN</div>
-                      <span className="edu-leader-name">Tom Nakamura</span>
-                      <span className="edu-leader-xp">5,490 XP</span>
-                      <span className="edu-leader-badge">🥉</span>
+                      <span className="edu-see-all" style={{fontSize: 11}}>Personal Progress</span>
                     </div>
                     <div className="edu-leader-row edu-leader-highlight">
-                      <span className="edu-leader-rank" style={{color:'var(--edu-accent)'}}>4</span>
+                      <span className="edu-leader-rank" style={{color:'var(--edu-accent)'}}>1</span>
                       <div className="edu-leader-avatar" style={{background:'linear-gradient(135deg, #6B8DD6, #2D5BE3)', color:'white'}}>{initials}</div>
                       <span className="edu-leader-name">You</span>
                       <span className="edu-leader-xp">{totalEnrolled * 240} XP</span>
-                      <span style={{fontSize:11,color:'var(--edu-accent)',fontWeight:500}}>▲ +2</span>
+                      <span style={{fontSize:11,color:'var(--edu-accent)',fontWeight:500, marginLeft:'auto'}}>Global Rank #1</span>
                     </div>
-                    <div className="edu-leader-row">
-                      <span className="edu-leader-rank edu-rank-other">5</span>
-                      <div className="edu-leader-avatar edu-lav-d">SL</div>
-                      <span className="edu-leader-name">Sara Liu</span>
-                      <span className="edu-leader-xp">4,650 XP</span>
+                    <div style={{textAlign: 'center', padding: '15px 0', borderTop: '1px solid #E2E0D8', marginTop: '10px'}}>
+                      <p style={{fontSize: '12px', color: '#9B9890', margin: 0}}>Complete more courses to climb higher!</p>
                     </div>
                   </div>
                 </div>
