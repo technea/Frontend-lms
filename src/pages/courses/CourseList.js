@@ -7,10 +7,6 @@ import gsap from 'gsap';
 import { FiSearch, FiActivity } from 'react-icons/fi';
 import '../../styles/EduFlow.css';
 
-const courseEmojis = { 'Technology': '💻', 'Design': '🎨', 'Business': '📈', 'Marketing': '📊', 'Data Science': '🤖' };
-const getCourseEmoji = (cat) => courseEmojis[cat] || '📚';
-const thumbColors = ['t1', 't2', 't3', 't4'];
-
 const CourseList = () => {
   const [courses, setCourses] = useState([]);
   const [filteredCourses, setFilteredCourses] = useState([]);
@@ -19,7 +15,7 @@ const CourseList = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    gsap.from('.edu-page-header', { opacity: 0, scale: 0.9, duration: 1, ease: 'back.out(1.7)' });
+    gsap.from('.edu-page-header', { opacity: 0, y: 30, duration: 1, ease: 'power3.out' });
   }, []);
 
   useEffect(() => {
@@ -50,9 +46,8 @@ const CourseList = () => {
     }
     setFilteredCourses(filtered);
     
-    // Animate grid items
-    gsap.fromTo('.edu-course-item', 
-      { opacity: 0, y: 30 },
+    gsap.fromTo('.edu-card-v2', 
+      { opacity: 0, y: 20 },
       { opacity: 1, y: 0, stagger: 0.1, duration: 0.5, ease: 'power2.out' }
     );
   }, [searchQuery, courses, activeCategory]);
@@ -60,50 +55,37 @@ const CourseList = () => {
   const categories = ['All', 'Technology', 'Design', 'Business', 'Marketing', 'Data Science'];
 
   return (
-    <div className="edu-page" style={{background: '#FAF9F6', minHeight: '100vh', position: 'relative'}}>
+    <div className="edu-page" style={{background: '#FAF9F6', minHeight: '100vh'}}>
       <Navbar />
       
-      {/* Cinematic Background Pattern */}
-      <div style={{
-        position: 'absolute', top: 0, left: 0, right: 0, height: '600px',
-        background: 'radial-gradient(circle at 50% -20%, #E85D2A10 0%, transparent 70%)',
-        zIndex: 0, pointerEvents: 'none'
-      }}></div>
-
-      <div className="container py-5 mt-5" style={{position: 'relative', zIndex: 1}}>
-        <header className="edu-page-header text-center mb-5" style={{maxWidth: '900px', margin: '0 auto'}}>
-          <div className="edu-tag-mini mb-3">ELITE CURRICULUM</div>
-          <h1 className="display-3 fw-bold mb-3" style={{
+      <div className="container py-5 mt-5">
+        <header className="edu-page-header text-center mb-5" style={{maxWidth: '800px', margin: '0 auto'}}>
+          <h1 className="display-4 fw-bold mb-3" style={{
             fontFamily: '"Playfair Display", serif',
-            letterSpacing: '-1px',
-            background: 'linear-gradient(135deg, #1A1916 0%, #E85D2A 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent'
+            color: '#1A1916'
           }}>
-            NexLearn Universe
+            Explore Our Courses
           </h1>
-          <p className="lead mb-5" style={{color: '#6B6962', fontSize: '1.2rem', fontWeight: 400}}>
-            Accelerate your growth with our elite curriculum engineered for global impact. <br/>
-            Sourced from the world's most prestigious institutions.
+          <p className="lead mb-5" style={{color: '#6B6962', fontSize: '1.1rem'}}>
+            Discover professional courses designed to help you master new skills and advance your career.
           </p>
           
           <div className="row justify-content-center mt-4">
-            <div className="col-md-7">
-              <div className="edu-search-v3 shadow-lg">
+            <div className="col-md-8">
+              <div className="edu-search-v3 shadow-sm">
                 <FiSearch style={{fontSize: '20px', color: '#9B9890'}} />
                 <input 
                   type="text" 
                   className="form-control"
-                  placeholder="What would you like to master today?" 
+                  placeholder="Search for courses..." 
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
-                <kbd style={{background: '#F5F4F0', color: '#9B9890', padding: '2px 8px', borderRadius: '4px', border: '1px solid #E2E0D8'}}>⌘K</kbd>
               </div>
             </div>
           </div>
 
-          <div className="d-flex flex-wrap justify-content-center gap-3 mt-5">
+          <div className="d-flex flex-wrap justify-content-center gap-2 mt-4">
             {categories.map(cat => (
               <button 
                 key={cat} 
@@ -119,7 +101,6 @@ const CourseList = () => {
         {loading ? (
           <div style={{textAlign: 'center', padding: '100px'}}>
              <div className="edu-loading-ring"></div>
-             <p style={{color: '#9B9890', marginTop: '20px', letterSpacing: '2px'}}>SYNCHRONIZING REPOSITORY...</p>
           </div>
         ) : (
           <>
@@ -127,27 +108,27 @@ const CourseList = () => {
               <div className="edu-course-grid-v2">
                 {filteredCourses.map((course, idx) => (
                   <Link to={`/course/${course._id}`} key={course._id} className="edu-card-v2">
-                    <div className={`c-v2-thumb ${thumbColors[idx % 4]}`}>
-                      <span className="c-v2-emoji">{getCourseEmoji(course.category)}</span>
+                    <div className={`c-v2-thumb ${thumbColors[idx % 4]}`} style={{height: '160px'}}>
+                      <FiActivity style={{fontSize: '40px', color: '#1A1916', opacity: 0.6}} />
                       {course.isExternal && (
                         <div className="c-v2-source-badge">
                            {course.source}
                         </div>
                       )}
                     </div>
-                    <div className="c-v2-body">
+                    <div className="c-v2-body" style={{padding: '25px'}}>
                       <div className="c-v2-header">
                         <span className="c-v2-tag">{course.category}</span>
-                        <div className="c-v2-price">{course.price === 0 ? 'COMPLIMENTARY' : `$${course.price}`}</div>
+                        <div className="c-v2-price" style={{color: '#1A1916', fontWeight: 800}}>{course.price === 0 ? 'FREE' : `$${course.price}`}</div>
                       </div>
-                      <h3 className="c-v2-title">{course.title}</h3>
-                      <p className="c-v2-desc">{course.description ? course.description.substring(0, 110) + '...' : 'Premium curriculum details pending decryption.'}</p>
+                      <h3 className="c-v2-title" style={{fontSize: '18px', marginBottom: '10px'}}>{course.title}</h3>
+                      <p className="c-v2-desc" style={{fontSize: '14px', marginBottom: '20px'}}>{course.description ? course.description.substring(0, 90) + '...' : 'Details pending.'}</p>
                       
                       <div className="c-v2-footer">
-                         <div className="c-v2-stats">
-                            <FiActivity style={{marginRight: '5px'}} /> Advanced Level
+                         <div className="c-v2-stats" style={{fontSize: '11px'}}>
+                            <FiActivity style={{marginRight: '5px'}} /> Professional Track
                          </div>
-                         <div className="c-v2-link">Unlock Repository →</div>
+                         <div className="c-v2-link" style={{fontSize: '11px'}}>View Course →</div>
                       </div>
                     </div>
                   </Link>

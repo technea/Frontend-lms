@@ -27,23 +27,10 @@ const Home = () => {
     fetchCourses();
 
     // GSAP Animations
-    gsap.from('.hero-title', { opacity: 0, duration: 0.6, ease: 'sine.out' });
-    gsap.from('.hero-sub', { opacity: 0, duration: 0.6, delay: 0.2, ease: 'sine.out' });
-    gsap.from('.edu-feature-card', { 
-      y: 10, 
-      opacity: 0, 
-      stagger: 0.05, 
-      duration: 0.6, 
-      ease: 'power1.out', 
-      scrollTrigger: {
-        trigger: '.edu-features-grid',
-        start: 'top 90%'
-      }
-    });
+    gsap.from('.hero-title', { opacity: 0, y: 30, duration: 1, ease: 'power3.out' });
+    gsap.from('.hero-sub', { opacity: 0, y: 20, duration: 1, delay: 0.2, ease: 'power3.out' });
   }, []);
 
-  const courseEmojis = { 'Technology': '💻', 'Design': '🎨', 'Business': '📈', 'Marketing': '📊', 'Data Science': '🤖' };
-  const getCourseEmoji = (cat) => courseEmojis[cat] || '📚';
   const thumbColors = ['t1', 't2', 't3', 't4'];
 
   return (
@@ -52,92 +39,79 @@ const Home = () => {
       
       <div className="edu-page-content">
         {/* HERO SECTION */}
-        <section className="edu-home-hero">
-          <div className="hero-text">
-            <div className="hero-eyebrow">Next Generation Learning</div>
-            <h1 className="hero-title">Master The<br/>Art of Code & Flow</h1>
-            <p className="hero-sub">
-              Join 10,000+ creators architecting the digital future with our premium NexLearn experience.
+        <section className="edu-home-hero" style={{background: '#1A1916', borderRadius: '0 0 40px 40px', padding: '100px 40px'}}>
+          <div className="hero-text" style={{maxWidth: '800px', margin: '0 auto', textAlign: 'center'}}>
+            <div className="hero-eyebrow" style={{color: '#E85D2A', fontWeight: 800, fontSize: '14px', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '20px'}}>Global Academy</div>
+            <h1 className="hero-title" style={{color: '#fff', fontSize: '56px', fontWeight: 900, fontFamily: '"Playfair Display", serif', lineHeight: 1.1}}>Elevate Your Skills <br/>For the Digital Era</h1>
+            <p className="hero-sub" style={{color: 'rgba(255,255,255,0.7)', fontSize: '18px', margin: '30px auto', maxWidth: '600px'}}>
+              Master top-tier curriculum engineered for high-performance careers in technology, design, and business.
             </p>
-            <div className="hero-actions">
-              <Link to="/register" className="edu-btn edu-btn-white" style={{textDecoration: 'none'}}>Get Started</Link>
-              <Link to="/courses" className="edu-btn edu-btn-outline" style={{color: 'white', borderColor: 'rgba(255,255,255,0.3)', textDecoration: 'none'}}>Browse Courses</Link>
-            </div>
-          </div>
-          <div className="edu-home-hero-stats">
-            <div className="hero-stats-row">
-              <div className="h-stat">
-                <div className="h-stat-num">150+</div>
-                <div className="h-stat-label">Expert Courses</div>
-              </div>
-              <div className="h-divider"></div>
-              <div className="h-stat">
-                <div className="h-stat-num">10K+</div>
-                <div className="h-stat-label">Active Learners</div>
-              </div>
-              <div className="h-divider"></div>
-              <div className="h-stat">
-                <div className="h-stat-num">98%</div>
-                <div className="h-stat-label">Success Rate</div>
-              </div>
+            <div className="hero-actions" style={{display: 'flex', gap: '20px', justifyContent: 'center'}}>
+              <Link to="/register" className="edu-btn" style={{background: '#fff', color: '#1A1916', padding: '15px 40px', borderRadius: '50px', fontWeight: 800, textDecoration: 'none'}}>Join for Free</Link>
+              <Link to="/courses" className="edu-btn" style={{border: '1px solid rgba(255,255,255,0.3)', color: 'white', padding: '15px 40px', borderRadius: '50px', fontWeight: 800, textDecoration: 'none'}}>Browse Library</Link>
             </div>
           </div>
         </section>
 
         {/* FEATURES SECTION */}
-        <div className="edu-page-header" style={{marginTop: '60px'}}>
-          <h1>Why NexLearn?</h1>
-          <p>We provide the elite infrastructure needed to accelerate your career trajectory.</p>
-        </div>
-
-        <div className="edu-features-grid">
-          <div className="edu-feature-card">
-            <div className="edu-feature-icon">⚡</div>
-            <h3 className="edu-feature-title">Propulsive Learning</h3>
-            <p className="edu-feature-text">High-octane curriculum designed for rapid skill acquisition and retention.</p>
-          </div>
-          <div className="edu-feature-card">
-            <div className="edu-feature-icon">💎</div>
-            <h3 className="edu-feature-title">Elite Mentorship</h3>
-            <p className="edu-feature-text">Direct access to industry architects who have built world-class systems.</p>
-          </div>
-          <div className="edu-feature-card">
-            <div className="edu-feature-icon">🏗️</div>
-            <h3 className="edu-feature-title">Architectural Mindset</h3>
-            <p className="edu-feature-text">Go beyond syntax; learn the patterns and architectures behind the code.</p>
+        <div className="container" style={{marginTop: '100px'}}>
+           <div className="row g-4">
+            <div className="col-md-4">
+              <div className="edu-feature-card" style={{background: '#fff', padding: '40px', borderRadius: '24px', border: '1px solid #E2E0D8', textAlign: 'center'}}>
+                <FiActivity style={{fontSize: '32px', color: '#E85D2A', marginBottom: '20px'}} />
+                <h3 style={{fontSize: '20px', fontWeight: 800, marginBottom: '15px'}}>Focused Learning</h3>
+                <p style={{color: '#6B6962', fontSize: '14px'}}>Optimized curriculums for rapid skill retention and real-world application.</p>
+              </div>
+            </div>
+            <div className="col-md-4">
+              <div className="edu-feature-card" style={{background: '#fff', padding: '40px', borderRadius: '24px', border: '1px solid #E2E0D8', textAlign: 'center'}}>
+                 <FiActivity style={{fontSize: '32px', color: '#E85D2A', marginBottom: '20px'}} />
+                <h3 style={{fontSize: '20px', fontWeight: 800, marginBottom: '15px'}}>Expert Mentors</h3>
+                <p style={{color: '#6B6962', fontSize: '14px'}}>Learn directly from industry leaders with decades of practical experience.</p>
+              </div>
+            </div>
+            <div className="col-md-4">
+              <div className="edu-feature-card" style={{background: '#fff', padding: '40px', borderRadius: '24px', border: '1px solid #E2E0D8', textAlign: 'center'}}>
+                 <FiActivity style={{fontSize: '32px', color: '#E85D2A', marginBottom: '20px'}} />
+                <h3 style={{fontSize: '20px', fontWeight: 800, marginBottom: '15px'}}>Modern Patterns</h3>
+                <p style={{color: '#6B6962', fontSize: '14px'}}>Master the advanced architectural mental models behind every craft.</p>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* POPULAR COURSES SECTION */}
-        <div className="edu-page-header" style={{marginTop: '80px', textAlign: 'left', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end'}}>
-          <div>
-            <h1>Popular Courses</h1>
-            <p>Start your journey with our top-rated curriculum.</p>
+        <div className="container" style={{marginTop: '120px', marginBottom: '100px'}}>
+          <div className="d-flex justify-content-between align-items-end mb-5">
+            <div>
+              <h2 style={{fontFamily: '"Playfair Display", serif', fontSize: '38px', fontWeight: 900}}>Recommended Programs</h2>
+              <p style={{color: '#6B6962', fontSize: '16px'}}>Curated curriculum to help you achieve mastery.</p>
+            </div>
+            <Link to="/courses" className="edu-pill-btn active" style={{textDecoration: 'none'}}>Explore All Programs</Link>
           </div>
-          <Link to="/courses" className="edu-btn edu-btn-outline" style={{textDecoration: 'none'}}>View All</Link>
-        </div>
 
-        <div className="edu-courses-list">
-          {loading ? (
-            <p style={{gridColumn: '1/-1', textAlign: 'center', padding: '40px'}}>Loading courses...</p>
-          ) : (
-            courses.map((course, idx) => (
-              <Link to={`/course/${course._id}`} key={course._id} className="edu-course-item">
-                <div className={`c-thumb ${thumbColors[idx % 4]}`}>
-                  {getCourseEmoji(course.category)}
-                </div>
-                <div className="c-body">
-                  <span className="c-cat">{course.category}</span>
-                  <h3 className="c-title">{course.title}</h3>
-                  <p className="c-desc">{course.description ? course.description.substring(0, 80) + '...' : 'No description available.'}</p>
-                  <div className="c-footer">
-                    <span className="c-price">{course.price === 0 ? 'FREE' : `$${course.price}`}</span>
-                    <span className="edu-tag edu-tag-blue">View Details</span>
+          <div className="edu-course-grid-v2">
+            {loading ? (
+              <p style={{gridColumn: '1/-1', textAlign: 'center', padding: '40px', color: '#9B9890'}}>Sourcing recommended programs...</p>
+            ) : (
+              courses.map((course, idx) => (
+                <Link to={`/course/${course._id}`} key={course._id} className="edu-card-v2">
+                  <div className={`c-v2-thumb ${thumbColors[idx % 4]}`} style={{height: '140px'}}>
+                     <FiActivity style={{fontSize: '32px', color: '#1A1916', opacity: 0.5}} />
                   </div>
-                </div>
-              </Link>
-            ))
-          )}
+                  <div className="c-v2-body" style={{padding: '25px'}}>
+                    <span className="c-v2-tag" style={{fontSize: '10px', color: '#E85D2A', fontWeight: 800, textTransform: 'uppercase'}}>{course.category}</span>
+                    <h3 className="c-v2-title" style={{fontSize: '18px', margin: '10px 0', fontFamily: 'inherit', fontWeight: 800}}>{course.title}</h3>
+                    <p className="c-v2-desc" style={{fontSize: '14px', marginBottom: '20px', color: '#6B6962'}}>{course.description ? course.description.substring(0, 85) + '...' : 'Program details pending.'}</p>
+                    <div className="c-v2-footer" style={{paddingTop: '15px', borderTop: '1px solid #F5F4F0', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                      <span style={{fontWeight: 900, color: '#1A1916'}}>{course.price === 0 ? 'FREE' : `$${course.price}`}</span>
+                      <span style={{fontSize: '11px', fontWeight: 800, color: '#E85D2A'}}>Explore →</span>
+                    </div>
+                  </div>
+                </Link>
+              ))
+            )}
+          </div>
         </div>
 
         {/* CTA SECTION */}
