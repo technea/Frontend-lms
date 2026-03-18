@@ -34,40 +34,40 @@ const StudentDashboard = () => {
       const tl = gsap.timeline();
       
       tl.from(".edu-hero", { 
-        y: 50, 
+        y: 15, 
         opacity: 0, 
-        duration: 1, 
-        ease: "power4.out" 
+        duration: 0.8, 
+        ease: "power2.out" 
       })
       .from(".edu-stat-card", { 
-        y: 30, 
+        y: 10, 
         opacity: 0, 
-        stagger: 0.1, 
-        duration: 0.8, 
-        ease: "back.out(1.7)" 
-      }, "-=0.6")
+        stagger: 0.05, 
+        duration: 0.6, 
+        ease: "power1.out" 
+      }, "-=0.4")
       .from(".edu-section-header", { 
         opacity: 0, 
         x: -20, 
         duration: 0.5 
       }, "-=0.4")
       .from(".edu-course-card", { 
-        scale: 0.8, 
+        y: 10,
         opacity: 0, 
-        stagger: 0.1, 
+        stagger: 0.05, 
         duration: 0.6, 
-        ease: "power2.out" 
+        ease: "power1.out" 
       }, "-=0.3");
     }
   }, [loading, user]);
 
   const handleStatHover = (e, isEnter) => {
     gsap.to(e.currentTarget, {
-      scale: isEnter ? 1.05 : 1,
-      y: isEnter ? -5 : 0,
+      scale: isEnter ? 1.02 : 1,
+      y: isEnter ? -3 : 0,
       borderColor: isEnter ? "#2D5BE3" : "#E2E0D8",
-      duration: 0.3,
-      ease: "power2.out"
+      duration: 0.2,
+      ease: "power1.out"
     });
   };
 

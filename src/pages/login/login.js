@@ -14,9 +14,9 @@ const Login = () => {
   const [tempUserId, setTempUserId] = useState('');
 
   useEffect(() => {
-    gsap.from('.edu-auth-left', { x: -100, opacity: 0, duration: 1, ease: 'power4.out' });
-    gsap.from('.edu-auth-card', { x: 100, opacity: 0, duration: 1, delay: 0.2, ease: 'power4.out' });
-    gsap.from('.edu-auth-stat', { y: 20, opacity: 0, stagger: 0.1, duration: 0.8, delay: 0.5 });
+    gsap.from('.edu-auth-left', { x: -20, opacity: 0, duration: 0.8, ease: 'power2.out' });
+    gsap.from('.edu-auth-card', { x: 20, opacity: 0, duration: 0.8, delay: 0.1, ease: 'power2.out' });
+    gsap.from('.edu-auth-stat', { opacity: 0, stagger: 0.05, duration: 0.6, delay: 0.3 });
   }, []);
 
   const handleSubmit = async (e) => {

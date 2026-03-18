@@ -27,17 +27,17 @@ const Home = () => {
     fetchCourses();
 
     // GSAP Animations
-    gsap.from('.hero-title', { y: 30, opacity: 0, duration: 0.8, ease: 'power2.out' });
-    gsap.from('.hero-sub', { y: 20, opacity: 0, duration: 0.8, delay: 0.2, ease: 'power2.out' });
+    gsap.from('.hero-title', { opacity: 0, duration: 0.6, ease: 'sine.out' });
+    gsap.from('.hero-sub', { opacity: 0, duration: 0.6, delay: 0.2, ease: 'sine.out' });
     gsap.from('.edu-feature-card', { 
-      y: 30, 
+      y: 10, 
       opacity: 0, 
-      stagger: 0.1, 
-      duration: 0.8, 
-      ease: 'power2.out', 
+      stagger: 0.05, 
+      duration: 0.6, 
+      ease: 'power1.out', 
       scrollTrigger: {
         trigger: '.edu-features-grid',
-        start: 'top 80%'
+        start: 'top 90%'
       }
     });
   }, []);
