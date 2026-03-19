@@ -5,7 +5,7 @@ import '../styles/EduFlow.css';
 const Footer = () => {
   return (
     <footer className="edu-footer">
-      <div className="edu-navbar-container" style={{flexDirection: 'column', padding: '60px 32px 30px'}}>
+      <div className="edu-navbar-container footer-container">
         <div className="footer-grid">
           <div className="footer-brand">
             <Link to="/" className="edu-navbar-brand" style={{marginBottom: '16px'}}>

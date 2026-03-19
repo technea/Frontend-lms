@@ -234,7 +234,8 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 .mobile-nav-item:hover { background: #EEF1FD; color: #2D5BE3; }
 
 /* ═══ FOOTER ═══ */
-.edu-footer { background: var(--cardBg); border-top: 1px solid var(--cardBorder); margin-top: auto; color: var(--text); padding: 40px 0; }
+.edu-footer { background: var(--cardBg); border-top: 1px solid var(--cardBorder); margin-top: auto; color: var(--text); }
+.footer-container { flex-direction: column; padding: 60px 32px 30px; }
 .footer-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 40px; margin-bottom: 40px; width: 100%; }
 .footer-brand { display: flex; flex-direction: column; gap: 16px; }
 .footer-desc { font-size: 14px; color: #6B6962; line-height: 1.6; max-width: 320px; }
@@ -524,6 +525,12 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
   .edu-player-main { padding:20px; }
   .edu-profile-grid { grid-template-columns:1fr; }
   .stat-grid-v3 { grid-template-columns: 1fr !important; }
+  
+  /* Footer Responsiveness */
+  .footer-grid { grid-template-columns: 1fr; gap: 32px; }
+  .footer-links-group { flex-direction: column; gap: 24px; }
+  .footer-desc { max-width: 100%; }
+  .footer-bottom { flex-direction: column; gap: 16px; text-align: center; }
 }
 
 @media(max-width:480px) {
@@ -540,6 +547,9 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
   .edu-filter-chip { white-space: nowrap; flex-shrink: 0; }
   .c-v2-body { padding: 16px; }
   .c-v2-title { font-size: 15px; }
+  
+  /* Footer Mobile Spacing */
+  .footer-container { padding: 40px 16px 20px; }
 }
 
 /* ═══ V3 PREMIUM GLOBAL STYLES ═══ */
