@@ -39,7 +39,7 @@ const Navbar = () => {
             <Link 
               key={link.path} 
               to={link.path} 
-              className={`nav-item ${location.pathname === link.path ? 'active' : ''}`}
+              className={`edu-nav-link ${location.pathname === link.path ? 'active' : ''}`}
             >
               {link.name}
             </Link>
@@ -54,7 +54,7 @@ const Navbar = () => {
             </div>
           ) : (
             <div className="nav-auth-actions">
-              <Link to="/login" className="nav-item">Login</Link>
+              <Link to="/login" className="edu-nav-link">Login</Link>
               <Link to="/register" className="edu-btn edu-btn-primary" style={{padding: '8px 16px', fontSize: '13px', textDecoration:'none'}}>Join Free</Link>
             </div>
           )}
