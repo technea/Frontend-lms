@@ -38,7 +38,7 @@ const DashboardSidebar = ({ isOpen, onClose }) => {
         flexDirection: 'column'
       }}>
         <Link to="/" className="edu-logo" style={{textDecoration:'none', marginBottom: '40px', padding: '0 10px', display: 'flex', alignItems: 'center', gap: '10px'}}>
-          <div className="edu-logo-mark" style={{background: '#E85D2A', width: '36px', height: '36px', borderRadius: '10px', display: 'flex', alignItems: 'center', justify: 'center'}}>
+          <div className="edu-logo-mark" style={{background: '#2D5BE3', width: '36px', height: '36px', borderRadius: '10px', display: 'flex', alignItems: 'center', justify: 'center'}}>
             <svg viewBox="0 0 24 24" style={{width: '20px', height: '20px'}}><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" fill="white"/></svg>
           </div>
           <span className="edu-logo-text" style={{color: '#1A1916', fontFamily: '"Playfair Display", serif', fontSize: '22px', fontWeight: 700}}>NexLearn</span>
@@ -69,7 +69,7 @@ const DashboardSidebar = ({ isOpen, onClose }) => {
               >
                 <span style={{width: '18px', height: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>{link.icon}</span>
                 <span style={{fontWeight: location.pathname === link.path ? 700 : 500}}>{link.label}</span>
-                {link.badge && <span className="edu-nav-badge" style={{background: '#E85D2A', marginLeft: 'auto', fontSize: '10px', padding: '2px 6px', borderRadius: '10px', color: '#fff'}}>{link.badge}</span>}
+                {link.badge && <span className="edu-nav-badge" style={{background: '#2D5BE3', marginLeft: 'auto', fontSize: '10px', padding: '2px 6px', borderRadius: '10px', color: '#fff'}}>{link.badge}</span>}
               </Link>
             ))}
           </nav>
@@ -107,7 +107,7 @@ const DashboardSidebar = ({ isOpen, onClose }) => {
           <div className="edu-avatar" style={{background: '#2D5BE3', color: '#fff', width: '36px', height: '36px', borderRadius: '50%', display: 'flex', alignItems: 'center', justify: 'center', fontWeight: 700}}>{initials}</div>
           <div style={{marginLeft: '12px'}}>
             <div className="edu-user-name" style={{color: '#1A1916', fontSize: '14px', fontWeight: 700}}>{user?.name || 'User'}</div>
-            <div className="edu-user-role" style={{fontSize: '11px', color: '#E85D2A', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.5px'}}>
+            <div className="edu-user-role" style={{fontSize: '11px', color: '#2D5BE3', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.5px'}}>
                {user?.role === 'student' ? 'Student Tier' : user?.role || 'User'}
             </div>
           </div>

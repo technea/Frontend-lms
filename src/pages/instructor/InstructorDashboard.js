@@ -235,7 +235,7 @@ const InstructorDashboard = () => {
                           {lessons.map((lesson, idx) => (
                             <div key={lesson._id} style={{display:'flex', justifyContent:'space-between', padding:'10px', background:'#F5F4F0', borderRadius:'8px'}}>
                               <div style={{fontSize:'13px'}}><span style={{fontWeight:'bold', color:'#2D5BE3', marginRight:'6px'}}>{idx + 1}.</span> {lesson.title}</div>
-                              <button onClick={() => handleDeleteLesson(lesson._id)} style={{color:'#E85D2A', background:'none', border:'none', fontSize:'11px', cursor:'pointer'}}>Remove</button>
+                              <button onClick={() => handleDeleteLesson(lesson._id)} style={{color:'#2D5BE3', background:'none', border:'none', fontSize:'11px', cursor:'pointer'}}>Remove</button>
                             </div>
                           ))}
                         </div>
@@ -269,7 +269,7 @@ const InstructorDashboard = () => {
                       <div style={{display:'flex', gap:'8px', marginTop:'14px'}}>
                         <button onClick={() => openLessons(course)} className="edu-btn edu-btn-outline" style={{flex:1, padding:'6px', fontSize:'11px'}}>Manage</button>
                         <button onClick={() => startEdit(course)} className="edu-btn edu-btn-outline" style={{flex:1, padding:'6px', fontSize:'11px'}}>Edit</button>
-                        <button onClick={() => handleDeleteCourse(course._id)} className="edu-btn edu-btn-outline" style={{padding:'6px', color:'#E85D2A', borderColor:'#E85D2A'}}><span role="img" aria-label="delete">🗑️</span></button>
+                        <button onClick={() => handleDeleteCourse(course._id)} className="edu-btn edu-btn-outline" style={{padding:'6px', color:'#2D5BE3', borderColor:'#2D5BE3'}}><span role="img" aria-label="delete">🗑️</span></button>
                       </div>
                     </div>
                   </div>

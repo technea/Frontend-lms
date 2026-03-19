@@ -112,14 +112,14 @@ const AdminDashboard = () => {
       {/* ── SIDEBAR ── */}
       <aside className={`dash-sidebar ${sidebarOpen ? 'open' : ''}`} style={{ background: '#fff', color: '#1A1916', borderRight: '1px solid #F0EFEA' }}>
         <div className="dash-logo" style={{ padding: '0 10px', marginBottom: '40px' }}>
-          <div className="logo-icon" style={{ background: '#E85D2A', borderRadius: '10px' }}>
+          <div className="logo-icon" style={{ background: '#2D5BE3', borderRadius: '10px' }}>
              <svg viewBox="0 0 24 24" style={{width:'20px', height:'20px'}}><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" fill="white"/></svg>
           </div>
           <span className="logo-text" style={{ color: '#1A1916' }}>NexLearn<span>Admin</span></span>
         </div>
 
         <nav className="dash-nav">
-          <div className="nav-group-label" style={{ color: '#E85D2A', opacity: 0.8 }}>General</div>
+          <div className="nav-group-label" style={{ color: '#2D5BE3', opacity: 0.8 }}>General</div>
           {[
             { id: 'overview', name: 'Dashboard', icon: <FiGrid /> },
             { id: 'users', name: 'User Management', icon: <FiUsers /> },
@@ -129,9 +129,9 @@ const AdminDashboard = () => {
               key={item.id}
               onClick={() => { setActiveTab(item.id); setSidebarOpen(false); }}
               className={`nav-item ${activeTab === item.id ? 'active' : ''}`}
-              style={{ color: activeTab === item.id ? '#E85D2A' : '#6B6962', background: activeTab === item.id ? 'rgba(232, 93, 42, 0.05)' : 'transparent', border:'none', width:'100%', textAlign:'left', padding:'12px', borderRadius:'10px', display:'flex', alignItems:'center', gap:'12px', marginBottom:4, cursor:'pointer' }}
+              style={{ color: activeTab === item.id ? '#2D5BE3' : '#6B6962', background: activeTab === item.id ? 'rgba(232, 93, 42, 0.05)' : 'transparent', border:'none', width:'100%', textAlign:'left', padding:'12px', borderRadius:'10px', display:'flex', alignItems:'center', gap:'12px', marginBottom:4, cursor:'pointer' }}
             >
-              <span style={{ color: activeTab === item.id ? '#E85D2A' : 'inherit' }}>{item.icon}</span>
+              <span style={{ color: activeTab === item.id ? '#2D5BE3' : 'inherit' }}>{item.icon}</span>
               <span style={{ fontWeight: activeTab === item.id ? 700 : 500 }}>{item.name}</span>
             </button>
           ))}

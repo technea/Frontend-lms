@@ -258,17 +258,17 @@ const Profile = () => {
                    ) : (
                       <div>
                          <p style={{fontSize:'13px', color:'#6B6962', marginBottom:'16px'}}>Your account is protected with Two-Factor Authentication. You will be asked for a code during login.</p>
-                         <button className="edu-btn edu-btn-outline" style={{borderColor:'#E85D2A', color:'#E85D2A'}} onClick={handleDisable2FA} disabled={loading}>
+                         <button className="edu-btn edu-btn-outline" style={{borderColor:'#2D5BE3', color:'#2D5BE3'}} onClick={handleDisable2FA} disabled={loading}>
                             Disable 2FA
                          </button>
                       </div>
                    )}
                 </div>
 
-                <div className="edu-card" style={{border:'1px solid #FDF0EB', background:'#FDF0EB33'}}>
-                   <h3 style={{fontSize:'15px', fontWeight:600, color:'#E85D2A', marginBottom:'10px'}}>Archive Identity</h3>
+                <div className="edu-card" style={{border:'1px solid #EEF1FD', background:'#EEF1FD33'}}>
+                   <h3 style={{fontSize:'15px', fontWeight:600, color:'#2D5BE3', marginBottom:'10px'}}>Archive Identity</h3>
                    <p style={{fontSize:'13px', color:'#6B6962', marginBottom:'20px', lineHeight:1.6}}>Deactivating your account will permanently purge all enrolled progress and achievements from our database. This action is irreversible.</p>
-                   <button className="edu-btn edu-btn-outline" style={{borderColor:'#E85D2A', color:'#E85D2A', fontSize:'12px'}} onClick={() => { if(window.confirm('IRREVERSIBLE ACTION: Purge identity?')) { /* delete */ } }}>
+                   <button className="edu-btn edu-btn-outline" style={{borderColor:'#2D5BE3', color:'#2D5BE3', fontSize:'12px'}} onClick={() => { if(window.confirm('IRREVERSIBLE ACTION: Purge identity?')) { /* delete */ } }}>
                       Permanently Delete Identity
                    </button>
                 </div>

@@ -41,7 +41,7 @@ const Login = () => {
       const errorMsg = err.message || (typeof err === 'string' ? err : 'Login failed.');
       if (err.unverified) {
         setError(
-          <span>{errorMsg}. <Link to="/verify-otp" state={{ email: formData.email }} style={{ color: '#E85D2A', fontWeight: 'bold', textDecoration: 'underline' }}>Verify Now</Link></span>
+          <span>{errorMsg}. <Link to="/verify-otp" state={{ email: formData.email }} style={{ color: '#2D5BE3', fontWeight: 'bold', textDecoration: 'underline' }}>Verify Now</Link></span>
         );
       } else {
         setError(errorMsg);

@@ -73,7 +73,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 .edu-auth-link:hover { opacity:.8; }
 .edu-auth-footer { margin-top:24px; text-align:center; font-size:13px; color:#9B9890; }
 .edu-auth-footer a { color:#2D5BE3; font-weight:600; text-decoration:none; }
-.edu-auth-error { background:#FDF0EB; color:#E85D2A; padding:10px 14px; border-radius:8px; font-size:13px; border:1px solid rgba(232,93,42,.2); }
+.edu-auth-error { background:#EEF1FD; color:#2D5BE3; padding:10px 14px; border-radius:8px; font-size:13px; border:1px solid rgba(232,93,42,.2); }
 
 /* ═══ NEXLEARN PAGE LAYOUT ═══ */
 .edu-page { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; transition: background 0.3s, color 0.3s; }
@@ -255,7 +255,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 .edu-nav-item:hover { background: #F5F4F0; color: #1A1916; }
 .edu-nav-item.active { background: #EEF1FD; color: #2D5BE3; font-weight: 500; }
 .edu-nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
-.edu-nav-badge { margin-left: auto; background: #E85D2A; color: white; font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 20px; min-width: 18px; text-align: center; }
+.edu-nav-badge { margin-left: auto; background: #2D5BE3; color: white; font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 20px; min-width: 18px; text-align: center; }
 
 .edu-sidebar-user { margin-top: auto; padding: 16px; border-top: 1px solid #E2E0D8; display: flex; align-items: center; gap: 10px; cursor: pointer; text-decoration: none; color: inherit; }
 .edu-avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #6B8DD6, #2D5BE3); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: white; flex-shrink: 0; }
@@ -273,7 +273,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 .edu-search-box input { border: none; background: transparent; outline: none; font-size: 13px; flex: 1; }
 .edu-topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; }
 .edu-icon-btn { width: 36px; height: 36px; border: 1px solid #E2E0D8; border-radius: 8px; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; position: relative; }
-.edu-notif-dot { position: absolute; top: 7px; right: 7px; width: 7px; height: 7px; background: #E85D2A; border-radius: 50%; border: 1.5px solid white; }
+.edu-notif-dot { position: absolute; top: 7px; right: 7px; width: 7px; height: 7px; background: #2D5BE3; border-radius: 50%; border: 1.5px solid white; }
 .edu-hamburger { 
   display: none; width: 40px; height: 40px; border: 1px solid var(--cardBorder); 
   border-radius: 8px; background: white; cursor: pointer; align-items: center; 
@@ -302,7 +302,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 .edu-stat-icon { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
 .edu-stat-icon svg { width: 18px; height: 18px; }
 .edu-stat-icon.blue { background: #EEF1FD; color: #2D5BE3; }
-.edu-stat-icon.orange { background: #FDF0EB; color: #E85D2A; }
+.edu-stat-icon.orange { background: #EEF1FD; color: #2D5BE3; }
 .edu-stat-icon.green { background: #EBF6F1; color: #1C7A52; }
 .edu-stat-icon.amber { background: #FDF4E7; color: #B56C10; }
 .edu-stat-num { font-size: 26px; font-weight: 700; margin-bottom: 4px; }
@@ -331,7 +331,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 .edu-thumb-bg.amber { background: linear-gradient(135deg, #FAE0A0, #EAB840); }
 .edu-course-badge { position: absolute; top: 10px; left: 10px; font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 20px; background: rgba(255,255,255,.92); transition: all 0.3s ease; z-index: 2; }
 .edu-badge-progress { color: #2D5BE3; }
-.edu-badge-new { color: #E85D2A; }
+.edu-badge-new { color: #2D5BE3; }
 .edu-badge-completed { color: #1C7A52; }
 .edu-course-body { padding: 16px; }
 .edu-course-tag { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: #9B9890; margin-bottom: 5px; }
@@ -341,7 +341,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 .edu-course-meta-item svg { width: 12px; height: 12px; }
 .edu-progress-bar-wrap { background: #F5F4F0; border-radius: 20px; height: 5px; overflow: hidden; margin-bottom: 6px; }
 .edu-progress-bar { height: 100%; border-radius: 20px; background: #2D5BE3; transition: width .3s; }
-.edu-progress-bar.orange { background: #E85D2A; }
+.edu-progress-bar.orange { background: #2D5BE3; }
 .edu-progress-bar.green { background: #1C7A52; }
 .edu-progress-label { font-size: 11px; color: #9B9890; display: flex; justify-content: space-between; }
 
@@ -379,7 +379,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 .edu-cal-day.other { color: #9B9890; }
 .edu-cal-day.today { background: #2D5BE3; color: white; font-weight: 600; }
 .edu-cal-day.has-event { position: relative; font-weight: 500; color: #1A1916; }
-.edu-cal-day.has-event::after { content: ''; position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; background: #E85D2A; border-radius: 50%; }
+.edu-cal-day.has-event::after { content: ''; position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; background: #2D5BE3; border-radius: 50%; }
 
 /* ── EVENTS ── */
 .edu-event-item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid #E2E0D8; }
@@ -392,7 +392,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 .edu-event-sub { font-size: 11px; color: #6B6962; }
 .edu-event-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
 .edu-dot-blue { background: #2D5BE3; }
-.edu-dot-orange { background: #E85D2A; }
+.edu-dot-orange { background: #2D5BE3; }
 .edu-dot-green { background: #1C7A52; }
 
 /* ── LEADERBOARD ── */
