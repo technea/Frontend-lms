@@ -6,8 +6,8 @@ import authService from '../../services/authService';
 import gsap from 'gsap';
 import { 
   FiUsers, FiBookOpen, FiActivity, FiShield, 
-  FiUploadCloud, FiSettings, FiGrid, FiTrash2, FiUserCheck, 
-  FiDatabase, FiBell, FiSearch, FiMoreVertical, FiLogOut
+  FiUploadCloud, FiSettings, FiGrid, FiTrash2, 
+  FiBell, FiSearch, FiLogOut
 } from 'react-icons/fi';
 import '../../styles/EduFlow.css';
 
@@ -273,7 +273,7 @@ const AdminDashboard = () => {
                 <div className="table-responsive">
                   <table className="table-v3">
                     <thead>
-                      <tr><th>Curriculum</th><th>Classification</th><th>Valuation</th><th>Status</th></tr>
+                      <tr><th>Curriculum</th><th>Classification</th><th>Valuation</th><th>Status</th><th>Actions</th></tr>
                     </thead>
                     <tbody>
                       {courses.map(c => (
@@ -282,6 +282,14 @@ const AdminDashboard = () => {
                           <td><span className="role-badge" style={{ background: '#FAF9F6', color: '#6B6962' }}>{c.category}</span></td>
                           <td>${c.price}</td>
                           <td>{c.isExternal ? 'External' : 'Native'}</td>
+                          <td>
+                            <button 
+                              onClick={() => handleDeleteCourse(c._id)} 
+                              style={{ border: 'none', background: 'none', color: '#EF4444', cursor: 'pointer' }}
+                            >
+                              <FiTrash2 />
+                            </button>
+                          </td>
                         </tr>
                       ))}
                     </tbody>
