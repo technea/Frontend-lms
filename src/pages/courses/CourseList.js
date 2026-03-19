@@ -4,7 +4,10 @@ import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import api from '../../services/api';
 import gsap from 'gsap';
-import { FiSearch, FiActivity } from 'react-icons/fi';
+import { 
+  FiSearch, FiActivity, FiGlobe, FiZap, FiCommand, 
+  FiLayers, FiCpu, FiBox, FiTarget, FiTrendingUp 
+} from 'react-icons/fi';
 import '../../styles/EduFlow.css';
 
 const CourseList = () => {
@@ -100,8 +103,8 @@ const CourseList = () => {
               <div className="edu-course-grid-v2">
                 {filteredCourses.map((course, idx) => (
                   <Link to={`/course/${course._id}`} key={course._id} className="edu-card-v2">
-                    <div className="c-v2-thumb">
-                      <FiActivity style={{fontSize: '40px', color: '#2D5BE3', opacity: 0.6}} />
+                    <div className="c-v2-thumb" style={{fontSize: '40px'}}>
+                      {[<FiGlobe />, <FiZap />, <FiCommand />, <FiLayers />, <FiCpu />, <FiBox />, <FiActivity />, <FiTarget />][idx % 8]}
                       {course.isExternal && (
                         <div className="c-v2-source-badge">
                            {course.source}
@@ -118,7 +121,7 @@ const CourseList = () => {
                       
                       <div className="c-v2-footer">
                          <div className="c-v2-stats">
-                            <FiActivity style={{marginRight: '5px', color: '#2D5BE3'}} /> Professional Track
+                            <FiTrendingUp style={{marginRight: '5px', color: '#2D5BE3'}} /> Professional Track
                          </div>
                          <div className="c-v2-link">View Course →</div>
                       </div>

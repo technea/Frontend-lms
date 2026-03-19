@@ -5,7 +5,10 @@ import Footer from '../../components/Footer';
 import api from '../../services/api';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { FiActivity } from 'react-icons/fi';
+import { 
+  FiActivity, FiZap, FiUsers, FiCpu, FiLayers, 
+  FiShield, FiGlobe, FiCommand, FiTarget, FiBox 
+} from 'react-icons/fi';
 import '../../styles/EduFlow.css';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -30,6 +33,23 @@ const Home = () => {
     // GSAP Animations
     gsap.from('.hero-title', { opacity: 0, y: 30, duration: 1, ease: 'power3.out' });
     gsap.from('.hero-sub', { opacity: 0, y: 20, duration: 1, delay: 0.2, ease: 'power3.out' });
+    gsap.from('.hero-actions', { opacity: 0, y: 20, duration: 1, delay: 0.4, ease: 'power3.out' });
+
+    // Feature Cards Staggered Animation
+    gsap.fromTo('.edu-feature-card', 
+      { opacity: 0, y: 40 },
+      { 
+        opacity: 1, 
+        y: 0, 
+        stagger: 0.2, 
+        duration: 0.8, 
+        ease: 'power2.out',
+        scrollTrigger: {
+          trigger: '.row.g-4',
+          start: 'top 80%',
+        }
+      }
+    );
   }, []);
 
   const thumbColors = ['t1', 't2', 't3', 't4'];
@@ -59,21 +79,21 @@ const Home = () => {
            <div className="row g-4">
             <div className="col-md-4">
               <div className="edu-feature-card" style={{background: '#fff', padding: '40px', borderRadius: '24px', border: '1px solid #E2E0D8', textAlign: 'center'}}>
-                <FiActivity style={{fontSize: '32px', color: '#2D5BE3', marginBottom: '20px'}} />
+                <FiZap style={{fontSize: '32px', color: '#2D5BE3', marginBottom: '20px'}} />
                 <h3 style={{fontSize: '20px', fontWeight: 800, marginBottom: '15px'}}>Focused Learning</h3>
                 <p style={{color: '#6B6962', fontSize: '14px'}}>Optimized curriculums for rapid skill retention and real-world application.</p>
               </div>
             </div>
             <div className="col-md-4">
               <div className="edu-feature-card" style={{background: '#fff', padding: '40px', borderRadius: '24px', border: '1px solid #E2E0D8', textAlign: 'center'}}>
-                 <FiActivity style={{fontSize: '32px', color: '#2D5BE3', marginBottom: '20px'}} />
+                 <FiUsers style={{fontSize: '32px', color: '#2D5BE3', marginBottom: '20px'}} />
                 <h3 style={{fontSize: '20px', fontWeight: 800, marginBottom: '15px'}}>Expert Mentors</h3>
                 <p style={{color: '#6B6962', fontSize: '14px'}}>Learn directly from industry leaders with decades of practical experience.</p>
               </div>
             </div>
             <div className="col-md-4">
               <div className="edu-feature-card" style={{background: '#fff', padding: '40px', borderRadius: '24px', border: '1px solid #E2E0D8', textAlign: 'center'}}>
-                 <FiActivity style={{fontSize: '32px', color: '#2D5BE3', marginBottom: '20px'}} />
+                 <FiCpu style={{fontSize: '32px', color: '#2D5BE3', marginBottom: '20px'}} />
                 <h3 style={{fontSize: '20px', fontWeight: 800, marginBottom: '15px'}}>Modern Patterns</h3>
                 <p style={{color: '#6B6962', fontSize: '14px'}}>Master the advanced architectural mental models behind every craft.</p>
               </div>
@@ -98,7 +118,7 @@ const Home = () => {
               courses.map((course, idx) => (
                 <Link to={`/course/${course._id}`} key={course._id} className="edu-card-v2">
                   <div className={`c-v2-thumb ${thumbColors[idx % 4]}`} style={{height: '140px'}}>
-                     <FiActivity style={{fontSize: '32px', color: '#1A1916', opacity: 0.5}} />
+                     {[<FiGlobe />, <FiZap />, <FiCommand />, <FiLayers />, <FiCpu />, <FiBox />, <FiActivity />, <FiTarget />][idx % 8]}
                   </div>
                   <div className="c-v2-body" style={{padding: '25px'}}>
                     <span className="c-v2-tag" style={{fontSize: '10px', color: '#2D5BE3', fontWeight: 800, textTransform: 'uppercase'}}>{course.category}</span>
