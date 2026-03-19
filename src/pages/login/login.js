@@ -99,6 +99,12 @@ const Login = () => {
 
       <div className="edu-auth-right">
         <div className="edu-auth-card">
+          <div className="edu-auth-mobile-header">
+            <div className="brand-icon" style={{background: '#2D5BE3', width: '40px', height: '40px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '12px'}}>
+              <svg viewBox="0 0 24 24" style={{width: '24px', height: '24px', fill: 'white'}}><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            </div>
+            <h2 style={{fontFamily: "'Playfair Display', serif", fontSize: '24px', color: '#1A1916', margin: 0}}>NexLearn</h2>
+          </div>
           {!show2FA ? (
             <>
               <h2>Welcome Back</h2>

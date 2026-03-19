@@ -42,6 +42,7 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 
 
 /* ═══ NEXLEARN AUTH PAGES ═══ */
+.edu-auth-mobile-header { display: none; }
 .edu-auth-page { min-height:100vh; display:flex; font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); transition: background 0.3s, color 0.3s; }
 .edu-auth-left { flex:1; background:var(--accentGradient); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:60px; position:relative; overflow:hidden; }
 .edu-auth-left::before { content:''; position:absolute; top:-100px; right:-100px; width:400px; height:400px; background:rgba(255,255,255,.04); border-radius:50%; }
@@ -526,6 +527,13 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
   .edu-profile-grid { grid-template-columns:1fr; }
   .stat-grid-v3 { grid-template-columns: 1fr !important; }
   
+  /* Auth Pages Responsiveness */
+  .edu-auth-page { flex-direction: column; }
+  .edu-auth-left { display: none; }
+  .edu-auth-right { padding: 60px 24px; }
+  .edu-auth-mobile-header { display: flex !important; flex-direction: column; align-items: center; margin-bottom: 32px; text-align: center; }
+  .edu-auth-row { flex-direction: column; gap: 14px; }
+  
   /* Footer Responsiveness */
   .footer-grid { grid-template-columns: 1fr; gap: 32px; }
   .footer-links-group { flex-direction: column; gap: 24px; }
@@ -534,10 +542,9 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 }
 
 @media(max-width:480px) {
-  .edu-auth-right { padding:20px 16px; }
-  .edu-auth-card h2 { font-size:24px; }
+  .edu-auth-right { padding: 40px 16px; }
+  .edu-auth-card h2 { font-size: 26px; }
   .edu-home-hero .hero-actions { flex-direction:column; }
-  .edu-auth-row { flex-direction:column; }
   .edu-page-header h1 { font-size: 28px; }
   .edu-hero { padding: 20px; flex-direction: column; text-align: center; gap: 20px; }
   .edu-hero-stats { grid-template-columns: 1fr; gap: 15px; }
