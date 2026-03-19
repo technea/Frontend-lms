@@ -9,7 +9,7 @@ const Footer = () => {
         <div className="footer-grid">
           <div className="footer-brand">
             <Link to="/" className="edu-navbar-brand" style={{marginBottom: '16px'}}>
-              <div className="brand-icon" style={{background: '#E85D2A'}}>
+              <div className="brand-icon" style={{background: '#2D5BE3'}}>
                 <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" fill="white"/></svg>
               </div>
               <span className="brand-name">NexLearn</span>
