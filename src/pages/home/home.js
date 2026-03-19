@@ -35,18 +35,19 @@ const Home = () => {
     gsap.from('.hero-sub', { opacity: 0, y: 20, duration: 1, delay: 0.2, ease: 'power3.out' });
     gsap.from('.hero-actions', { opacity: 0, y: 20, duration: 1, delay: 0.4, ease: 'power3.out' });
 
-    // Feature Cards Staggered Animation
+    // Feature Cards Premium Animation
     gsap.fromTo('.edu-feature-card', 
-      { opacity: 0, y: 40 },
+      { opacity: 0, scale: 0.9, y: 30 },
       { 
         opacity: 1, 
+        scale: 1,
         y: 0, 
         stagger: 0.2, 
-        duration: 0.8, 
-        ease: 'power2.out',
+        duration: 1, 
+        ease: 'back.out(1.7)',
         scrollTrigger: {
           trigger: '.row.g-4',
-          start: 'top 80%',
+          start: 'top 85%',
         }
       }
     );
@@ -60,7 +61,7 @@ const Home = () => {
       
       <div className="edu-page-content">
         {/* HERO SECTION */}
-        <section className="edu-home-hero" style={{background: '#fff', borderBottom: '1px solid #F0EFEA', padding: '120px 20px', textAlign: 'center'}}>
+        <section className="edu-home-hero" style={{background: '#fff', borderBottom: '1px solid #F0EFEA', padding: 'clamp(60px, 15vw, 120px) 20px', textAlign: 'center'}}>
           <div className="hero-text" style={{maxWidth: '850px', margin: '0 auto'}}>
             <div className="hero-eyebrow" style={{color: '#2D5BE3', fontWeight: 800, fontSize: '13px', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '16px'}}>NexLearn Academy</div>
             <h1 className="hero-title" style={{color: '#1A1916', fontSize: 'clamp(32px, 5vw, 64px)', fontWeight: 900, fontFamily: '"Playfair Display", serif', lineHeight: 1.1, marginBottom: '24px'}}>Elevate Your Skills <br/>For the Digital Era</h1>

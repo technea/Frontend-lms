@@ -210,12 +210,18 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 .edu-navbar-brand .brand-icon svg { width: 18px; height: 18px; fill: white; }
 .edu-navbar-brand .brand-name { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--text); }
 .edu-navbar-desktop { display: flex; align-items: center; gap: 24px; }
-.edu-navbar-desktop .nav-item { text-decoration: none; font-size: 14px; font-weight: 600; color: #6B6962; transition: .15s; }
-.edu-navbar-desktop .nav-item:hover, .edu-navbar-desktop .nav-item.active { color: #2D5BE3; }
+.edu-navbar-desktop .nav-item { text-decoration: none; font-size: 14px; font-weight: 600; color: #6B6962; transition: .15s; position: relative; padding: 10px 0; }
+.edu-navbar-desktop .nav-item:hover { color: #2D5BE3; }
+.edu-navbar-desktop .nav-item.active { color: #2D5BE3; }
+.edu-navbar-desktop .nav-item.active::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: #2D5BE3; border-radius: 10px; }
 .edu-navbar-desktop .nav-divider { width: 1px; height: 20px; background: #E2E0D8; margin: 0 4px; }
 .nav-user-actions, .nav-auth-actions { display: flex; align-items: center; gap: 12px; }
-.edu-mobile-toggle { display: none; background: none; border: none; color: #1A1916; cursor: pointer; padding: 5px; }
+.edu-mobile-toggle { display: none; background: none; border: none; color: #1A1916; cursor: pointer; padding: 5px; align-items: center; justify-content: center; }
 .edu-mobile-toggle svg { width: 24px; height: 24px; }
+@media(max-width: 991px) {
+  .edu-navbar-desktop { display: none; }
+  .edu-mobile-toggle { display: flex; }
+}
 .edu-mobile-menu { position: fixed; top: 72px; left: 0; right: 0; background: white; border-bottom: 1px solid #E2E0D8; display: flex; flex-direction: column; padding: 20px 0; z-index: 999; }
 .mobile-nav-item { padding: 12px 24px; text-decoration: none; color: #1A1916; font-size: 15px; font-weight: 600; }
 .mobile-divider { height: 1px; background: #E2E0D8; margin: 10px 0; }
@@ -428,7 +434,9 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 /* ═══ COURSE LISTING (NORMAL PROFESSIONAL) ═══ */
 .edu-course-grid-v2 { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; margin-top: 30px; }
 @media(max-width: 480px) {
-  .edu-course-grid-v2 { grid-template-columns: 1fr; }
+  .edu-course-grid-v2 { grid-template-columns: 1fr; gap: 16px; }
+  .edu-home-hero { padding: 80px 16px !important; }
+  .edu-feature-card { padding: 30px 20px !important; }
 }
 .edu-card-v2 { 
   background: #fff; border: 1px solid #F0EFEA; border-radius: 18px; overflow: hidden; 
