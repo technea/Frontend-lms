@@ -79,11 +79,7 @@ const authService = {
 
   updateAvatar: async (formData) => {
     try {
-      const response = await api.put('/users/avatar', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
+      const response = await api.put('/users/avatar', formData);
       if (response.data.user) {
         localStorage.setItem('user', JSON.stringify(response.data.user));
       }
