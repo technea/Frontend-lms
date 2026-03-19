@@ -7,7 +7,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { 
   FiActivity, FiZap, FiUsers, FiCpu, FiLayers, 
-  FiShield, FiGlobe, FiCommand, FiTarget, FiBox 
+  FiGlobe, FiCommand, FiTarget, FiBox 
 } from 'react-icons/fi';
 import '../../styles/EduFlow.css';
 
