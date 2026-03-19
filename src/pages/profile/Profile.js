@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardSidebar from '../../components/DashboardSidebar';
 import authService from '../../services/authService';
+import { IMAGE_BASE_URL } from '../../services/api';
 import '../../styles/EduFlow.css';
 
 const Profile = () => {
@@ -147,7 +148,7 @@ const Profile = () => {
              <div className="edu-right-panel" style={{order:'-1'}}>
                 <div className="edu-card" style={{textAlign:'center', padding:'40px 24px'}}>
                    <div className="edu-avatar" style={{width:'100px', height:'100px', fontSize:'36px', margin:'0 auto 20px', overflow:'hidden'}}>
-                     {user?.avatar ? <img src={user.avatar} alt="Profile" style={{width:'100%', height:'100%', objectFit:'cover'}} /> : initials}
+                     {user?.avatar ? <img src={user.avatar.startsWith('http') ? user.avatar : `${IMAGE_BASE_URL}${user.avatar}`} alt="Profile" style={{width:'100%', height:'100%', objectFit:'cover'}} /> : initials}
                    </div>
                    <h3 style={{fontSize:'18px', fontWeight:600}}>{user?.name}</h3>
                    <p style={{fontSize:'12px', color:'#9B9890', textTransform:'capitalize', marginTop:'4px'}}>{user?.role}</p>
