@@ -2,10 +2,10 @@
 
 /* ── DASHBOARD VARIABLES ── */
 .edu-dashboard {
-  --edu-bg: #F5F4F0;
+  --edu-bg: #FFFFFF;
   --edu-surface: #FFFFFF;
-  --edu-surface2: #F0EEE9;
-  --edu-border: #E2E0D8;
+  --edu-surface2: #F5F4F0;
+  --edu-border: #F0EFEA;
   --edu-text: #1A1916;
   --edu-text2: #6B6962;
   --edu-text3: #9B9890;

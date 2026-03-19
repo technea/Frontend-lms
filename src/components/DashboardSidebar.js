@@ -30,21 +30,23 @@ const DashboardSidebar = ({ isOpen, onClose }) => {
     <>
       <div className={`edu-sidebar-overlay ${isOpen ? 'show' : ''}`} onClick={onClose} />
       <aside className={`edu-sidebar ${isOpen ? 'open' : ''}`} style={{
-        background: '#1A1916', 
-        color: '#fff', 
-        borderRight: '1px solid #252420',
-        padding: '30px 20px'
+        background: '#fff', 
+        color: '#1A1916', 
+        borderRight: '1px solid #F0EFEA',
+        padding: '30px 20px',
+        display: 'flex',
+        flexDirection: 'column'
       }}>
-        <Link to="/" className="edu-logo" style={{textDecoration:'none', marginBottom: '40px', padding: '0 10px'}}>
-          <div className="edu-logo-mark" style={{background: '#E85D2A'}}>
-            <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" fill="white"/></svg>
+        <Link to="/" className="edu-logo" style={{textDecoration:'none', marginBottom: '40px', padding: '0 10px', display: 'flex', alignItems: 'center', gap: '10px'}}>
+          <div className="edu-logo-mark" style={{background: '#E85D2A', width: '36px', height: '36px', borderRadius: '10px', display: 'flex', alignItems: 'center', justify: 'center'}}>
+            <svg viewBox="0 0 24 24" style={{width: '20px', height: '20px'}}><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" fill="white"/></svg>
           </div>
-          <span className="edu-logo-text" style={{color: '#fff', fontFamily: '"Playfair Display", serif', fontSize: '22px'}}>NexLearn</span>
+          <span className="edu-logo-text" style={{color: '#1A1916', fontFamily: '"Playfair Display", serif', fontSize: '22px', fontWeight: 700}}>NexLearn</span>
         </Link>
  
         <div style={{flexGrow: 1, overflowY: 'auto'}}>
-          <nav className="edu-nav-section mb-4">
-            <div className="edu-nav-label" style={{color: '#E85D2A', letterSpacing: '2px', fontWeight: 800, fontSize: '10px', padding: '0 10px 15px'}}>ECOSYSTEM</div>
+          <nav className="edu-nav-section" style={{marginBottom: '32px'}}>
+            <div className="edu-nav-label" style={{color: '#9B9890', letterSpacing: '2px', fontWeight: 800, fontSize: '10px', padding: '0 12px 12px', textTransform: 'uppercase', opacity: 0.6}}>Ecosystem</div>
             {mainLinks.map(link => (
               <Link
                 key={link.path}
@@ -52,23 +54,28 @@ const DashboardSidebar = ({ isOpen, onClose }) => {
                 className={`edu-nav-item ${location.pathname === link.path ? 'active' : ''}`}
                 onClick={onClose}
                 style={{
-                  color: location.pathname === link.path ? '#E85D2A' : '#9B9890',
-                  background: location.pathname === link.path ? 'rgba(232, 93, 42, 0.1)' : 'transparent',
+                  color: location.pathname === link.path ? '#2D5BE3' : '#6B6962',
+                  background: location.pathname === link.path ? '#EEF1FD' : 'transparent',
                   padding: '12px 15px',
                   borderRadius: '12px',
-                  marginBottom: '5px',
-                  transition: '0.3s'
+                  marginBottom: '4px',
+                  transition: '0.2s',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  textDecoration: 'none',
+                  fontSize: '14px'
                 }}
               >
-                {link.icon}
-                <span style={{fontWeight: location.pathname === link.path ? 700 : 400}}>{link.label}</span>
-                {link.badge && <span className="edu-nav-badge" style={{background: '#E85D2A'}}>{link.badge}</span>}
+                <span style={{width: '18px', height: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>{link.icon}</span>
+                <span style={{fontWeight: location.pathname === link.path ? 700 : 500}}>{link.label}</span>
+                {link.badge && <span className="edu-nav-badge" style={{background: '#E85D2A', marginLeft: 'auto', fontSize: '10px', padding: '2px 6px', borderRadius: '10px', color: '#fff'}}>{link.badge}</span>}
               </Link>
             ))}
           </nav>
  
           <nav className="edu-nav-section">
-            <div className="edu-nav-label" style={{color: '#9B9890', letterSpacing: '2px', fontWeight: 800, fontSize: '10px', padding: '0 10px 15px'}}>PERSONAL</div>
+            <div className="edu-nav-label" style={{color: '#9B9890', letterSpacing: '2px', fontWeight: 800, fontSize: '10px', padding: '0 12px 12px', textTransform: 'uppercase', opacity: 0.6}}>Personal</div>
             {accountLinks.map(link => (
               <Link
                 key={link.path}
@@ -76,31 +83,33 @@ const DashboardSidebar = ({ isOpen, onClose }) => {
                 className={`edu-nav-item ${location.pathname === link.path ? 'active' : ''}`}
                 onClick={onClose}
                 style={{
-                  color: '#9B9890', padding: '12px 15px', borderRadius: '12px', marginBottom: '5px'
+                  color: '#6B6962', padding: '12px 15px', borderRadius: '12px', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '12px', textDecoration: 'none', fontSize: '14px'
                 }}
               >
-                {link.icon}
-                {link.label}
+                <span style={{width: '18px', height: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>{link.icon}</span>
+                <span style={{fontWeight: 500}}>{link.label}</span>
               </Link>
             ))}
             <button
               className="edu-nav-item"
               onClick={() => { authService.logout(); window.location.href = '/'; }}
-              style={{color: '#9B9890', padding: '12px 15px', border: 'none', background: 'transparent', width: '100%', textAlign: 'left'}}
+              style={{color: '#9B9890', padding: '12px 15px', border: 'none', background: 'transparent', width: '100%', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', fontSize: '14px'}}
             >
               <LogoutIcon />
-              Logout
+              <span style={{fontWeight: 500}}>Logout</span>
             </button>
           </nav>
         </div>
  
         <Link to="/profile" className="edu-sidebar-user" onClick={onClose} style={{
-          background: '#252420', padding: '15px', borderRadius: '16px', border: '1px solid #333'
+          background: '#FAF9F6', padding: '15px', borderRadius: '16px', border: '1px solid #F0EFEA', marginTop: '20px', display: 'flex', alignItems: 'center', textDecoration: 'none'
         }}>
-          <div className="edu-avatar" style={{background: '#1A1916', border: '1px solid #444'}}>{initials}</div>
-          <div style={{marginLeft: '10px'}}>
-            <div className="edu-user-name" style={{color: '#fff', fontSize: '14px', fontWeight: 700}}>{user?.name || 'User'}</div>
-            <div className="edu-user-role" style={{fontSize: '11px', color: '#E85D2A', textTransform: 'uppercase', fontWeight: 800}}>{user?.role || 'Student'} TIER</div>
+          <div className="edu-avatar" style={{background: '#2D5BE3', color: '#fff', width: '36px', height: '36px', borderRadius: '50%', display: 'flex', alignItems: 'center', justify: 'center', fontWeight: 700}}>{initials}</div>
+          <div style={{marginLeft: '12px'}}>
+            <div className="edu-user-name" style={{color: '#1A1916', fontSize: '14px', fontWeight: 700}}>{user?.name || 'User'}</div>
+            <div className="edu-user-role" style={{fontSize: '11px', color: '#E85D2A', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.5px'}}>
+               {user?.role === 'student' ? 'Student Tier' : user?.role || 'User'}
+            </div>
           </div>
         </Link>
       </aside>

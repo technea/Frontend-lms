@@ -70,132 +70,115 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="edu-auth-page admin-access" style={{background: '#1A1916'}}>
-      <div className="edu-auth-right" style={{width: '100%', maxWidth: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-        <div className="edu-auth-card shadow-2xl" style={{
-          margin: '0 auto', 
-          maxWidth: '480px', 
-          border: '1px solid rgba(232, 93, 42, 0.3)',
-          borderRadius: '32px',
-          padding: '50px',
-          background: '#fff',
-          position: 'relative'
-        }}>
-          <div style={{
-            position: 'absolute', top: '-40px', left: '50%', transform: 'translateX(-50%)',
-            width: '80px', height: '80px', background: '#E85D2A', borderRadius: '24px',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff',
-            fontSize: '32px', border: '5px solid #fff', boxShadow: '0 15px 35px rgba(232, 93, 42, 0.3)',
-            fontWeight: '900'
-          }} className="edu-admin-lock">
-             🛡️
-          </div>
-          
-          <div style={{height: '30px'}}></div>
+    <div className="edu-auth-page admin-access" style={{background: '#FAF9F6', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', width: '100%'}}>
+      <div className="edu-auth-card" style={{
+        maxWidth: '480px', 
+        width: '100%',
+        padding: '0 20px',
+        textAlign: 'center',
+        background: 'transparent',
+        boxShadow: 'none',
+        border: 'none'
+      }}>
+        {!show2FA ? (
+          <>
+            <h2 style={{
+              fontFamily: '"Playfair Display", serif', 
+              fontSize: '48px', 
+              fontWeight: 900, 
+              color: '#1A1916',
+              marginBottom: '10px'
+            }}>Welcome Back</h2>
+            <p style={{fontSize: '16px', color: '#9B9890', marginBottom: '40px'}}>
+               Enter your credentials to access your dashboard
+            </p>
 
-          {!show2FA ? (
-            <>
-              <div className="text-center mb-5">
-                <h2 style={{
-                  fontFamily: '"Playfair Display", serif', 
-                  fontSize: '30px', 
-                  fontWeight: 900, 
-                  color: '#1A1916',
-                  letterSpacing: '-0.5px'
-                }}>Admin Protocol</h2>
-                <p style={{fontSize: '14px', color: '#6B6962', marginTop: '10px', fontWeight: 500}}>
-                   Restricted administrative access. Please authorize with your security credentials.
-                </p>
+            {error && <div className="mb-4" style={{color: '#EF4444', fontWeight: 600}}>{error}</div>}
+
+            <form className="edu-auth-form" onSubmit={handleSubmit} style={{textAlign: 'left'}}>
+              <div className="mb-4">
+                <label style={{fontSize: '14px', fontWeight: 600, color: '#9B9890', marginBottom: '10px', display: 'block', textAlign: 'center'}}>Email Address</label>
+                <input
+                  type="email"
+                  className="form-control"
+                  placeholder="you@example.com"
+                  value={formData.email}
+                  onChange={(e) => setFormData({...formData, email: e.target.value})}
+                  required
+                  style={{
+                    height: '60px', border: '1px solid #E2E0D8', borderRadius: '12px', padding: '0 20px', fontSize: '18px', background: '#F5F4F0', width: '100%'
+                  }}
+                />
+              </div>
+              <div className="mb-4">
+                <label style={{fontSize: '14px', fontWeight: 600, color: '#9B9890', marginBottom: '10px', display: 'block', textAlign: 'center'}}>Password</label>
+                <input
+                  type="password"
+                  className="form-control"
+                  placeholder="Enter your password"
+                  value={formData.password}
+                  onChange={(e) => setFormData({...formData, password: e.target.value})}
+                  required
+                  style={{
+                    height: '60px', border: '1px solid #E2E0D8', borderRadius: '12px', padding: '0 20px', fontSize: '18px', background: '#F5F4F0', width: '100%'
+                  }}
+                />
+              </div>
+              
+              <div style={{textAlign: 'right', marginBottom: '30px'}}>
+                <Link to="/forgot-password" style={{color: '#6366F1', fontWeight: 600, textDecoration: 'none'}}>Forgot Password?</Link>
               </div>
 
-              {error && <div className="mb-4" style={{
-                background: '#FEF2F2', color: '#EF4444', padding: '14px', borderRadius: '12px', fontSize: '13px', textAlign: 'center', fontWeight: '600'
-              }}>{error}</div>}
+              <button type="submit" className="edu-auth-btn" style={{
+                background: '#2D5BE3', 
+                color: '#fff',
+                height: '64px',
+                borderRadius: '12px',
+                fontSize: '18px',
+                fontWeight: 700,
+                width: '100%',
+                border: 'none',
+                boxShadow: '0 10px 20px rgba(45,91,227,0.2)'
+              }} disabled={loading}>
+                {loading ? 'Logging in...' : 'Log In'}
+              </button>
+            </form>
+          </>
+        ) : (
+          <>
+             <h2 style={{fontFamily: '"Playfair Display", serif', fontSize: '36px', fontWeight: 900}}>Verify Identity</h2>
+             <p style={{color: '#9B9890', marginBottom: '30px'}}>Please enter the 6-digit verification code.</p>
 
-              <form className="edu-auth-form" onSubmit={handleSubmit}>
-                <div className="mb-4">
-                  <label style={{fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px', color: '#9B9890', marginBottom: '8px', display: 'block'}}>ADMINISTRATOR ID</label>
-                  <input
-                    type="email"
-                    className="edu-auth-input"
-                    placeholder="admin@nexlearn.com"
-                    value={formData.email}
-                    onChange={(e) => setFormData({...formData, email: e.target.value})}
-                    required
-                    style={{
-                      height: '56px', border: '1px solid #E2E0D8', borderRadius: '14px', padding: '0 20px', fontSize: '15px'
-                    }}
-                  />
-                </div>
-                <div className="mb-5">
-                  <label style={{fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px', color: '#9B9890', marginBottom: '8px', display: 'block'}}>SECURITY PASSKEY</label>
-                  <input
-                    type="password"
-                    className="edu-auth-input"
-                    placeholder="••••••••"
-                    value={formData.password}
-                    onChange={(e) => setFormData({...formData, password: e.target.value})}
-                    required
-                    style={{
-                      height: '56px', border: '1px solid #E2E0D8', borderRadius: '14px', padding: '0 20px', fontSize: '15px'
-                    }}
-                  />
-                </div>
+             <form className="edu-auth-form" onSubmit={handle2FASubmit}>
+                <input
+                  type="text"
+                  className="form-control text-center"
+                  placeholder="000 000"
+                  maxLength="6"
+                  value={twoFactorToken}
+                  onChange={(e) => setTwoFactorToken(e.target.value)}
+                  required
+                  style={{
+                    letterSpacing: '8px', fontSize: '24px', fontWeight: 800, 
+                    height: '70px', borderRadius: '12px', border: '1px solid #E2E0D8', background: '#F5F4F0', marginBottom: '30px', width: '100%'
+                  }}
+                />
                 <button type="submit" className="edu-auth-btn" style={{
-                  background: '#1A1916', 
-                  color: '#fff',
-                  height: '60px',
-                  borderRadius: '16px',
-                  fontSize: '16px',
-                  fontWeight: 700,
-                  width: '100%',
-                  boxShadow: '0 15px 30px rgba(0,0,0,0.15)',
-                  transition: '0.3s'
+                  background: '#2D5BE3', height: '64px', borderRadius: '12px', fontSize: '18px', fontWeight: 700, width: '100%', color: '#fff', border: 'none'
                 }} disabled={loading}>
-                  {loading ? 'AUTHENTICATING...' : 'AUTHORIZE LOGIN'}
+                  {loading ? 'Verifying...' : 'Authorize Access'}
                 </button>
-              </form>
-            </>
-          ) : (
-            <>
-              <div className="text-center mb-5">
-                <h2 style={{fontFamily: '"Playfair Display", serif', fontSize: '28px', fontWeight: 900}}>MFA Bypass Code</h2>
-                <p style={{color: '#64748B'}}>Enter the 6-digit administrative verification key.</p>
-              </div>
+             </form>
+          </>
+        )}
 
-              {error && <div className="mb-4">{error}</div>}
-
-              <form className="edu-auth-form" onSubmit={handle2FASubmit}>
-                <div className="mb-5">
-                  <label style={{fontSize: '11px', fontWeight: 800, textTransform: 'uppercase'}}>Security Key</label>
-                  <input
-                    type="text"
-                    className="edu-auth-input text-center"
-                    placeholder="000 000"
-                    maxLength="6"
-                    value={twoFactorToken}
-                    onChange={(e) => setTwoFactorToken(e.target.value)}
-                    required
-                    style={{
-                      letterSpacing: '10px', fontSize: '28px', fontWeight: 800, 
-                      height: '75px', borderRadius: '16px', border: '2px solid #E85D2A'
-                    }}
-                  />
-                </div>
-                <button type="submit" className="edu-auth-btn" style={{
-                  background: '#E85D2A', height: '60px', borderRadius: '16px', fontSize: '16px', fontWeight: 700, width: '100%', color: '#fff'
-                }} disabled={loading}>
-                  {loading ? 'VERIFYING...' : 'CONFIRM IDENTITY'}
-                </button>
-              </form>
-            </>
-          )}
-
-          <div className="text-center mt-5">
-            <Link to="/login" style={{color:'#9B9890', fontSize:'13px', textDecoration: 'none', fontWeight: 600}}>
-               ← RETURN TO USER GATEWAY
-            </Link>
-          </div>
+        <div className="text-center mt-5">
+          <p style={{color: '#9B9890', fontSize: '14px'}}>
+            Don't have an account? <Link to="/register" style={{color: '#2D5BE3', fontWeight: 700, textDecoration: 'none'}}>Sign Up</Link>
+          </p>
+          <Link to="/" style={{color:'#9B9890', fontSize:'14px', textDecoration: 'none', fontWeight: 600, display: 'block', marginTop: '15px'}}>
+             ← Back to Home
+          </Link>
         </div>
       </div>
     </div>

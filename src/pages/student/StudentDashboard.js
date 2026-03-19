@@ -5,6 +5,7 @@ import DashboardSidebar from '../../components/DashboardSidebar';
 import authService from '../../services/authService';
 import api from '../../services/api';
 import '../../styles/EduFlow.css';
+import '../../styles/StudentDashboard.css';
 import gsap from 'gsap';
 
 const StudentDashboard = () => {

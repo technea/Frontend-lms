@@ -39,16 +39,16 @@ const Home = () => {
       
       <div className="edu-page-content">
         {/* HERO SECTION */}
-        <section className="edu-home-hero" style={{background: '#1A1916', borderRadius: '0 0 40px 40px', padding: '100px 40px'}}>
-          <div className="hero-text" style={{maxWidth: '800px', margin: '0 auto', textAlign: 'center'}}>
-            <div className="hero-eyebrow" style={{color: '#E85D2A', fontWeight: 800, fontSize: '14px', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '20px'}}>Global Academy</div>
-            <h1 className="hero-title" style={{color: '#fff', fontSize: '56px', fontWeight: 900, fontFamily: '"Playfair Display", serif', lineHeight: 1.1}}>Elevate Your Skills <br/>For the Digital Era</h1>
-            <p className="hero-sub" style={{color: 'rgba(255,255,255,0.7)', fontSize: '18px', margin: '30px auto', maxWidth: '600px'}}>
-              Master top-tier curriculum engineered for high-performance careers in technology, design, and business.
+        <section className="edu-home-hero" style={{background: '#fff', borderBottom: '1px solid #F0EFEA', padding: '120px 20px', textAlign: 'center'}}>
+          <div className="hero-text" style={{maxWidth: '850px', margin: '0 auto'}}>
+            <div className="hero-eyebrow" style={{color: '#2D5BE3', fontWeight: 800, fontSize: '13px', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '16px'}}>NexLearn Academy</div>
+            <h1 className="hero-title" style={{color: '#1A1916', fontSize: 'clamp(32px, 5vw, 64px)', fontWeight: 900, fontFamily: '"Playfair Display", serif', lineHeight: 1.1, marginBottom: '24px'}}>Elevate Your Skills <br/>For the Digital Era</h1>
+            <p className="hero-sub" style={{color: '#6B6962', fontSize: '1.1rem', margin: '0 auto 40px', maxWidth: '650px', lineHeight: 1.6}}>
+              Master top-tier curriculum engineered for high-performance careers in technology, design, and business. Start your journey today with world-class mentors.
             </p>
-            <div className="hero-actions" style={{display: 'flex', gap: '20px', justifyContent: 'center'}}>
-              <Link to="/register" className="edu-btn" style={{background: '#fff', color: '#1A1916', padding: '15px 40px', borderRadius: '50px', fontWeight: 800, textDecoration: 'none'}}>Join for Free</Link>
-              <Link to="/courses" className="edu-btn" style={{border: '1px solid rgba(255,255,255,0.3)', color: 'white', padding: '15px 40px', borderRadius: '50px', fontWeight: 800, textDecoration: 'none'}}>Browse Library</Link>
+            <div className="hero-actions" style={{display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap'}}>
+              <Link to="/register" className="edu-btn edu-btn-primary" style={{padding: '16px 40px', borderRadius: '12px', fontWeight: 800, textDecoration: 'none'}}>Get Started for Free</Link>
+              <Link to="/courses" className="edu-btn edu-btn-outline" style={{padding: '16px 40px', borderRadius: '12px', fontWeight: 800, textDecoration: 'none'}}>Explore All Programs</Link>
             </div>
           </div>
         </section>

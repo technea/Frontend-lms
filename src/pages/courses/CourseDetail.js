@@ -38,6 +38,18 @@ const CourseDetail = () => {
     const user = authService.getCurrentUser();
     if (!user) { navigate('/login'); return; }
 
+    if (course.isExternal && course.externalLink) {
+      // Direct redirection for external courses
+      let finalLink = course.externalLink;
+      if (course.couponCode && course.externalLink.includes('udemy.com')) {
+        finalLink = course.externalLink.includes('?') 
+          ? `${course.externalLink}&couponCode=${course.couponCode}`
+          : `${course.externalLink}?couponCode=${course.couponCode}`;
+      }
+      window.open(finalLink, '_blank');
+      return;
+    }
+
     setEnrolling(true);
     try {
       await api.post('/enroll', { courseId: course._id });
