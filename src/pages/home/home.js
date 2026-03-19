@@ -5,6 +5,7 @@ import Footer from '../../components/Footer';
 import api from '../../services/api';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { FiActivity } from 'react-icons/fi';
 import '../../styles/EduFlow.css';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -58,21 +59,21 @@ const Home = () => {
            <div className="row g-4">
             <div className="col-md-4">
               <div className="edu-feature-card" style={{background: '#fff', padding: '40px', borderRadius: '24px', border: '1px solid #E2E0D8', textAlign: 'center'}}>
-                <FiActivity style={{fontSize: '32px', color: '#E85D2A', marginBottom: '20px'}} />
+                <FiActivity style={{fontSize: '32px', color: '#2D5BE3', marginBottom: '20px'}} />
                 <h3 style={{fontSize: '20px', fontWeight: 800, marginBottom: '15px'}}>Focused Learning</h3>
                 <p style={{color: '#6B6962', fontSize: '14px'}}>Optimized curriculums for rapid skill retention and real-world application.</p>
               </div>
             </div>
             <div className="col-md-4">
               <div className="edu-feature-card" style={{background: '#fff', padding: '40px', borderRadius: '24px', border: '1px solid #E2E0D8', textAlign: 'center'}}>
-                 <FiActivity style={{fontSize: '32px', color: '#E85D2A', marginBottom: '20px'}} />
+                 <FiActivity style={{fontSize: '32px', color: '#2D5BE3', marginBottom: '20px'}} />
                 <h3 style={{fontSize: '20px', fontWeight: 800, marginBottom: '15px'}}>Expert Mentors</h3>
                 <p style={{color: '#6B6962', fontSize: '14px'}}>Learn directly from industry leaders with decades of practical experience.</p>
               </div>
             </div>
             <div className="col-md-4">
               <div className="edu-feature-card" style={{background: '#fff', padding: '40px', borderRadius: '24px', border: '1px solid #E2E0D8', textAlign: 'center'}}>
-                 <FiActivity style={{fontSize: '32px', color: '#E85D2A', marginBottom: '20px'}} />
+                 <FiActivity style={{fontSize: '32px', color: '#2D5BE3', marginBottom: '20px'}} />
                 <h3 style={{fontSize: '20px', fontWeight: 800, marginBottom: '15px'}}>Modern Patterns</h3>
                 <p style={{color: '#6B6962', fontSize: '14px'}}>Master the advanced architectural mental models behind every craft.</p>
               </div>
@@ -100,12 +101,12 @@ const Home = () => {
                      <FiActivity style={{fontSize: '32px', color: '#1A1916', opacity: 0.5}} />
                   </div>
                   <div className="c-v2-body" style={{padding: '25px'}}>
-                    <span className="c-v2-tag" style={{fontSize: '10px', color: '#E85D2A', fontWeight: 800, textTransform: 'uppercase'}}>{course.category}</span>
+                    <span className="c-v2-tag" style={{fontSize: '10px', color: '#2D5BE3', fontWeight: 800, textTransform: 'uppercase'}}>{course.category}</span>
                     <h3 className="c-v2-title" style={{fontSize: '18px', margin: '10px 0', fontFamily: 'inherit', fontWeight: 800}}>{course.title}</h3>
                     <p className="c-v2-desc" style={{fontSize: '14px', marginBottom: '20px', color: '#6B6962'}}>{course.description ? course.description.substring(0, 85) + '...' : 'Program details pending.'}</p>
                     <div className="c-v2-footer" style={{paddingTop: '15px', borderTop: '1px solid #F5F4F0', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
                       <span style={{fontWeight: 900, color: '#1A1916'}}>{course.price === 0 ? 'FREE' : `$${course.price}`}</span>
-                      <span style={{fontSize: '11px', fontWeight: 800, color: '#E85D2A'}}>Explore →</span>
+                      <span style={{fontSize: '11px', fontWeight: 800, color: '#2D5BE3'}}>Explore →</span>
                     </div>
                   </div>
                 </Link>
