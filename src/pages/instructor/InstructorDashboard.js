@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import DashboardSidebar from '../../components/DashboardSidebar';
 import api from '../../services/api';
 import authService from '../../services/authService';
-import '../../styles/EduFlow.css';
+import '../../styles/InstructorStudio.css';
+import gsap from 'gsap';
+import { FiPlus, FiBook, FiTrash2, FiEdit, FiArrowLeft, FiClock, FiLayers, FiMenu, FiHelpCircle } from 'react-icons/fi';
 
 const InstructorDashboard = () => {
   const navigate = useNavigate();
@@ -27,6 +28,10 @@ const InstructorDashboard = () => {
   const [lessonUploading, setLessonUploading] = useState(false);
   const [user, setUser] = useState(null);
 
+  const [quizzes, setQuizzes] = useState([]);
+  const [quizData, setQuizData] = useState({ title: '', description: '', tag: 'General', difficulty: 'Intermediate', courseId: '' });
+  const [quizUploading, setQuizUploading] = useState(false);
+
   useEffect(() => {
     const currentUser = authService.getCurrentUser();
     if (!currentUser || (currentUser.role !== 'instructor' && currentUser.role !== 'admin')) {
@@ -35,6 +40,22 @@ const InstructorDashboard = () => {
     }
     setUser(currentUser);
     fetchMyCourses();
+    fetchQuizzes();
+
+    // GSAP Entrance Animation
+    gsap.from('.animate-fade-up', {
+      y: 30,
+      opacity: 0,
+      scrollTrigger: {
+        trigger: ".animate-fade-up",
+        start: "top 80%",
+        end: "bottom 20%",
+        toggleActions: "play none none reverse"
+      },
+      duration: 0.8,
+      stagger: 0.1,
+      ease: 'power3.out'
+    });
   }, [navigate]);
 
   const fetchMyCourses = async () => {
@@ -47,6 +68,17 @@ const InstructorDashboard = () => {
       console.error('Error fetching courses:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchQuizzes = async () => {
+    try {
+      const res = await api.get('/quizzes');
+      const currentUser = authService.getCurrentUser();
+      const filtered = res.data.filter(q => q.instructor?._id === currentUser._id || q.instructor === currentUser._id);
+      setQuizzes(filtered);
+    } catch (error) {
+      console.error('Error fetching quizzes:', error);
     }
   };
 
@@ -159,189 +191,427 @@ const InstructorDashboard = () => {
     }
   };
 
+  const handleQuizSubmit = async (e) => {
+    e.preventDefault();
+    setQuizUploading(true);
+    try {
+      await api.post('/quizzes', quizData);
+      toast.success('Quiz Created!');
+      setQuizData({ title: '', description: '', tag: 'General', difficulty: 'Intermediate', courseId: '' });
+      setActiveTab('quizzes');
+      fetchQuizzes();
+    } catch (err) {
+      toast.error('Action failed: ' + (err.response?.data?.message || err.message));
+    } finally {
+      setQuizUploading(false);
+    }
+  };
+
+  const handleDeleteQuiz = async (id) => {
+    if (window.confirm('Delete this quiz?')) {
+      try {
+        await api.delete(`/quizzes/${id}`);
+        fetchQuizzes();
+      } catch (err) { toast.error('Delete failed'); }
+    }
+  };
+
   const initials = user?.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2) : 'I';
 
   return (
-    <div className="edu-dashboard">
-      <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      
-      <div className="edu-main">
-        <header className="edu-topbar">
-          <button className="edu-hamburger" onClick={() => setSidebarOpen(true)}>☰</button>
-          <span className="edu-topbar-title">Instructor Studio</span>
+    <div className="studio-dashboard">
+      {/* Sidebar */}
+      <aside className={`studio-sidebar ${sidebarOpen ? 'open' : ''}`}>
+        <div className="studio-logo">
+          <div className="studio-logo-icon">N</div>
+          <span className="studio-logo-text">NexLearn</span>
+        </div>
+        
+        <nav className="studio-nav">
+          <div style={{fontSize: '10px', color: 'var(--studio-text-muted)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '10px', paddingLeft: '16px'}}>Studio</div>
+          <button 
+            className={`studio-nav-item ${activeTab === 'my-courses' ? 'active' : ''}`}
+            onClick={() => { setActiveTab('my-courses'); setSelectedCourse(null); setIsEditing(false); setSidebarOpen(false); }}
+          >
+            <FiLayers /> Courses
+          </button>
+          <button 
+            className={`studio-nav-item ${activeTab === 'create' ? 'active' : ''}`}
+            onClick={() => { setActiveTab('create'); setSelectedCourse(null); setSidebarOpen(false); }}
+          >
+            <FiPlus /> {isEditing ? 'Edit Course' : 'Add Course'}
+          </button>
+          <button 
+            className={`studio-nav-item ${activeTab === 'quizzes' ? 'active' : ''}`}
+            onClick={() => { setActiveTab('quizzes'); setSelectedCourse(null); setIsEditing(false); setSidebarOpen(false); }}
+          >
+            <FiHelpCircle /> Quizzes
+          </button>
+          <button 
+            className={`studio-nav-item ${activeTab === 'add-quiz' ? 'active' : ''}`}
+            onClick={() => { setActiveTab('add-quiz'); setSelectedCourse(null); setSidebarOpen(false); }}
+          >
+            <FiPlus /> Add Quiz
+          </button>
+          
+          <div style={{marginTop: 'auto', paddingTop: '20px', borderTop: '1px solid var(--studio-border)'}}>
+            <div style={{display: 'flex', alignItems: 'center', gap: '10px', padding: '16px'}}>
+              <div className="edu-avatar" style={{width: '32px', height: '32px'}}>{initials}</div>
+              <div style={{overflow: 'hidden'}}>
+                <div style={{fontSize: '13px', fontWeight: '600', whiteSpace: 'nowrap', textOverflow: 'ellipsis', color: 'var(--studio-text)'}}>{user?.name}</div>
+                <div style={{fontSize: '11px', color: 'var(--studio-text-muted)', textTransform: 'capitalize'}}>{user?.role} Role</div>
+              </div>
+            </div>
+            <button className="studio-nav-item" onClick={() => navigate('/profile')}>
+               Profile Settings
+            </button>
+          </div>
+        </nav>
+      </aside>
+
+      {sidebarOpen && (
+        <div 
+          style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1000 }} 
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Main Content */}
+      <main className="studio-main">
+        <header className="studio-topbar">
+          <button className="studio-hamburger" onClick={() => setSidebarOpen(true)}>
+            <FiMenu />
+          </button>
+          <div style={{fontSize: '14px', fontWeight: '500', color: 'var(--studio-text-muted)'}}>
+            Instructor Panel / <span style={{color: 'var(--studio-text)'}}>{selectedCourse ? 'Course Content' : activeTab === 'my-courses' ? 'Courses' : activeTab === 'quizzes' ? 'Quizzes' : activeTab === 'add-quiz' ? 'Add Quiz' : 'Add Course'}</span>
+          </div>
           <div className="edu-topbar-actions">
-            <div className="edu-avatar">{initials}</div>
+            <button className="studio-btn studio-btn-primary" onClick={() => setActiveTab('create')} style={{padding: '8px 16px', fontSize: '12px'}}>
+              <FiPlus /> Add Course
+            </button>
           </div>
         </header>
 
-        <div className="edu-content">
-          {!selectedCourse && (
-            <aside style={{marginBottom:'24px', display:'flex', gap:'8px', overflowX:'auto', paddingBottom:'8px'}}>
-              {[
-                { id: 'my-courses', name: 'My Courses', icon: '📚' },
-                { id: 'create', name: isEditing ? 'Edit Course' : 'Create New Course', icon: '➕' }
-              ].map(tab => (
-                <button 
-                  key={tab.id}
-                  className={`edu-filter-chip ${activeTab === tab.id ? 'active' : ''}`}
-                  onClick={() => { setActiveTab(tab.id); if(tab.id==='my-courses') setIsEditing(false); }}
-                >
-                   {tab.icon} {tab.name}
-                </button>
-              ))}
-            </aside>
-          )}
-
+        <section className="studio-content">
           {loading ? (
-            <div style={{textAlign:'center', padding:'100px', color:'#9B9890'}}>Loading your curriculum...</div>
+            <div style={{textAlign: 'center', padding: '150px', color: 'var(--studio-text-muted)'}}>
+               <div style={{fontSize: '32px', marginBottom: '16px'}}>⚡</div>
+               Preparing your creative workspace...
+            </div>
           ) : selectedCourse ? (
-             <div className="edu-main-content-inner">
-                <button onClick={() => setSelectedCourse(null)} className="edu-btn edu-btn-outline" style={{marginBottom:'24px', fontSize:'11px'}}>← Back to Courses</button>
-                <header className="edu-dash-header">
-                    <h1 className="edu-dash-title" style={{fontSize:'22px'}}>Lessons: {selectedCourse.title}</h1>
-                </header>
+             <div className="animate-fade-up">
+                <button onClick={() => setSelectedCourse(null)} className="studio-btn studio-btn-outline" style={{marginBottom: '28px'}}>
+                  <FiArrowLeft /> Back to Courses
+                </button>
                 
-                <div className="edu-main-grid">
-                  <div className="edu-profile-section">
-                    <h4 style={{ marginBottom: '20px', fontSize:'15px', fontWeight:'600' }}>Add New Lesson</h4>
-                    <form onSubmit={handleAddLesson} className="edu-auth-form">
+                <h1 className="studio-page-title">Course Content: {selectedCourse.title}</h1>
+                
+                <div style={{display: 'grid', gridTemplateColumns: '1fr 340px', gap: '32px'}}>
+                  <div className="studio-form-container" style={{margin: '0', maxWidth: '100%'}}>
+                    <h3 style={{marginBottom: '24px', fontSize: '18px'}}>Add Curriculum Content</h3>
+                    <form onSubmit={handleAddLesson} style={{display: 'flex', flexDirection: 'column', gap: '20px'}}>
                       <div>
-                        <label className="edu-auth-label">Lesson Title</label>
-                        <input className="edu-auth-input" placeholder="Title" value={lessonData.title} onChange={(e) => setLessonData({...lessonData, title: e.target.value})} required />
-                      </div>
-                      <div>
-                        <label className="edu-auth-label">Lesson Content</label>
-                        <textarea className="edu-auth-input" style={{height: '100px'}} placeholder="What will students learn?" value={lessonData.content} onChange={(e) => setLessonData({...lessonData, content: e.target.value})} required />
+                        <label className="studio-label">Lesson Title</label>
+                        <input className="studio-input" placeholder="e.g. Setting up the environment" value={lessonData.title} onChange={(e) => setLessonData({...lessonData, title: e.target.value})} required />
                       </div>
                       <div>
-                        <label className="edu-auth-label">YouTube URL (Optional)</label>
-                        <input className="edu-auth-input" placeholder="https://youtube.com/..." value={lessonData.videoUrl} onChange={(e) => setLessonData({...lessonData, videoUrl: e.target.value})} />
+                        <label className="studio-label">Key Learning Points</label>
+                        <textarea className="studio-input studio-textarea" placeholder="Detailed content or learning objectives..." value={lessonData.content} onChange={(e) => setLessonData({...lessonData, content: e.target.value})} required />
                       </div>
-                      <div style={{padding:'14px', background:'#F5F4F0', borderRadius:8}}>
-                        <label className="edu-auth-label">OR Upload Video</label>
-                        <input type="file" accept="video/*" className="edu-auth-input" style={{background:'transparent', border:'none', padding:0}} onChange={(e) => setLessonData({...lessonData, video: e.target.files[0]})} />
+                      
+                      <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px'}}>
+                        <div>
+                          <label className="studio-label">Video Source</label>
+                          <select 
+                            className="studio-input studio-select" 
+                            onChange={(e) => {
+                              if(e.target.value === 'file') setLessonData({...lessonData, videoUrl: ''});
+                              else setLessonData({...lessonData, video: null});
+                            }}
+                          >
+                            <option value="file">File Upload</option>
+                            <option value="url">External URL (YouTube)</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="studio-label">Media Attachment</label>
+                          <input 
+                            type="file" 
+                            accept="video/*" 
+                            className="studio-input" 
+                            style={{padding: '10px'}}
+                            onChange={(e) => setLessonData({...lessonData, video: e.target.files[0]})} 
+                          />
+                        </div>
                       </div>
-                      <button type="submit" className="edu-auth-btn" disabled={lessonUploading}>
-                        {lessonUploading ? 'Uploading...' : 'Add Lesson'}
+
+                      <div>
+                        <label className="studio-label">Or Paste YouTube Link</label>
+                        <input className="studio-input" placeholder="https://youtube.com/..." value={lessonData.videoUrl} onChange={(e) => setLessonData({...lessonData, videoUrl: e.target.value})} />
+                      </div>
+
+                      <button type="submit" className="studio-btn studio-btn-primary" style={{width: '100%', justifyContent: 'center', padding: '14px'}} disabled={lessonUploading}>
+                        {lessonUploading ? 'Syncing...' : 'Publish Lesson'}
                       </button>
                     </form>
                   </div>
 
-                  <div className="edu-right-panel">
-                    <div className="edu-card">
-                      <h4 style={{ marginBottom: '16px', fontSize:'14px', fontWeight:'600' }}>Curriculum Schedule</h4>
-                      {lessonLoading ? <p style={{fontSize:'12px'}}>Loading...</p> : lessons.length === 0 ? <p style={{color:'#9B9890', fontSize:'12px'}}>No lessons yet.</p> : (
-                        <div style={{display:'flex', flexDirection:'column', gap:'10px'}}>
+                  <aside style={{display: 'flex', flexDirection: 'column', gap: '20px'}}>
+                    <div style={{background: 'var(--studio-card)', borderRadius: '24px', padding: '24px', border: '1px solid var(--studio-border)'}}>
+                      <h4 style={{fontSize: '14px', fontWeight: '600', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px'}}>
+                        <FiLayers style={{color: 'var(--studio-accent)'}} /> Curriculum Plan
+                      </h4>
+                      {lessonLoading ? (
+                        <p style={{fontSize: '12px', color: 'var(--studio-text-muted)'}}>Indexing content...</p>
+                      ) : lessons.length === 0 ? (
+                        <div style={{textAlign: 'center', padding: '20px'}}>
+                           <div style={{fontSize: '24px', marginBottom: '8px'}}>📦</div>
+                           <p style={{color: 'var(--studio-text-muted)', fontSize: '13px'}}>Your curriculum is currently empty.</p>
+                        </div>
+                      ) : (
+                        <div style={{display: 'flex', flexDirection: 'column', gap: '12px'}}>
                           {lessons.map((lesson, idx) => (
-                            <div key={lesson._id} style={{display:'flex', justifyContent:'space-between', padding:'10px', background:'#F5F4F0', borderRadius:'8px'}}>
-                              <div style={{fontSize:'13px'}}><span style={{fontWeight:'bold', color:'#2D5BE3', marginRight:'6px'}}>{idx + 1}.</span> {lesson.title}</div>
-                              <button onClick={() => handleDeleteLesson(lesson._id)} style={{color:'#2D5BE3', background:'none', border:'none', fontSize:'11px', cursor:'pointer'}}>Remove</button>
+                            <div key={lesson._id} className="animate-fade-up" style={{display: 'flex', justifyContent: 'space-between', padding: '14px', background: 'var(--studio-card)', borderRadius: '14px', border: '1px solid var(--studio-border)'}}>
+                              <div style={{fontSize: '13px', display: 'flex', gap: '10px'}}>
+                                <span style={{fontWeight: '700', color: 'var(--studio-accent)'}}>{idx + 1}</span>
+                                <span>{lesson.title}</span>
+                              </div>
+                              <button onClick={() => handleDeleteLesson(lesson._id)} style={{color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer', opacity: 0.6}}>
+                                <FiTrash2 />
+                              </button>
                             </div>
                           ))}
                         </div>
                       )}
                     </div>
-                  </div>
+                  </aside>
                 </div>
              </div>
           ) : activeTab === 'my-courses' ? (
-            <div>
-              <header className="edu-dash-header">
-                <h1 className="edu-dash-title" style={{fontSize:'22px'}}>Your Catalog</h1>
-                <button className="edu-btn edu-btn-primary" style={{padding:'8px 16px', fontSize:'12px'}} onClick={() => setActiveTab('create')}>+ Create Course</button>
-              </header>
-              <div className="edu-courses-grid">
+            <div className="animate-fade-up">
+              <div className="studio-dash-header" style={{marginBottom: '40px'}}>
+                <div>
+                  <h1 className="studio-page-title" style={{marginBottom: '4px'}}>Manage Courses</h1>
+                  <p style={{color: 'var(--studio-text-muted)', fontSize: '14px'}}>Manage your published courses and curriculum.</p>
+                </div>
+              </div>
+
+              <div className="studio-courses-grid">
                 {myCourses.map(course => (
-                   <div key={course._id} className="edu-course-card">
-                    <div className="edu-course-thumb">
-                       <div className="edu-thumb-bg teal">📚</div>
-                       <span className="edu-course-badge edu-badge-progress">${course.price}</span>
+                   <div key={course._id} className="studio-course-card animate-fade-up">
+                    <div className="studio-card-thumb">
+                       <span>{course.category === 'Technology' ? '💻' : course.category === 'Design' ? '🎨' : '📚'}</span>
+                       <span className="studio-card-badge">${course.price}</span>
                     </div>
-                    <div className="edu-course-body">
-                      <div className="edu-course-tag">{course.category}</div>
-                      <div className="edu-course-title">{course.title}</div>
-                      <div className="edu-course-meta">
-                         <span className="edu-course-meta-item">
-                           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                           {course.lessons?.length || 0} Lessons
+                    <div className="studio-card-body">
+                      <div className="studio-card-cat">{course.category}</div>
+                      <div className="studio-card-title">{course.title}</div>
+                      
+                      <div className="studio-card-meta">
+                         <span className="studio-meta-item">
+                           <FiBook /> {course.lessons?.length || 0} Lessons
+                         </span>
+                         <span className="studio-meta-item">
+                           <FiClock /> Lifetime Access
                          </span>
                       </div>
-                      <div style={{display:'flex', gap:'8px', marginTop:'14px'}}>
-                        <button onClick={() => openLessons(course)} className="edu-btn edu-btn-outline" style={{flex:1, padding:'6px', fontSize:'11px'}}>Manage</button>
-                        <button onClick={() => startEdit(course)} className="edu-btn edu-btn-outline" style={{flex:1, padding:'6px', fontSize:'11px'}}>Edit</button>
-                        <button onClick={() => handleDeleteCourse(course._id)} className="edu-btn edu-btn-outline" style={{padding:'6px', color:'#2D5BE3', borderColor:'#2D5BE3'}}><span role="img" aria-label="delete">🗑️</span></button>
+
+                      <div className="studio-card-actions">
+                        <button onClick={() => openLessons(course)} className="studio-btn studio-btn-primary" style={{flex: 1}}>
+                          <FiLayers /> Manage
+                        </button>
+                        <button onClick={() => startEdit(course)} className="studio-btn studio-btn-outline">
+                          <FiEdit />
+                        </button>
+                        <button onClick={() => handleDeleteCourse(course._id)} className="studio-btn studio-btn-danger">
+                          <FiTrash2 />
+                        </button>
                       </div>
                     </div>
                   </div>
                 ))}
                 {myCourses.length === 0 && (
-                   <div style={{gridColumn:'1/-1', textAlign:'center', padding:'60px', background:'white', borderRadius:'14px', border:'1px dashed #E2E0D8'}}>
-                      <p style={{color:'#9B9890', marginBottom:'16px'}}>You haven't published any courses yet.</p>
-                      <button className="edu-btn edu-btn-primary" onClick={() => setActiveTab('create')}>Start Teaching Today</button>
+                   <div className="studio-empty" style={{gridColumn: '1/-1'}}>
+                      <div className="studio-empty-icon">📂</div>
+                      <p className="studio-empty-text">Your list of courses is empty. Start adding some!</p>
+                      <button className="studio-btn studio-btn-primary" style={{margin: '0 auto'}} onClick={() => setActiveTab('create')}>
+                         <FiPlus /> Add Course
+                      </button>
                    </div>
                 )}
               </div>
             </div>
-          ) : (
-            <div className="edu-profile-section" style={{maxWidth:'800px'}}>
-               <header className="edu-dash-header">
-                <h1 className="edu-dash-title" style={{fontSize:'22px'}}>{isEditing ? 'Edit' : 'Create'} Course</h1>
-              </header>
-                <form onSubmit={handleCourseSubmit} className="edu-auth-form">
-                  <div>
-                    <label className="edu-auth-label">Course Title</label>
-                    <input className="edu-auth-input" placeholder="e.g. Modern Web Design" value={courseData.title} onChange={(e) => setCourseData({...courseData, title: e.target.value})} required />
-                  </div>
-                  <div>
-                    <label className="edu-auth-label">Description</label>
-                    <textarea className="edu-auth-input" style={{height: '100px'}} placeholder="What will students achieve?" value={courseData.description} onChange={(e) => setCourseData({...courseData, description: e.target.value})} required />
-                  </div>
-                  <div className="edu-auth-row">
-                    <div>
-                        <label className="edu-auth-label">Category</label>
-                        <select className="edu-auth-input" value={courseData.category} onChange={(e) => setCourseData({...courseData, category: e.target.value})}>
-                            <option>Technology</option><option>Business</option><option>Design</option><option>Marketing</option>
-                        </select>
+          ) : activeTab === 'quizzes' ? (
+            <div className="animate-fade-up">
+              <div className="studio-dash-header" style={{marginBottom: '40px'}}>
+                <div>
+                  <h1 className="studio-page-title" style={{marginBottom: '4px'}}>Manage Quizzes</h1>
+                  <p style={{color: 'var(--studio-text-muted)', fontSize: '14px'}}>Manage interactive quizzes for your students.</p>
+                </div>
+              </div>
+
+              <div className="studio-courses-grid">
+                {quizzes.map(quiz => (
+                   <div key={quiz._id} className="studio-course-card animate-fade-up">
+                    <div className="studio-card-thumb" style={{background: 'linear-gradient(135deg, #EEF1FD 0%, #E2E8FA 100%)'}}>
+                       <span>❓</span>
+                       <span className="studio-card-badge">{quiz.difficulty}</span>
                     </div>
-                    <div>
-                        <label className="edu-auth-label">Price ($)</label>
-                        <input type="number" className="edu-auth-input" placeholder="0 for Free" value={courseData.price} onChange={(e) => setCourseData({...courseData, price: e.target.value})} required />
-                    </div>
-                  </div>
-                  
-                  <div style={{padding:'14px', background:'#F5F4F0', borderRadius: 8, marginBottom: '14px'}}>
-                    <label style={{display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontWeight: '600', fontSize:'13px'}}>
-                      <input type="checkbox" checked={courseData.isYouTube} onChange={(e) => setCourseData({...courseData, isYouTube: e.target.checked})} />
-                      This course uses a YouTube Playlist
-                    </label>
-                  </div>
-                  
-                  {courseData.isYouTube ? (
-                    <div>
-                      <label className="edu-auth-label">YouTube Playlist URL</label>
-                      <input className="edu-auth-input" placeholder="https://..." value={courseData.playlistUrl} onChange={(e) => setCourseData({...courseData, playlistUrl: e.target.value})} required />
-                    </div>
-                  ) : (
-                    !isEditing && (
-                      <div>
-                        <label className="edu-auth-label">Promotional Video</label>
-                        <input type="file" accept="video/*" className="edu-auth-input" onChange={(e) => setCourseData({...courseData, video: e.target.files[0]})} />
+                    <div className="studio-card-body">
+                      <div className="studio-card-cat">{quiz.tag}</div>
+                      <div className="studio-card-title">{quiz.title}</div>
+                      <p style={{fontSize: '12px', color: 'var(--studio-text-muted)', marginTop: '8px', marginBottom: '8px', height: '36px', overflow: 'hidden'}}>{quiz.description}</p>
+                      
+                      <div className="studio-card-meta">
+                         <span className="studio-meta-item">
+                           <FiBook /> {quiz.questions?.length || 0} Questions
+                         </span>
+                         {quiz.courseId && <span className="studio-meta-item"><FiLayers /> Linked to Course</span>}
                       </div>
-                    )
-                  )}
-                  <div style={{display:'flex', gap:'12px', marginTop:'20px'}}>
-                    <button type="submit" className="edu-auth-btn" style={{flex:2}} disabled={uploading}>
-                        {uploading ? 'Finalizing...' : isEditing ? 'Update Course' : 'Launch Course'}
-                    </button>
-                    {isEditing && (
-                        <button onClick={() => {setIsEditing(false); setActiveTab('my-courses');}} className="edu-btn edu-btn-outline" style={{flex:1}}>Cancel</button>
-                    )}
+
+                      <div className="studio-card-actions">
+                        <button onClick={() => handleDeleteQuiz(quiz._id)} className="studio-btn studio-btn-danger" style={{flex: 1, justifyContent: 'center'}}>
+                          <FiTrash2 /> Delete
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                </form>
+                ))}
+                {quizzes.length === 0 && (
+                   <div className="studio-empty" style={{gridColumn: '1/-1'}}>
+                      <div className="studio-empty-icon">📝</div>
+                      <p className="studio-empty-text">No quizzes published yet.</p>
+                      <button className="studio-btn studio-btn-primary" style={{margin: '0 auto'}} onClick={() => setActiveTab('add-quiz')}>
+                         <FiPlus /> Add Quiz
+                      </button>
+                   </div>
+                )}
+              </div>
+            </div>
+          ) : activeTab === 'add-quiz' ? (
+            <div className="animate-fade-up">
+                <header style={{marginBottom: '40px'}}>
+                  <h1 className="studio-page-title" style={{marginBottom: '4px'}}>Add New Quiz</h1>
+                  <p style={{color: 'var(--studio-text-muted)', fontSize: '14px'}}>Create a new quiz to assess your students.</p>
+                </header>
+
+                <div className="studio-form-container">
+                  <form onSubmit={handleQuizSubmit} style={{display: 'flex', flexDirection: 'column', gap: '24px'}}>
+                    <div>
+                      <label className="studio-label">Quiz Title</label>
+                      <input className="studio-input" placeholder="e.g. JavaScript Basics" value={quizData.title} onChange={(e) => setQuizData({...quizData, title: e.target.value})} required />
+                    </div>
+                    <div>
+                      <label className="studio-label">Description</label>
+                      <textarea className="studio-input studio-textarea" placeholder="Briefly describe what this quiz is about..." value={quizData.description} onChange={(e) => setQuizData({...quizData, description: e.target.value})} required />
+                    </div>
+                    
+                    <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px'}}>
+                      <div>
+                          <label className="studio-label">Topic / Tag</label>
+                          <input className="studio-input" placeholder="e.g. JavaScript, React, Security" value={quizData.tag} onChange={(e) => setQuizData({...quizData, tag: e.target.value})} />
+                      </div>
+                      <div>
+                          <label className="studio-label">Difficulty Level</label>
+                          <select className="studio-input studio-select" value={quizData.difficulty} onChange={(e) => setQuizData({...quizData, difficulty: e.target.value})}>
+                              <option>Beginner</option><option>Intermediate</option><option>Advanced</option>
+                          </select>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="studio-label">Link to Course (Optional)</label>
+                      <select className="studio-input studio-select" value={quizData.courseId} onChange={(e) => setQuizData({...quizData, courseId: e.target.value})}>
+                          <option value="">-- No Course --</option>
+                          {myCourses.map(c => <option key={c._id} value={c._id}>{c.title}</option>)}
+                      </select>
+                    </div>
+
+                    <div style={{display: 'flex', gap: '16px', marginTop: '20px'}}>
+                      <button type="submit" className="studio-btn studio-btn-primary" style={{flex: 2, padding: '14px', justifyContent: 'center'}} disabled={quizUploading}>
+                          {quizUploading ? 'Saving Quiz...' : 'Create Quiz'}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+            </div>
+          ) : (
+            <div className="animate-fade-up">
+                <header style={{marginBottom: '40px'}}>
+                  <h1 className="studio-page-title" style={{marginBottom: '4px'}}>{isEditing ? 'Editing Course' : 'Add New Course'}</h1>
+                  <p style={{color: 'var(--studio-text-muted)', fontSize: '14px'}}>Set the foundations for your upcoming course.</p>
+                </header>
+
+                <div className="studio-form-container">
+                  <form onSubmit={handleCourseSubmit} style={{display: 'flex', flexDirection: 'column', gap: '24px'}}>
+                    <div>
+                      <label className="studio-label">Project Title</label>
+                      <input className="studio-input" placeholder="e.g. Masterclass: Cinematic Lighting" value={courseData.title} onChange={(e) => setCourseData({...courseData, title: e.target.value})} required />
+                    </div>
+                    <div>
+                      <label className="studio-label">Description & Vision</label>
+                      <textarea className="studio-input studio-textarea" placeholder="What is the ultimate goal of this project?" value={courseData.description} onChange={(e) => setCourseData({...courseData, description: e.target.value})} required />
+                    </div>
+                    
+                    <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px'}}>
+                      <div>
+                      <label className="studio-label">Course Category</label>
+                          <select className="studio-input studio-select" value={courseData.category} onChange={(e) => setCourseData({...courseData, category: e.target.value})}>
+                              <option>Technology</option><option>Business</option><option>Design</option><option>Marketing</option>
+                          </select>
+                      </div>
+                      <div>
+                          <label className="studio-label">Access Investment ($)</label>
+                          <input type="number" className="studio-input" placeholder="0 for Free Access" value={courseData.price} onChange={(e) => setCourseData({...courseData, price: e.target.value})} required />
+                      </div>
+                    </div>
+                    
+                    <div style={{padding: '20px', background: 'var(--studio-card)', borderRadius: '16px', border: '1px solid var(--studio-border)'}}>
+                      <label style={{display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', fontSize: '14px', color: 'var(--studio-text)'}}>
+                        <input 
+                          type="checkbox" 
+                          checked={courseData.isYouTube} 
+                          onChange={(e) => setCourseData({...courseData, isYouTube: e.target.checked})} 
+                          style={{accentColor: 'var(--studio-accent)', width: '18px', height: '18px'}}
+                        />
+                        Sync curriculum with a YouTube Playlist
+                      </label>
+                    </div>
+                    
+                    {courseData.isYouTube ? (
+                      <div>
+                        <label className="studio-label">Playlist Connection URL</label>
+                        <input className="studio-input" placeholder="https://youtube.com/playlist?list=..." value={courseData.playlistUrl} onChange={(e) => setCourseData({...courseData, playlistUrl: e.target.value})} required />
+                      </div>
+                    ) : (
+                      !isEditing && (
+                        <div>
+                          <label className="studio-label">Brand Intro Video (Optional)</label>
+                          <input 
+                            type="file" 
+                            accept="video/*" 
+                            className="studio-input" 
+                            style={{padding: '10px'}}
+                            onChange={(e) => setCourseData({...courseData, video: e.target.files[0]})} 
+                          />
+                        </div>
+                      )
+                    )}
+
+                    <div style={{display: 'flex', gap: '16px', marginTop: '20px'}}>
+                      <button type="submit" className="studio-btn studio-btn-primary" style={{flex: 2, padding: '14px', justifyContent: 'center'}} disabled={uploading}>
+                          {uploading ? 'Processing...' : isEditing ? 'Update Course' : 'Add Course'}
+                      </button>
+                      {isEditing && (
+                          <button onClick={() => {setIsEditing(false); setActiveTab('my-courses');}} className="studio-btn studio-btn-outline" style={{flex: 1, justifyContent: 'center'}}>Cancel</button>
+                      )}
+                    </div>
+                  </form>
+                </div>
             </div>
           )}
-        </div>
-      </div>
+        </section>
+      </main>
     </div>
   );
 };

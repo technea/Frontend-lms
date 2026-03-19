@@ -49,7 +49,7 @@ const Navbar = () => {
           
           {user ? (
             <div className="nav-user-actions">
-              <Link to="/dashboard" className="edu-btn edu-btn-outline" style={{padding: '8px 16px', fontSize: '13px'}}>Dashboard</Link>
+              <Link to={user.role === 'admin' ? '/admin' : user.role === 'instructor' ? '/instructor' : '/dashboard'} className="edu-btn edu-btn-outline" style={{padding: '8px 16px', fontSize: '13px'}}>Dashboard</Link>
               <button onClick={handleLogout} className="edu-btn edu-btn-primary" style={{padding: '8px 16px', fontSize: '13px'}}>Logout</button>
             </div>
           ) : (
@@ -75,7 +75,7 @@ const Navbar = () => {
            <div className="mobile-divider"></div>
            {user ? (
              <>
-               <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)} className="mobile-nav-item">Dashboard</Link>
+               <Link to={user.role === 'admin' ? '/admin' : user.role === 'instructor' ? '/instructor' : '/dashboard'} onClick={() => setMobileMenuOpen(false)} className="mobile-nav-item">Dashboard</Link>
                <Link to="/profile" onClick={() => setMobileMenuOpen(false)} className="mobile-nav-item">My Profile</Link>
                <button onClick={handleLogout} className="edu-btn edu-btn-primary" style={{margin:'10px 20px'}}>Logout</button>
              </>

@@ -33,6 +33,8 @@ const Login = () => {
         if (data.user?.role === 'admin') {
           toast.info('Admin detected. Redirecting to Management Console...');
           navigate('/admin');
+        } else if (data.user?.role === 'instructor') {
+          navigate('/instructor');
         } else {
           navigate('/dashboard');
         }
@@ -60,6 +62,8 @@ const Login = () => {
       if (data.token) {
         if (data.user?.role === 'admin') {
           navigate('/admin');
+        } else if (data.user?.role === 'instructor') {
+          navigate('/instructor');
         } else {
           navigate('/dashboard');
         }
