@@ -319,38 +319,78 @@ const InstructorDashboard = () => {
                         <textarea className="studio-input studio-textarea" placeholder="Detailed content or learning objectives..." value={lessonData.content} onChange={(e) => setLessonData({...lessonData, content: e.target.value})} required />
                       </div>
                       
-                      <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px'}}>
+                      <div style={{display: 'grid', gridTemplateColumns: '1fr', gap: '16px'}}>
                         <div>
-                          <label className="studio-label">Video Source</label>
+                          <label className="studio-label">Video Source Type</label>
                           <select 
                             className="studio-input studio-select" 
+                            style={{padding: '12px'}}
+                            value={lessonData.sourceType || 'file'}
                             onChange={(e) => {
-                              if(e.target.value === 'file') setLessonData({...lessonData, videoUrl: ''});
-                              else setLessonData({...lessonData, video: null});
+                               setLessonData({
+                                  ...lessonData, 
+                                  sourceType: e.target.value,
+                                  video: null,
+                                  videoUrl: ''
+                               });
                             }}
                           >
-                            <option value="file">File Upload</option>
-                            <option value="url">External URL (YouTube)</option>
+                            <option value="file">Local Video (File Upload)</option>
+                            <option value="url">External Video (YouTube Link)</option>
                           </select>
                         </div>
-                        <div>
-                          <label className="studio-label">Media Attachment</label>
-                          <input 
-                            type="file" 
-                            accept="video/*" 
-                            className="studio-input" 
-                            style={{padding: '10px'}}
-                            onChange={(e) => setLessonData({...lessonData, video: e.target.files[0]})} 
-                          />
-                        </div>
+
+                        {lessonData.sourceType === 'url' ? (
+                          <div className="animate-fade-up">
+                            <label className="studio-label">YouTube Video URL</label>
+                            <input 
+                              className="studio-input" 
+                              placeholder="https://www.youtube.com/watch?v=..." 
+                              value={lessonData.videoUrl} 
+                              onChange={(e) => setLessonData({...lessonData, videoUrl: e.target.value})} 
+                              required
+                            />
+                            <p style={{fontSize: '11px', color: 'var(--studio-text-muted)', marginTop: '4px'}}>
+                               Supports both full YouTube links and short youtu.be links.
+                            </p>
+                            {lessonData.videoUrl && (
+                                <div style={{marginTop: '10px', fontSize: '11px', color: '#10b981'}}>
+                                    ✓ Valid URL detected. It will be converted to an embed format.
+                                </div>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="animate-fade-up">
+                            <label className="studio-label">Upload Video Attachment</label>
+                            <div style={{
+                                border: '2px dashed var(--studio-border)',
+                                borderRadius: '16px',
+                                padding: '20px',
+                                textAlign: 'center',
+                                background: 'rgba(255,255,255,0.02)'
+                            }}>
+                                <input 
+                                    type="file" 
+                                    accept="video/*" 
+                                    onChange={(e) => setLessonData({...lessonData, video: e.target.files[0]})} 
+                                    id="lesson-video-id"
+                                    hidden
+                                />
+                                <label htmlFor="lesson-video-id" style={{cursor: 'pointer'}}>
+                                    <div style={{fontSize: '24px', marginBottom: '8px'}}><FiPlus /></div>
+                                    <div style={{fontSize: '13px', color: 'var(--studio-text)'}}>
+                                        {lessonData.video ? lessonData.video.name : 'Choose video file'}
+                                    </div>
+                                    <div style={{fontSize: '11px', color: 'var(--studio-text-muted)', marginTop: '4px'}}>
+                                        Max 50MB (mp4, mkv, avi)
+                                    </div>
+                                </label>
+                            </div>
+                          </div>
+                        )}
                       </div>
 
-                      <div>
-                        <label className="studio-label">Or Paste YouTube Link</label>
-                        <input className="studio-input" placeholder="https://youtube.com/..." value={lessonData.videoUrl} onChange={(e) => setLessonData({...lessonData, videoUrl: e.target.value})} />
-                      </div>
-
-                      <button type="submit" className="studio-btn studio-btn-primary" style={{width: '100%', justifyContent: 'center', padding: '14px'}} disabled={lessonUploading}>
+                      <button type="submit" className="studio-btn studio-btn-primary" style={{width: '100%', justifyContent: 'center', padding: '14px', marginTop: '10px'}} disabled={lessonUploading}>
                         {lessonUploading ? 'Syncing...' : 'Publish Lesson'}
                       </button>
                     </form>

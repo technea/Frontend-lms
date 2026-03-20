@@ -35,8 +35,8 @@ const Footer = () => {
             <div className="footer-col">
               <h4>Connect</h4>
               <a href="https://twitter.com" target="_blank" rel="noreferrer">Twitter</a>
-              <a href="https://linkedin.com" target="_blank" rel="noreferrer">LinkedIn</a>
-              <a href="https://github.com" target="_blank" rel="noreferrer">GitHub</a>
+              <a href="https://www.linkedin.com/in/furqan-safeer-849696144/" target="_blank" rel="noreferrer">LinkedIn</a>
+              <a href="https://github.com/technea" target="_blank" rel="noreferrer">GitHub</a>
             </div>
           </div>
         </div>

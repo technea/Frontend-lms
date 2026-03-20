@@ -72,13 +72,24 @@ const LessonPlayer = () => {
               
               <div className="edu-player-video">
                 {currentLesson.videoUrl ? (
-                  <iframe 
-                    src={currentLesson.videoUrl.replace('watch?v=', 'embed/').split('&')[0]} 
-                    title="Lesson Video"
-                    allowFullScreen
-                  ></iframe>
+                  currentLesson.videoUrl.includes('youtube.com/embed') || currentLesson.videoUrl.includes('youtu.be') ? (
+                    <iframe 
+                      src={currentLesson.videoUrl} 
+                      title="Lesson Video"
+                      allowFullScreen
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    ></iframe>
+                  ) : (
+                    <video 
+                      src={`${IMAGE_BASE_URL}${currentLesson.videoUrl}`} 
+                      controls 
+                      width="100%" 
+                      height="100%"
+                      style={{borderRadius: '16px'}}
+                    ></video>
+                  )
                 ) : (
-                  <div style={{height:'100%', display:'flex', alignItems:'center', justifyCenter:'center', background:'#F0EEE9', color:'#9B9890'}}>
+                  <div style={{height:'100%', display:'flex', alignItems:'center', justifyContent:'center', background:'#F0EEE9', color:'#9B9890'}}>
                     No video content for this lesson.
                   </div>
                 )}
