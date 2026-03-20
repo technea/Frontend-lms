@@ -3,10 +3,10 @@ import socketService from '../../services/socketService';
 import authService from '../../services/authService';
 import {
   Container, Row, Col, Form, Button,
-  Card, Badge, ListGroup, Offcanvas
+  Card, Badge, ListGroup, Offcanvas, Modal
 } from 'react-bootstrap';
 import {
-  FaPaperPlane, FaUserCircle, FaHashtag, FaUsers, FaBars
+  FaPaperPlane, FaUserCircle, FaHashtag, FaUsers, FaBars, FaPlus
 } from 'react-icons/fa';
 import DashboardSidebar from '../../components/DashboardSidebar';
 import Navbar from '../../components/Navbar';
@@ -16,9 +16,9 @@ const CommunityChat = () => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [room, setRoom] = useState('General');
-  const [rooms] = useState([
-    'General', 'Web Development', 'Mobile Dev', 'AI & ML', 'Student Support'
-  ]);
+  const [rooms, setRooms] = useState(['General']);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newRoomName, setNewRoomName] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showRooms, setShowRooms] = useState(false);
   const [user, setUser] = useState(null);
@@ -63,6 +63,19 @@ const CommunityChat = () => {
     }
   };
 
+  const handleCreateRoom = (e) => {
+    e.preventDefault();
+    if (newRoomName.trim()) {
+      const formattedName = newRoomName.trim().replace(/\s+/g, '-');
+      if (!rooms.includes(formattedName)) {
+        setRooms([...rooms, formattedName]);
+        setRoom(formattedName);
+      }
+      setNewRoomName('');
+      setShowCreateModal(false);
+    }
+  };
+
   const handleTyping = (e) => {
     setNewMessage(e.target.value);
     socketService.sendTyping(room, e.target.value.length > 0);
@@ -70,33 +83,46 @@ const CommunityChat = () => {
 
   /* ---- Room list (reused in desktop sidebar + mobile offcanvas) ---- */
   const RoomList = () => (
-    <ListGroup variant="flush" className="rooms-list">
-      {rooms.map((r) => (
-        <ListGroup.Item
-          key={r}
-          onClick={() => { setRoom(r); setShowRooms(false); }}
-          className={`room-item border-0 ${room === r ? 'active' : ''}`}
-        >
-          <div className="d-flex align-items-center gap-2">
-            <div className={`room-icon ${room === r ? 'active' : ''}`}>
-              <FaHashtag />
+    <div className="rooms-container">
+      <ListGroup variant="flush" className="rooms-list">
+        {rooms.map((r) => (
+          <ListGroup.Item
+            key={r}
+            onClick={() => { setRoom(r); setShowRooms(false); }}
+            className={`room-item border-0 ${room === r ? 'active' : ''}`}
+          >
+            <div className="d-flex align-items-center gap-2">
+              <div className={`room-icon ${room === r ? 'active' : ''}`}>
+                <FaHashtag />
+              </div>
+              <span className="fw-medium">{r}</span>
             </div>
-            <span className="fw-medium">{r}</span>
-          </div>
-        </ListGroup.Item>
-      ))}
-    </ListGroup>
+          </ListGroup.Item>
+        ))}
+      </ListGroup>
+      
+      <div className="px-3 mt-3">
+        <Button 
+          variant="outline-primary" 
+          className="w-100 rounded-pill d-flex align-items-center justify-content-center gap-2 py-2"
+          onClick={() => setShowCreateModal(true)}
+          style={{ fontSize: '13px', fontWeight: 600 }}
+        >
+          <FaPlus size={12} /> Create Room
+        </Button>
+      </div>
+    </div>
   );
 
   /* ---- Render ---- */
   return (
-    <div className="dashboard-container">
+    <div className="edu-dashboard">
       <DashboardSidebar
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
       />
 
-      <div className="dashboard-main chat-page">
+      <div className="edu-main chat-page">
         <Navbar onMenuClick={() => setIsSidebarOpen(true)} />
 
         {/* ========== Main layout ========== */}
@@ -262,6 +288,39 @@ const CommunityChat = () => {
             <RoomList />
           </Offcanvas.Body>
         </Offcanvas>
+
+        {/* ========== Create Room Modal ========== */}
+        <Modal show={showCreateModal} onHide={() => setShowCreateModal(false)} centered className="create-room-modal">
+          <Modal.Header closeButton className="border-0 pb-0">
+            <Modal.Title className="fw-bold h5">Create New Room</Modal.Title>
+          </Modal.Header>
+          <Modal.Body className="pt-3">
+            <Form onSubmit={handleCreateRoom}>
+              <Form.Group className="mb-3">
+                <Form.Label className="small text-muted fw-bold">ROOM NAME</Form.Label>
+                <Form.Control 
+                  type="text" 
+                  placeholder="e.g. Web-Development"
+                  className="rounded-3 py-2 border-0 bg-light"
+                  value={newRoomName}
+                  onChange={(e) => setNewRoomName(e.target.value)}
+                  autoFocus
+                />
+                <Form.Text className="text-muted small">
+                  Room names will be formatted with hyphens.
+                </Form.Text>
+              </Form.Group>
+              <div className="d-flex gap-2">
+                <Button variant="light" className="flex-grow-1 rounded-pill" onClick={() => setShowCreateModal(false)}>
+                  Cancel
+                </Button>
+                <Button variant="primary" type="submit" className="flex-grow-1 rounded-pill">
+                  Create
+                </Button>
+              </div>
+            </Form>
+          </Modal.Body>
+        </Modal>
       </div>
     </div>
   );
