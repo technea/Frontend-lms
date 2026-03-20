@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import DashboardSidebar from '../../components/DashboardSidebar';
 import authService from '../../services/authService';
-import api from '../../services/api';
+import api, { IMAGE_BASE_URL } from '../../services/api';
 import '../../styles/EduFlow.css';
 import '../../styles/StudentDashboard.css';
 import gsap from 'gsap';
@@ -14,6 +14,7 @@ const StudentDashboard = () => {
   const [user, setUser] = useState(null);
   const [enrollments, setEnrollments] = useState([]);
   const [allCourses, setAllCourses] = useState([]);
+  const [leaderboard, setLeaderboard] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState('All');
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -62,11 +63,21 @@ const StudentDashboard = () => {
     }
   }, [loading, user]);
 
-  const handleStatHover = (e, isEnter) => {
+  const handleStatHover = (e) => {
     gsap.to(e.currentTarget, {
-      scale: isEnter ? 1.02 : 1,
-      y: isEnter ? -3 : 0,
-      borderColor: isEnter ? "#2D5BE3" : "#E2E0D8",
+      scale: 1.02,
+      y: -3,
+      borderColor: "#2D5BE3",
+      duration: 0.2,
+      ease: "power1.out"
+    });
+  };
+
+  const handleStatLeave = (e) => {
+    gsap.to(e.currentTarget, {
+      scale: 1,
+      y: 0,
+      borderColor: "#E2E0D8",
       duration: 0.2,
       ease: "power1.out"
     });
@@ -74,12 +85,14 @@ const StudentDashboard = () => {
 
   const fetchData = async () => {
     try {
-      const [enrollRes, coursesRes] = await Promise.all([
+      const [enrollRes, coursesRes, leaderRes] = await Promise.all([
         api.get('/my-courses').catch(() => ({ data: [] })),
-        api.get('/courses').catch(() => ({ data: [] }))
+        api.get('/courses').catch(() => ({ data: [] })),
+        api.get('/users/global/leaderboard').catch(() => ({ data: [] }))
       ]);
       setEnrollments(enrollRes.data || []);
       setAllCourses(coursesRes.data || []);
+      setLeaderboard(leaderRes.data || []);
     } catch (err) {
       console.error('Fetch error:', err);
     } finally {
@@ -230,8 +243,8 @@ const StudentDashboard = () => {
               <div className="edu-stats-row">
                 <div 
                   className="edu-stat-card"
-                  onMouseEnter={(e) => handleStatHover(e, true)}
-                  onMouseLeave={(e) => handleStatHover(e, false)}
+                  onMouseEnter={handleStatHover}
+                  onMouseLeave={handleStatLeave}
                 >
                   <div className="edu-stat-icon blue">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
@@ -245,8 +258,8 @@ const StudentDashboard = () => {
                 </div>
                 <div 
                   className="edu-stat-card"
-                  onMouseEnter={(e) => handleStatHover(e, true)}
-                  onMouseLeave={(e) => handleStatHover(e, false)}
+                  onMouseEnter={handleStatHover}
+                  onMouseLeave={handleStatLeave}
                 >
                   <div className="edu-stat-icon orange">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
@@ -260,8 +273,8 @@ const StudentDashboard = () => {
                 </div>
                 <div 
                   className="edu-stat-card"
-                  onMouseEnter={(e) => handleStatHover(e, true)}
-                  onMouseLeave={(e) => handleStatHover(e, false)}
+                  onMouseEnter={handleStatHover}
+                  onMouseLeave={handleStatLeave}
                 >
                   <div className="edu-stat-icon green">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
@@ -275,8 +288,8 @@ const StudentDashboard = () => {
                 </div>
                 <div 
                   className="edu-stat-card"
-                  onMouseEnter={(e) => handleStatHover(e, true)}
-                  onMouseLeave={(e) => handleStatHover(e, false)}
+                  onMouseEnter={handleStatHover}
+                  onMouseLeave={handleStatLeave}
                 >
                   <div className="edu-stat-icon amber">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -460,17 +473,44 @@ const StudentDashboard = () => {
                   <div className="edu-leaderboard-card">
                     <div className="edu-section-header" style={{marginBottom: 12}}>
                       <span className="edu-section-title">Leaderboard</span>
-                      <span className="edu-see-all" style={{fontSize: 11}}>Personal Progress</span>
+                      <span className="edu-see-all" style={{fontSize: 11}}>Live Rankings</span>
                     </div>
-                    <div className="edu-leader-row edu-leader-highlight" style={{border: '1px solid #D4A017'}}>
-                      <span className="edu-leader-rank edu-rank-gold" style={{fontSize: '18px'}}>1</span>
-                      <div className="edu-leader-avatar" style={{background:'linear-gradient(135deg, #6B8DD6, #2D5BE3)', color:'white'}}>{initials}</div>
-                      <span className="edu-leader-name">You</span>
-                      <span className="edu-leader-xp">{totalEnrolled * 240} XP</span>
-                      <span style={{fontSize:12,color:'#D4A017',fontWeight:700, marginLeft:'auto'}}>#1 GLOBAL</span>
+                    
+                    <div className="edu-leaderboard-list">
+                      {leaderboard.length > 0 ? leaderboard.map((player, idx) => {
+                        const isMe = player.name === user?.name;
+                        const initials = player.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2);
+                        return (
+                          <div 
+                            key={player._id || idx} 
+                            className={`edu-leader-row ${isMe ? 'edu-leader-highlight' : ''}`}
+                            style={isMe ? {border: '1px solid #D4A017'} : {}}
+                          >
+                            <span className={`edu-leader-rank ${idx === 0 ? 'edu-rank-gold' : idx === 1 ? 'edu-rank-silver' : idx === 2 ? 'edu-rank-bronze' : ''}`}>
+                              {idx + 1}
+                            </span>
+                            <div className="edu-leader-avatar">
+                              {player.avatar ? (
+                                <img src={player.avatar.startsWith('http') ? player.avatar : `${IMAGE_BASE_URL}${player.avatar}`} alt="" style={{width:'100%', height:'100%', objectFit:'cover'}} />
+                              ) : initials}
+                            </div>
+                            <span className="edu-leader-name">{isMe ? 'You' : player.name}</span>
+                            <span className="edu-leader-xp">{player.points || 0} PTS</span>
+                          </div>
+                        );
+                      }) : (
+                        <div style={{textAlign: 'center', padding: '10px', color: '#9B9890', fontSize: '12px'}}>
+                          No active students on leaderboard yet.
+                        </div>
+                      )}
                     </div>
+
                     <div style={{textAlign: 'center', padding: '15px 0', borderTop: '1px solid #E2E0D8', marginTop: '10px'}}>
-                      <p style={{fontSize: '12px', color: '#9B9890', margin: 0}}>Complete more courses to climb higher!</p>
+                      <p style={{fontSize: '12px', color: '#9B9890', margin: 0}}>
+                        {leaderboard.findIndex(p => p.name === user?.name) === 0 
+                          ? "You're at the top! Keep it up! 🏆" 
+                          : "Complete more courses to climb higher!"}
+                      </p>
                     </div>
                   </div>
                 </div>

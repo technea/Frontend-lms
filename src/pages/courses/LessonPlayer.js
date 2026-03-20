@@ -10,17 +10,24 @@ const LessonPlayer = () => {
   const [course, setCourse] = useState(null);
   const [lessons, setLessons] = useState([]);
   const [currentLesson, setCurrentLesson] = useState(null);
+  const [enrollment, setEnrollment] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [courseRes, lessonsRes] = await Promise.all([
+        const [courseRes, lessonsRes, myCRes] = await Promise.all([
           api.get(`/courses/${courseId}`),
-          api.get(`/lessons/course/${courseId}`)
+          api.get(`/lessons/course/${courseId}`),
+          api.get('/my-courses').catch(() => ({ data: [] }))
         ]);
         setCourse(courseRes.data);
         setLessons(lessonsRes.data);
+
+        // Find specific enrollment
+        const currentEnroll = myCRes.data.find(e => (e.course?._id === courseId || e.course === courseId));
+        setEnrollment(currentEnroll);
         
         if (lessonId) {
           setCurrentLesson(lessonsRes.data.find(l => l._id === lessonId));
@@ -43,6 +50,20 @@ const LessonPlayer = () => {
     };
     fetchData();
   }, [courseId, lessonId]);
+
+  const handleCompleteCourse = async () => {
+    if (!enrollment) return;
+    setUpdating(true);
+    try {
+      await api.put(`/enrollments/${enrollment._id}`, { progress: 100 });
+      setEnrollment({ ...enrollment, progress: 100 });
+      alert(`Congratulations! You've earned ${course.points || 0} points for completing this course.`);
+    } catch (err) {
+      console.error('Progress update error:', err);
+    } finally {
+      setUpdating(false);
+    }
+  };
 
   if (loading) return <div className="edu-page"><Navbar /><div style={{textAlign:'center', padding:'100px'}}>Loading Lesson...</div><Footer /></div>;
   if (!course) return <div className="edu-page"><Navbar /><div style={{textAlign:'center', padding:'100px'}}>Course not found</div><Footer /></div>;
@@ -136,7 +157,22 @@ const LessonPlayer = () => {
               </div>
 
               <div className="edu-player-text">
-                <h3>Lesson Overview</h3>
+                <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
+                   <h3>Lesson Overview</h3>
+                   {enrollment && enrollment.progress < 100 && (
+                     <button 
+                        className="edu-btn edu-btn-primary" 
+                        style={{fontSize:'12px', padding:'8px 16px', background:'var(--edu-green)'}}
+                        onClick={handleCompleteCourse}
+                        disabled={updating}
+                     >
+                        {updating ? 'Updating...' : 'Mark Course as Completed'}
+                     </button>
+                   )}
+                   {enrollment && enrollment.progress >= 100 && (
+                     <span style={{fontSize:'13px', color:'var(--edu-green)', fontWeight:700}}>✓ Course Completed</span>
+                   )}
+                </div>
                 <p>{currentLesson.content}</p>
               </div>
 
