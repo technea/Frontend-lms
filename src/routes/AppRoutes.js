@@ -17,6 +17,7 @@ import LessonPlayer from '../pages/courses/LessonPlayer';
 import MyCourses from '../pages/student/MyCourses';
 import StudentDashboard from '../pages/student/StudentDashboard';
 import QuizList from '../pages/student/QuizList';
+import CommunityChat from '../pages/chat/CommunityChat';
 import ProtectedRoute from '../components/ProtectedRoute';
 
 const AppRoutes = () => {
@@ -83,6 +84,15 @@ const AppRoutes = () => {
           </ProtectedRoute>
         } 
       />
+      <Route 
+        path="/community-chat" 
+        element={
+          <ProtectedRoute allowedRoles={['student', 'instructor', 'admin']}>
+            <CommunityChat />
+          </ProtectedRoute>
+        } 
+      />
+
       <Route 
         path="/profile" 
         element={

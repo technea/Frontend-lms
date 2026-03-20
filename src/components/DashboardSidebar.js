@@ -12,6 +12,8 @@ const DashboardSidebar = ({ isOpen, onClose }) => {
     { path: '/my-courses', label: 'My Courses', icon: <BookIcon />, badge: null },
     { path: '/courses', label: 'Explore', icon: <SearchIcon /> },
     { path: '/quizzes', label: 'Quizzes', icon: <QuizIcon />, badge: 'New' },
+    { path: '/community-chat', label: 'Community', icon: <MessageIcon />, badge: 'Live' },
+
   ];
 
   const accountLinks = [
@@ -142,5 +144,9 @@ const LogoutIcon = () => (
 const QuizIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/><path d="M9 22V12h6v10"/><path d="M12 2v20"/></svg>
 );
+const MessageIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+);
+
 
 export default DashboardSidebar;
