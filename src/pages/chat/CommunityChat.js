@@ -22,7 +22,7 @@ const CommunityChat = () => {
     const token = authService.getToken();
     setUser(currentUser);
 
-    const socket = socketService.connect(token);
+    socketService.connect(token);
 
     socketService.onMessage((msg) => {
       setMessages((prev) => [...prev, msg]);
