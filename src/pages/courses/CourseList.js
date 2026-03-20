@@ -55,7 +55,7 @@ const CourseList = () => {
     );
   }, [searchQuery, courses, activeCategory]);
 
-  const categories = ['All', 'Technology', 'Design', 'Business', 'Marketing', 'Data Science'];
+  const categories = ['All', 'Technology', 'Design', 'Business', 'Marketing', 'Data Science', 'Testing'];
 
   return (
     <div className="edu-page">
@@ -114,7 +114,10 @@ const CourseList = () => {
                     <div className="c-v2-body">
                       <div className="c-v2-header">
                         <span className="c-v2-tag">{course.category}</span>
-                        <div className="c-v2-price">{course.price === 0 ? 'FREE' : `$${course.price}`}</div>
+                        <div style={{display:'flex', gap:'6px', alignItems:'center'}}>
+                          {course.points > 0 && <span style={{background:'#FEF3C7', color:'#92400E', fontSize:'10px', fontWeight:700, padding:'3px 8px', borderRadius:'8px'}}>🏆 {course.points}pts</span>}
+                          <div className="c-v2-price">{course.price === 0 ? 'FREE' : `$${course.price}`}</div>
+                        </div>
                       </div>
                       <h3 className="c-v2-title">{course.title}</h3>
                       <p className="c-v2-desc">{course.description ? course.description.substring(0, 90) + '...' : 'Details pending.'}</p>

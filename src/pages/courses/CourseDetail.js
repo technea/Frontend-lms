@@ -5,6 +5,7 @@ import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import api from '../../services/api';
 import authService from '../../services/authService';
+import gsap from 'gsap';
 import '../../styles/EduFlow.css';
 
 const CourseDetail = () => {
@@ -33,6 +34,37 @@ const CourseDetail = () => {
     };
     fetchData();
   }, [id]);
+
+  useEffect(() => {
+    if (!loading && course) {
+      const tl = gsap.timeline();
+      
+      tl.from(".cd-hero", { 
+        y: 60, 
+        opacity: 0, 
+        duration: 1.2, 
+        ease: "power4.out" 
+      })
+      .from(".cd-video-section", {
+        scale: 0.95,
+        opacity: 0,
+        duration: 1,
+        ease: "expo.out"
+      }, "-=0.8")
+      .from(".cd-section", {
+        y: 30,
+        opacity: 0,
+        duration: 0.8,
+        ease: "power2.out"
+      }, "-=0.4")
+      .from(".cd-price-card", {
+        x: 40,
+        opacity: 0,
+        duration: 0.8,
+        ease: "power2.out"
+      }, "-=0.6");
+    }
+  }, [loading, course]);
 
   const handleEnroll = async () => {
     const user = authService.getCurrentUser();
@@ -72,13 +104,48 @@ const CourseDetail = () => {
         {/* Hero Banner */}
         <div className="cd-hero">
           <div className="cd-hero-inner">
-            <span className="cd-badge">{course.category}</span>
+            <div style={{display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap'}}>
+              <span className="cd-badge">{course.category}</span>
+              {course.points > 0 && (
+                <span className="cd-badge" style={{background: '#F59E0B', color: '#fff'}}>
+                  🏆 {course.points} Points
+                </span>
+              )}
+            </div>
             <h1 className="cd-title">{course.title}</h1>
             <p className="cd-meta">
               Curated by <span style={{ color: '#2D5BE3', fontWeight: 600 }}>NexLearn Faculty</span> · Updated March 2026
             </p>
           </div>
         </div>
+
+        {/* YouTube Video Player */}
+        {course.isYouTube && course.playlistUrl && (
+          <div className="cd-video-section">
+            <div className="cd-video-wrapper">
+              <iframe
+                src={(() => {
+                  const url = course.playlistUrl;
+                  // Extract YouTube video ID
+                  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+                  const match = url.match(regExp);
+                  const videoId = (match && match[2].length === 11) ? match[2] : null;
+                  if (videoId) return `https://www.youtube.com/embed/${videoId}`;
+                  // Check if it's a playlist
+                  if (url.includes('list=')) {
+                    const listMatch = url.match(/[?&]list=([^#&?]+)/);
+                    if (listMatch) return `https://www.youtube.com/embed/videoseries?list=${listMatch[1]}`;
+                  }
+                  return url;
+                })()}
+                title={course.title}
+                frameBorder="0"
+                allowFullScreen
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              ></iframe>
+            </div>
+          </div>
+        )}
 
         {/* Main Grid */}
         <div className="cd-grid">
@@ -135,6 +202,13 @@ const CourseDetail = () => {
               <div className="cd-price">
                 {isEnrolled ? '✓ Enrolled' : course.price === 0 ? 'FREE' : `$${course.price}`}
               </div>
+
+              {course.points > 0 && (
+                <div className="cd-points-badge">
+                  <span>🏆</span>
+                  <span>Earn <strong>{course.points}</strong> Points</span>
+                </div>
+              )}
               
               {isEnrolled ? (
                 <button 
@@ -157,7 +231,7 @@ const CourseDetail = () => {
               <ul className="cd-perks">
                 <li>
                   <svg viewBox="0 0 24 24" fill="none" stroke="#2D5BE3" strokeWidth="2" style={{width:16, height:16, flexShrink:0}}><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                  {course.lessons?.length || 0} Video Lessons
+                  {course.isYouTube ? 'YouTube Video Course' : `${course.lessons?.length || 0} Video Lessons`}
                 </li>
                 <li>
                   <svg viewBox="0 0 24 24" fill="none" stroke="#2D5BE3" strokeWidth="2" style={{width:16, height:16, flexShrink:0}}><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
@@ -344,6 +418,50 @@ const CourseDetail = () => {
         }
 
         /* ═══ RESPONSIVE ═══ */
+
+        /* YouTube Video Section */
+        .cd-video-section {
+          margin-bottom: 40px;
+          border-radius: 20px;
+          overflow: hidden;
+          background: #000;
+          box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+        }
+        .cd-video-wrapper {
+          position: relative;
+          padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+          height: 0;
+          overflow: hidden;
+        }
+        .cd-video-wrapper iframe {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          border: none;
+        }
+
+        /* Points Badge */
+        .cd-points-badge {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+          color: #92400E;
+          padding: 10px 16px;
+          border-radius: 12px;
+          font-size: 14px;
+          font-weight: 500;
+          margin-bottom: 16px;
+          border: 1px solid #FCD34D;
+        }
+        .cd-points-badge strong {
+          font-weight: 800;
+          font-size: 16px;
+        }
+
         @media (max-width: 991px) {
           .cd-hero { padding: 36px 24px; }
           .cd-title { font-size: 26px; }

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
-import api from '../../services/api';
+import api, { IMAGE_BASE_URL } from '../../services/api';
 import '../../styles/EduFlow.css';
 
 const LessonPlayer = () => {
@@ -26,6 +26,14 @@ const LessonPlayer = () => {
           setCurrentLesson(lessonsRes.data.find(l => l._id === lessonId));
         } else if (lessonsRes.data.length > 0) {
           setCurrentLesson(lessonsRes.data[0]);
+        } else if (courseRes.data.isYouTube && courseRes.data.playlistUrl) {
+          // Virtual lesson for YouTube playlist
+          setCurrentLesson({
+            _id: 'v-playlist',
+            title: 'Full Course Playlist',
+            videoUrl: courseRes.data.playlistUrl,
+            content: 'Watch the full course video/playlist on YouTube via the player above.'
+          });
         }
       } catch (err) {
         console.error('Error fetching lesson data:', err);
@@ -50,7 +58,7 @@ const LessonPlayer = () => {
             <span>{lessons.length} Lessons</span>
           </div>
           <div style={{paddingBottom: '20px'}}>
-            {lessons.map((lesson, idx) => (
+            {lessons.length > 0 ? lessons.map((lesson, idx) => (
               <div 
                 key={lesson._id}
                 onClick={() => setCurrentLesson(lesson)}
@@ -60,7 +68,20 @@ const LessonPlayer = () => {
                 <span>{lesson.title}</span>
                 {currentLesson?._id === lesson._id && <span style={{marginLeft:'auto', fontSize:'12px'}}>▶</span>}
               </div>
-            ))}
+            )) : course.isYouTube && (
+              <div 
+                className={`ps-item active`}
+                onClick={() => setCurrentLesson({
+                  _id: 'v-playlist',
+                  title: 'Full Course Playlist',
+                  videoUrl: course.playlistUrl,
+                  content: 'Watch the full course video/playlist'
+                })}
+              >
+                <span className="ps-num">▶</span>
+                <span>Watch Full Playlist</span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -72,22 +93,41 @@ const LessonPlayer = () => {
               
               <div className="edu-player-video">
                 {currentLesson.videoUrl ? (
-                  currentLesson.videoUrl.includes('youtube.com/embed') || currentLesson.videoUrl.includes('youtu.be') ? (
-                    <iframe 
-                      src={currentLesson.videoUrl} 
-                      title="Lesson Video"
-                      allowFullScreen
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    ></iframe>
-                  ) : (
-                    <video 
-                      src={`${IMAGE_BASE_URL}${currentLesson.videoUrl}`} 
-                      controls 
-                      width="100%" 
-                      height="100%"
-                      style={{borderRadius: '16px'}}
-                    ></video>
-                  )
+                  (() => {
+                    const url = currentLesson.videoUrl;
+                    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+                    const match = url.match(regExp);
+                    const videoId = (match && match[2].length === 11) ? match[2] : null;
+                    
+                    if (videoId || url.includes('youtube.com/embed') || url.includes('list=')) {
+                      let finalSrc = url;
+                      if (videoId && !url.includes('embed')) finalSrc = `https://www.youtube.com/embed/${videoId}`;
+                      if (url.includes('list=') && !url.includes('embed')) {
+                        const listMatch = url.match(/[?&]list=([^#&?]+)/);
+                        if (listMatch) finalSrc = `https://www.youtube.com/embed/videoseries?list=${listMatch[1]}`;
+                      }
+                      
+                      return (
+                        <iframe 
+                          src={finalSrc} 
+                          title="Lesson Video"
+                          allowFullScreen
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        ></iframe>
+                      );
+                    }
+                    
+                    // Fallback for non-YouTube
+                    return (
+                      <video 
+                        src={url.startsWith('http') ? url : `${IMAGE_BASE_URL.replace(/\/$/, '')}/${url.replace(/^\//, '')}`} 
+                        controls 
+                        width="100%" 
+                        height="100%"
+                        style={{borderRadius: '16px'}}
+                      ></video>
+                    );
+                  })()
                 ) : (
                   <div style={{height:'100%', display:'flex', alignItems:'center', justifyContent:'center', background:'#F0EEE9', color:'#9B9890'}}>
                     No video content for this lesson.
