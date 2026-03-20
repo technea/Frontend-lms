@@ -50,6 +50,10 @@ const authService = {
     return JSON.parse(localStorage.getItem('user'));
   },
 
+  getToken: () => {
+    return localStorage.getItem('token');
+  },
+
   changePassword: async (passwords) => {
     try {
       const response = await api.put('/users/change-password', passwords);
