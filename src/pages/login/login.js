@@ -106,6 +106,49 @@ const Login = () => {
     }
   };
 
+  const handleMetaMaskLogin = async () => {
+    setError('');
+    setLoading(true);
+    try {
+      if (!window.ethereum) {
+        throw new Error('MetaMask not found. Please install it to continue.');
+      }
+
+      // 1 — Request accounts
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      const address = accounts[0];
+
+      // 2 — Request signature to verify identity
+      const message = `Welcome to NexLearn! Sign this message to log in to your account.\n\nNonce: ${window.crypto.randomUUID()}`;
+      const signature = await window.ethereum.request({
+        method: 'personal_sign',
+        params: [message, address],
+      });
+
+      // 3 — Log in to backend
+      const data = await authService.walletLogin({ address, message, signature });
+      
+      if (data.token) {
+        if (data.user?.role === 'admin') {
+          navigate('/admin');
+        } else if (data.user?.role === 'instructor') {
+          navigate('/instructor');
+        } else {
+          navigate('/dashboard');
+        }
+      }
+    } catch (err) {
+      console.error("MetaMask Login Error:", err);
+      if (err.code === 4001) {
+        setError(null); // User rejected
+      } else {
+        setError(err.message || 'MetaMask verification failed.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handle2FASubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -206,12 +249,39 @@ const Login = () => {
                 <hr style={{flexGrow:1, border:'0', borderTop:'1px solid #eee'}} />
               </div>
 
-              <div style={{display:'flex', justifyContent:'center'}}>
+              <div style={{display:'flex', flexDirection:'column', gap:'12px', alignItems:'center'}}>
                 <SignInWithBaseButton 
                   colorScheme="light" 
                   onClick={handleWalletLogin}
                   disabled={loading}
                 />
+                
+                <button 
+                  onClick={handleMetaMaskLogin}
+                  disabled={loading}
+                  className="edu-auth-btn-wallet"
+                  style={{
+                    background: '#fff',
+                    color: '#1A1916',
+                    border: '1px solid #e2e8f0',
+                    width: '100%',
+                    padding: '8px 16px',
+                    borderRadius: '8px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '10px',
+                    fontSize: '14px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseOver={(e) => {e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.borderColor = '#cbd5e1';}}
+                  onMouseOut={(e) => {e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#e2e8f0';}}
+                >
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Logo.svg" alt="MetaMask" style={{width:'20px', height:'20px'}} />
+                  Sign in with MetaMask
+                </button>
               </div>
             </>
           ) : (
