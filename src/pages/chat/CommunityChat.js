@@ -6,7 +6,7 @@ import {
   Card, Badge, ListGroup, Offcanvas, Modal
 } from 'react-bootstrap';
 import {
-  FaPaperPlane, FaUserCircle, FaHashtag, FaUsers, FaBars, FaPlus
+  FaPaperPlane, FaHashtag, FaUsers, FaBars, FaPlus
 } from 'react-icons/fa';
 import DashboardSidebar from '../../components/DashboardSidebar';
 import Navbar from '../../components/Navbar';
