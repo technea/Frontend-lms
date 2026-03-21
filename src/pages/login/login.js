@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { Modal, Button } from 'react-bootstrap';
+import { Modal } from 'react-bootstrap';
 import authService from '../../services/authService';
 import gsap from 'gsap';
 import '../../styles/EduFlow.css';
 import { createBaseAccountSDK } from "@base-org/account";
-import { SignInWithBaseButton } from "@base-org/account-ui/react";
 
 const Login = () => {
   const navigate = useNavigate();
