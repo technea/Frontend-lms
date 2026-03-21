@@ -4,6 +4,8 @@ import { toast } from 'react-toastify';
 import authService from '../../services/authService';
 import gsap from 'gsap';
 import '../../styles/EduFlow.css';
+import { createBaseAccountSDK } from "@base-org/account";
+import { SignInWithBaseButton } from "@base-org/account-ui/react";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -47,6 +49,57 @@ const Login = () => {
         );
       } else {
         setError(errorMsg);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleWalletLogin = async () => {
+    setError('');
+    setLoading(true);
+    try {
+      const sdk = createBaseAccountSDK({ appName: "NexLearn" });
+      const provider = sdk.getProvider();
+      
+      // 1 — Connect and get accounts
+      const { accounts } = await provider.request({
+        method: "wallet_connect",
+        params: [
+          {
+            version: "1",
+            capabilities: {
+              signInWithEthereum: {
+                nonce: window.crypto.randomUUID().replace(/-/g, ""),
+                chainId: "0x2105", // Base Mainnet
+              },
+            },
+          },
+        ],
+      });
+
+      const { address } = accounts[0];
+      const { message, signature } = accounts[0].capabilities.signInWithEthereum;
+
+      // 2 — Log in to backend
+      const data = await authService.walletLogin({ address, message, signature });
+      
+      if (data.token) {
+        if (data.user?.role === 'admin') {
+          navigate('/admin');
+        } else if (data.user?.role === 'instructor') {
+          navigate('/instructor');
+        } else {
+          navigate('/dashboard');
+        }
+      }
+    } catch (err) {
+      console.error("Wallet Login Error:", err);
+      // Some errors are just the user closing the modal
+      if (err.message && err.message.includes("User rejected")) {
+        setError(null);
+      } else {
+        setError(err.message || 'Verification with Base Account failed.');
       }
     } finally {
       setLoading(false);
@@ -146,6 +199,20 @@ const Login = () => {
                   {loading ? 'Logging in...' : 'Log In'}
                 </button>
               </form>
+
+              <div className="edu-auth-separator" style={{margin:'20px 0', textAlign:'center', display:'flex', alignItems:'center', gap:'10px'}}>
+                <hr style={{flexGrow:1, border:'0', borderTop:'1px solid #eee'}} />
+                <span style={{fontSize:'12px', color:'#9B9890', textTransform:'uppercase', fontWeight:600}}>or</span>
+                <hr style={{flexGrow:1, border:'0', borderTop:'1px solid #eee'}} />
+              </div>
+
+              <div style={{display:'flex', justifyContent:'center'}}>
+                <SignInWithBaseButton 
+                  colorScheme="light" 
+                  onClick={handleWalletLogin}
+                  disabled={loading}
+                />
+              </div>
             </>
           ) : (
             <>
