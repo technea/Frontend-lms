@@ -19,7 +19,6 @@ gsap.registerPlugin(ScrollTrigger);
 const Home = () => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [walletLoading, setWalletLoading] = useState(false);
   const [showWalletModal, setShowWalletModal] = useState(false);
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
@@ -62,7 +61,6 @@ const Home = () => {
   }, []);
 
   const handleWalletLogin = async () => {
-    setWalletLoading(true);
     try {
       const sdk = createBaseAccountSDK({ appName: "NexLearn" });
       const provider = sdk.getProvider();
@@ -76,14 +74,11 @@ const Home = () => {
       if (data.token) navigate(data.user?.role === 'admin' ? '/admin' : (data.user?.role === 'instructor' ? '/instructor' : '/dashboard'));
     } catch (err) {
       console.error("Wallet Login Error:", err);
-    } finally {
-      setWalletLoading(false);
     }
   };
 
   const handleMetaMaskLogin = async () => {
     if (!window.ethereum) return alert('MetaMask not found!');
-    setWalletLoading(true);
     try {
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
       const address = accounts[0];
@@ -93,8 +88,6 @@ const Home = () => {
       if (data.token) navigate(data.user?.role === 'admin' ? '/admin' : (data.user?.role === 'instructor' ? '/instructor' : '/dashboard'));
     } catch (err) {
       console.error("MetaMask Error:", err);
-    } finally {
-      setWalletLoading(false);
     }
   };
 
