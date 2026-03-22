@@ -23,29 +23,65 @@ const CommunityChat = () => {
   const [showRooms, setShowRooms] = useState(false);
   const [user, setUser] = useState(null);
   const [typingUser, setTypingUser] = useState(null);
+  const [connected, setConnected] = useState(false);
   const lastMessageRef = useRef(null);
+  const prevRoomRef = useRef(null);
 
-  /* ---- Socket setup ---- */
+  /* ---- Socket connection (runs ONCE) ---- */
   useEffect(() => {
     const currentUser = authService.getCurrentUser();
     const token = authService.getToken();
     setUser(currentUser);
 
-    socketService.connect(token);
+    if (!token) {
+      console.error('No auth token found for chat');
+      return;
+    }
 
-    socketService.onMessage((msg) =>
-      setMessages((prev) => [...prev, msg])
-    );
+    // Connect socket ONCE
+    const socket = socketService.connect(token);
 
-    socketService.onRoomHistory((msgs) => setMessages(msgs));
+    // Register listeners
+    const handleMessage = (msg) => setMessages((prev) => [...prev, msg]);
+    const handleRoomHistory = (msgs) => setMessages(msgs);
+    const handleUserTyping = (data) =>
+      setTypingUser(data.isTyping ? data.userName : null);
 
-    socketService.onUserTyping((data) =>
-      setTypingUser(data.isTyping ? data.userName : null)
-    );
+    socketService.onMessage(handleMessage);
+    socketService.onRoomHistory(handleRoomHistory);
+    socketService.onUserTyping(handleUserTyping);
 
+    // Track connection status
+    if (socket) {
+      socket.on('connect', () => setConnected(true));
+      socket.on('disconnect', () => setConnected(false));
+      if (socket.connected) setConnected(true);
+    }
+
+    // Cleanup on unmount only
+    return () => {
+      socketService.offMessage(handleMessage);
+      socketService.offRoomHistory(handleRoomHistory);
+      socketService.offUserTyping(handleUserTyping);
+      socketService.disconnect();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  /* ---- Join/leave rooms when room changes ---- */
+  useEffect(() => {
+    if (!socketService.isConnected() && !socketService.socket) return;
+
+    // Leave previous room
+    if (prevRoomRef.current && prevRoomRef.current !== room) {
+      socketService.leaveRoom(prevRoomRef.current);
+    }
+
+    // Join new room
+    setMessages([]);
+    setTypingUser(null);
     socketService.joinRoom(room);
-
-    return () => socketService.disconnect();
+    prevRoomRef.current = room;
   }, [room]);
 
   /* ---- Auto-scroll to latest message ---- */
@@ -179,8 +215,11 @@ const CommunityChat = () => {
                       </small>
                     </div>
                   </div>
-                  <Badge bg="success" className="rounded-pill px-2 px-md-3 py-2 flex-shrink-0">
-                    Online
+                  <Badge 
+                    bg={connected ? "success" : "secondary"} 
+                    className="rounded-pill px-2 px-md-3 py-2 flex-shrink-0"
+                  >
+                    {connected ? 'Online' : 'Connecting…'}
                   </Badge>
                 </Card.Header>
 
@@ -256,11 +295,13 @@ const CommunityChat = () => {
                         value={newMessage}
                         onChange={handleTyping}
                         autoComplete="off"
+                        disabled={!connected}
                       />
                       <Button
                         type="submit"
                         className="send-message-btn"
                         aria-label="Send message"
+                        disabled={!connected || !newMessage.trim()}
                       >
                         <FaPaperPlane />
                       </Button>
