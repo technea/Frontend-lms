@@ -1,6 +1,10 @@
 import { io } from 'socket.io-client';
+import { API_BASE_URL } from './api';
 
-const SOCKET_URL = process.env.REACT_APP_SOCKET_URL || 'http://localhost:5000';
+// Derived socket URL from API URL if not explicitly provided
+// e.g. https://backend.vercel.app/api -> https://backend.vercel.app
+const DEFAULT_SOCKET_URL = API_BASE_URL ? API_BASE_URL.replace(/\/api$/, '') : 'http://localhost:5000';
+const SOCKET_URL = process.env.REACT_APP_SOCKET_URL || DEFAULT_SOCKET_URL;
 
 class SocketService {
     socket = null;
@@ -9,6 +13,7 @@ class SocketService {
     connect(token) {
         // Don't reconnect if already connected with the same token
         if (this.socket?.connected) {
+            console.log('Already connected to socket');
             return this.socket;
         }
 
@@ -18,6 +23,8 @@ class SocketService {
             this.socket.disconnect();
             this.socket = null;
         }
+
+        console.log('🔌 Attempting socket connection to:', SOCKET_URL);
 
         // According to Socket.io v4: Use 'auth' object for authentication
         this.socket = io(SOCKET_URL, {
@@ -51,7 +58,7 @@ class SocketService {
 
         // Re-register any pending listeners on the new socket
         this._listeners.forEach(({ event, callback }) => {
-            this.socket.on(event, callback);
+            if (this.socket) this.socket.on(event, callback);
         });
 
         return this.socket;
@@ -67,12 +74,17 @@ class SocketService {
     }
 
     joinRoom(room) {
-        if (this.socket?.connected) {
+        if (!this.socket) return;
+
+        // If connected, emit immediately
+        if (this.socket.connected) {
             this.socket.emit('joinRoom', room);
-        } else if (this.socket) {
-            // Wait for connection then join
+            console.log('Room Join emitted (connected):', room);
+        } else {
+            // Buffer it: wait for connection then join
             this.socket.once('connect', () => {
                 this.socket.emit('joinRoom', room);
+                console.log('Room Join emitted (delayed):', room);
             });
         }
     }
@@ -83,10 +95,11 @@ class SocketService {
         }
     }
 
-    // Updated with acknowledgement support
     sendMessage(room, message, callback) {
-        if (this.socket?.connected) {
+        // We allow emit even if not "connected" status yet, socket.io will buffer internally
+        if (this.socket) {
             this.socket.emit('sendMessage', { room, message }, (response) => {
+                console.log('Message Ack:', response);
                 if (callback) callback(response);
             });
         }
@@ -102,7 +115,6 @@ class SocketService {
         this._registerListener('message', callback);
     }
 
-    // Renamed according to new backend event name
     onRoomHistory(callback) {
         this._registerListener('roomHistory', callback);
     }
@@ -111,15 +123,20 @@ class SocketService {
         this._registerListener('userTyping', callback);
     }
 
-    // Helper to safely register listeners (even before socket is ready)
     _registerListener(event, callback) {
-        this._listeners.push({ event, callback });
+        // Prevent duplicate local listeners in our queue
+        const exists = this._listeners.some(l => l.event === event && l.callback === callback);
+        if (!exists) {
+            this._listeners.push({ event, callback });
+        }
+        
         if (this.socket) {
+            // Remove previous instances of same callback to avoid duplicates on the socket
+            this.socket.off(event, callback);
             this.socket.on(event, callback);
         }
     }
 
-    // Remove specific event listeners
     offMessage(callback) {
         this._removeListener('message', callback);
     }

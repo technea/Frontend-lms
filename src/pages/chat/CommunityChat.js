@@ -34,16 +34,22 @@ const CommunityChat = () => {
     setUser(currentUser);
 
     if (!token) {
-      console.error('No auth token found for chat');
+      console.warn('No auth token found for chat');
       return;
     }
 
-    // Connect socket ONCE
+    // Connect socket ONE PER MOUNT
     const socket = socketService.connect(token);
 
     // Register listeners
-    const handleMessage = (msg) => setMessages((prev) => [...prev, msg]);
-    const handleRoomHistory = (msgs) => setMessages(msgs);
+    const handleMessage = (msg) => {
+      console.log('📨 New message received via socket:', msg);
+      setMessages((prev) => [...prev, msg]);
+    }
+    const handleRoomHistory = (msgs) => {
+      console.log('📜 History loaded:', msgs.length, 'messages');
+      setMessages(msgs);
+    }
     const handleUserTyping = (data) =>
       setTypingUser(data.isTyping ? data.userName : null);
 
@@ -53,16 +59,29 @@ const CommunityChat = () => {
 
     // Track connection status
     if (socket) {
-      socket.on('connect', () => setConnected(true));
-      socket.on('disconnect', () => setConnected(false));
       if (socket.connected) setConnected(true);
+      
+      socket.on('connect', () => {
+        console.log('Chat Status: Online');
+        setConnected(true);
+      });
+      socket.on('disconnect', () => {
+        console.warn('Chat Status: Offline');
+        setConnected(false);
+      });
+      socket.on('connect_error', (err) => {
+        console.error('Chat Connection Error:', err.message);
+      });
     }
 
     // Cleanup on unmount only
     return () => {
+      console.log('Cleaning up chat listeners...');
       socketService.offMessage(handleMessage);
       socketService.offRoomHistory(handleRoomHistory);
       socketService.offUserTyping(handleUserTyping);
+      // Optional: keep socket connected for other background tasks, 
+      // but usually for chat-only apps disconnect is fine.
       socketService.disconnect();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -70,14 +89,14 @@ const CommunityChat = () => {
 
   /* ---- Join/leave rooms when room changes ---- */
   useEffect(() => {
-    if (!socketService.isConnected() && !socketService.socket) return;
-
-    // Leave previous room
+    // Leave previous room if any
     if (prevRoomRef.current && prevRoomRef.current !== room) {
+      console.log(`Leaving room: ${prevRoomRef.current}`);
       socketService.leaveRoom(prevRoomRef.current);
     }
 
-    // Join new room
+    // Reset messages UI and Join new room (socketService handles if not yet connected)
+    console.log(`Join Room Request: ${room}`);
     setMessages([]);
     setTypingUser(null);
     socketService.joinRoom(room);
@@ -93,6 +112,7 @@ const CommunityChat = () => {
   const handleSendMessage = (e) => {
     e.preventDefault();
     if (newMessage.trim()) {
+      console.log(`Sending message to ${room}: ${newMessage}`);
       socketService.sendMessage(room, newMessage);
       setNewMessage('');
       socketService.sendTyping(room, false);
@@ -117,13 +137,14 @@ const CommunityChat = () => {
     socketService.sendTyping(room, e.target.value.length > 0);
   };
 
-  /* ---- Room list (reused in desktop sidebar + mobile offcanvas) ---- */
+  /* ---- Room list component (Desktop sidebar/Mobile offcanvas) ---- */
   const RoomList = () => (
     <div className="rooms-container">
       <ListGroup variant="flush" className="rooms-list">
         {rooms.map((r) => (
           <ListGroup.Item
             key={r}
+            active={room === r}
             onClick={() => { setRoom(r); setShowRooms(false); }}
             className={`room-item border-0 ${room === r ? 'active' : ''}`}
           >
@@ -131,7 +152,7 @@ const CommunityChat = () => {
               <div className={`room-icon ${room === r ? 'active' : ''}`}>
                 <FaHashtag />
               </div>
-              <span className="fw-medium">{r}</span>
+              <span className="fw-medium text-truncate">{r}</span>
             </div>
           </ListGroup.Item>
         ))}
@@ -161,14 +182,13 @@ const CommunityChat = () => {
       <div className="edu-main chat-page">
         <Navbar onMenuClick={() => setIsSidebarOpen(true)} />
 
-        {/* ========== Main layout ========== */}
         <Container
           fluid
-          className="chat-content-wrapper px-0 px-md-3 px-lg-4 py-0 py-md-3 py-lg-4"
+          className="chat-content-wrapper px-0 px-md-3 px-lg-4 py-0 py-md-3"
         >
-          <Row className="chat-row g-0 g-md-3 g-lg-4 flex-nowrap">
+          <Row className="chat-row g-0 g-md-3 g-lg-4 flex-nowrap h-100">
 
-            {/* ----- Desktop Rooms Sidebar (hidden on mobile) ----- */}
+            {/* ----- Desktop Sidebar ----- */}
             <Col
               lg={3}
               md={4}
@@ -187,7 +207,7 @@ const CommunityChat = () => {
               </Card>
             </Col>
 
-            {/* ----- Chat Main Area ----- */}
+            {/* ----- Chat Area ----- */}
             <Col
               lg={9}
               md={8}
@@ -195,16 +215,12 @@ const CommunityChat = () => {
               className="chat-main-col d-flex flex-column"
             >
               <Card className="glass-card chat-box-card border-0 shadow-lg flex-grow-1">
-
-                {/* Header */}
                 <Card.Header className="chat-header d-flex justify-content-between align-items-center border-0">
                   <div className="d-flex align-items-center gap-2 gap-md-3 overflow-hidden">
-                    {/* Hamburger — only on mobile */}
                     <Button
                       variant="link"
                       className="p-0 text-dark d-md-none flex-shrink-0"
                       onClick={() => setShowRooms(true)}
-                      aria-label="Open rooms"
                     >
                       <FaBars size={18} />
                     </Button>
@@ -217,24 +233,21 @@ const CommunityChat = () => {
                   </div>
                   <Badge 
                     bg={connected ? "success" : "secondary"} 
-                    className="rounded-pill px-2 px-md-3 py-2 flex-shrink-0"
+                    className="rounded-pill px-2 px-md-3 py-1 flex-shrink-0"
                   >
-                    {connected ? 'Online' : 'Connecting…'}
+                    {connected ? '● Online' : '🔌 Reconnecting…'}
                   </Badge>
                 </Card.Header>
 
-                {/* Messages */}
-                <Card.Body className="chat-messages-body p-3 p-md-4" id="chat-scroll">
+                <Card.Body className="chat-messages-body p-3 p-md-4" id="chat-box">
                   {messages.length === 0 ? (
                     <div className="empty-chat-placeholder">
-                      <FaHashtag size={36} className="mb-3 opacity-25" />
-                      <p className="text-muted mb-0">
-                        No messages yet. Start the conversation!
-                      </p>
+                      <FaHashtag size={36} className="mb-3 opacity-10" />
+                      <p className="text-muted small">No messages in # {room} yet.</p>
                     </div>
                   ) : (
                     messages.map((msg, idx) => {
-                      const isSender = msg.sender?._id === user?._id;
+                      const isSender = (msg.sender?._id === user?._id) || (msg.sender === user?._id);
                       return (
                         <div
                           key={msg._id || idx}
@@ -243,7 +256,7 @@ const CommunityChat = () => {
                           {!isSender && (
                             <div className="msg-avatar flex-shrink-0">
                               {msg.sender?.avatar ? (
-                                <img src={msg.sender.avatar} alt="avatar" />
+                                <img src={msg.sender.avatar.startsWith('/') ? `${process.env.REACT_APP_API_URL.replace('/api','')}${msg.sender.avatar}` : msg.sender.avatar} alt="avatar" />
                               ) : (
                                 <div className="avatar-placeholder">
                                   {msg.senderName?.[0]?.toUpperCase() || 'U'}
@@ -260,8 +273,7 @@ const CommunityChat = () => {
                               <span className="msg-text">{msg.message}</span>
                               <span className="msg-time">
                                 {new Date(msg.timestamp).toLocaleTimeString([], {
-                                  hour: '2-digit',
-                                  minute: '2-digit',
+                                  hour: '2-digit', minute: '2-digit'
                                 })}
                               </span>
                             </div>
@@ -273,37 +285,36 @@ const CommunityChat = () => {
                   <div ref={lastMessageRef} />
                 </Card.Body>
 
-                {/* Footer / Input */}
                 <Card.Footer className="chat-footer border-0 p-3 p-md-4">
                   {typingUser && (
                     <div className="typing-status mb-2">
                       <span className="typing-dot" />
                       <span className="typing-dot" />
                       <span className="typing-dot" />
-                      <small className="ms-2 text-primary fw-medium">
+                      <small className="ms-2 text-primary fw-medium font-size-xs">
                         {typingUser} is typing…
                       </small>
                     </div>
                   )}
 
                   <Form onSubmit={handleSendMessage} className="chat-input-form">
-                    <div className="input-group">
+                    <div className="input-group bg-white rounded-pill overflow-hidden border">
                       <Form.Control
                         type="text"
-                        className="chat-input-field"
-                        placeholder="Type a message…"
+                        className="chat-input-field border-0 px-4 py-2"
+                        placeholder={connected ? "Type a message…" : "Waiting for connection…"}
                         value={newMessage}
                         onChange={handleTyping}
                         autoComplete="off"
-                        disabled={!connected}
                       />
                       <Button
                         type="submit"
-                        className="send-message-btn"
-                        aria-label="Send message"
-                        disabled={!connected || !newMessage.trim()}
+                        variant="primary"
+                        className="rounded-circle d-flex align-items-center justify-content-center m-1 p-0"
+                        style={{width: '38px', height: '38px'}}
+                        disabled={!newMessage.trim()}
                       >
-                        <FaPaperPlane />
+                        <FaPaperPlane size={14} />
                       </Button>
                     </div>
                   </Form>
@@ -313,52 +324,31 @@ const CommunityChat = () => {
           </Row>
         </Container>
 
-        {/* ========== Mobile Rooms Drawer ========== */}
-        <Offcanvas
-          show={showRooms}
-          onHide={() => setShowRooms(false)}
-          placement="start"
-          className="mobile-rooms-offcanvas"
-        >
+        {/* Mobile Sidebar */}
+        <Offcanvas show={showRooms} onHide={() => setShowRooms(false)} placement="start">
           <Offcanvas.Header closeButton>
-            <Offcanvas.Title className="fw-bold d-flex align-items-center gap-2">
-              <FaUsers className="text-primary" /> Chat Rooms
-            </Offcanvas.Title>
+            <Offcanvas.Title className="fw-bold">Chat Rooms</Offcanvas.Title>
           </Offcanvas.Header>
-          <Offcanvas.Body className="px-2 py-0">
-            <RoomList />
-          </Offcanvas.Body>
+          <Offcanvas.Body><RoomList /></Offcanvas.Body>
         </Offcanvas>
 
-        {/* ========== Create Room Modal ========== */}
-        <Modal show={showCreateModal} onHide={() => setShowCreateModal(false)} centered className="create-room-modal">
-          <Modal.Header closeButton className="border-0 pb-0">
-            <Modal.Title className="fw-bold h5">Create New Room</Modal.Title>
+        {/* Create Room Modal */}
+        <Modal show={showCreateModal} onHide={() => setShowCreateModal(false)} centered>
+          <Modal.Header closeButton>
+            <Modal.Title className="h5 fw-bold">Create Room</Modal.Title>
           </Modal.Header>
-          <Modal.Body className="pt-3">
+          <Modal.Body>
             <Form onSubmit={handleCreateRoom}>
               <Form.Group className="mb-3">
-                <Form.Label className="small text-muted fw-bold">ROOM NAME</Form.Label>
                 <Form.Control 
                   type="text" 
-                  placeholder="e.g. Web-Development"
-                  className="rounded-3 py-2 border-0 bg-light"
+                  placeholder="Room name..."
                   value={newRoomName}
                   onChange={(e) => setNewRoomName(e.target.value)}
                   autoFocus
                 />
-                <Form.Text className="text-muted small">
-                  Room names will be formatted with hyphens.
-                </Form.Text>
               </Form.Group>
-              <div className="d-flex gap-2">
-                <Button variant="light" className="flex-grow-1 rounded-pill" onClick={() => setShowCreateModal(false)}>
-                  Cancel
-                </Button>
-                <Button variant="primary" type="submit" className="flex-grow-1 rounded-pill">
-                  Create
-                </Button>
-              </div>
+              <Button type="submit" className="w-100 rounded-pill">Create Room</Button>
             </Form>
           </Modal.Body>
         </Modal>
