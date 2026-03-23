@@ -1,65 +1,84 @@
 import { io } from 'socket.io-client';
 import { API_BASE_URL } from './api';
 
-const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-const DEFAULT_SOCKET_URL = isLocalhost 
-    ? 'http://localhost:5000' 
-    : (API_BASE_URL ? API_BASE_URL.replace(/\/api$/, '') : 'http://localhost:5000');
+// Derive the socket URL dynamically. 
+// If we are on localhost, we point to localhost:5000.
+// If NOT on localhost, we derive from API URL.
+const getSocketUrl = () => {
+    // Priority 1: Environment variable
+    if (process.env.REACT_APP_SOCKET_URL) return process.env.REACT_APP_SOCKET_URL;
+    
+    // Priority 2: Localhost detection
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    if (isLocalhost) {
+        // We use the same protocol as the page (http/https) but port 5000
+        return `${window.location.protocol}//${window.location.hostname}:5000`;
+    }
+    
+    // Priority 3: Fallback to API base URL (removing /api)
+    return API_BASE_URL ? API_BASE_URL.replace(/\/api$/, '') : 'http://localhost:5000';
+};
 
-const SOCKET_URL = process.env.REACT_APP_SOCKET_URL || DEFAULT_SOCKET_URL;
+const SOCKET_URL = getSocketUrl();
 
 class SocketService {
     socket = null;
     _listeners = []; // Track registered listeners for cleanup
 
     connect(token) {
-        // Don't reconnect if already connected with the same token
+        // If already connected, just return the socket
         if (this.socket?.connected) {
-            console.log('Already connected to socket');
+            console.log('✅ Socket already connected');
             return this.socket;
         }
 
-        // Clean up any existing socket
+        // If currently connecting, don't start a new one
         if (this.socket) {
-            this.socket.removeAllListeners();
-            this.socket.disconnect();
-            this.socket = null;
+            console.log('⏳ Socket connection attempt already pending...');
+            return this.socket;
         }
 
-        console.log(`🔌 Attempting socket connection to: ${SOCKET_URL} (Localhost mode: ${isLocalhost})`);
+        if (!token) {
+            console.error('❌ Cannot connect: No token provided');
+            return null;
+        }
 
-        // According to Socket.io v4: Use 'auth' object for authentication
+        console.log(`🔌 Attempting socket connection to: ${SOCKET_URL}`);
+
         this.socket = io(SOCKET_URL, {
             autoConnect: true,
             reconnection: true,
             reconnectionAttempts: Infinity,
             reconnectionDelay: 1000,
             reconnectionDelayMax: 5000,
-            timeout: 20000,
             auth: {
                 token: token
-            }
+            },
+            transports: ['polling', 'websocket']
         });
 
         this.socket.on('connect', () => {
-            console.log('✅ Connected to socket server:', this.socket.id);
+            console.log('✅ Socket connected successfully with ID:', this.socket.id);
         });
 
         this.socket.on('connect_error', (err) => {
-            console.error('❌ Socket Connection Error:', err.message);
+            console.error('❌ Socket connection error:', err.message);
         });
 
         this.socket.on('disconnect', (reason) => {
-            console.log('🔌 Disconnected from socket server:', reason);
+            console.warn('🔌 Socket disconnected:', reason);
+            // If the server forced disconnect, try to reconnect manually after a delay
+            if (reason === "io server disconnect") {
+                this.socket.connect();
+            }
         });
 
-        this.socket.on('reconnect', (attemptNumber) => {
-            console.log('🔄 Reconnected after', attemptNumber, 'attempts');
-        });
-
-        // Re-register any pending listeners on the new socket
+        // Register any listeners that were set up before connect
         this._listeners.forEach(({ event, callback }) => {
-            if (this.socket) this.socket.on(event, callback);
+            if (this.socket) {
+                this.socket.off(event, callback);
+                this.socket.on(event, callback);
+            }
         });
 
         return this.socket;
@@ -75,17 +94,19 @@ class SocketService {
     }
 
     joinRoom(room) {
-        if (!this.socket) return;
-
-        // If connected, emit immediately
+        if (!this.socket) {
+            console.warn('Cannot join room: Socket not initialized');
+            return;
+        }
+        
         if (this.socket.connected) {
             this.socket.emit('joinRoom', room);
-            console.log('Room Join emitted (connected):', room);
+            console.log(`➡️ Joined room immediately: ${room}`);
         } else {
-            // Buffer it: wait for connection then join
+            console.log(`⏳ Buffering joinRoom for ${room} until connected...`);
             this.socket.once('connect', () => {
                 this.socket.emit('joinRoom', room);
-                console.log('Room Join emitted (delayed):', room);
+                console.log(`➡️ Joined room after connecting: ${room}`);
             });
         }
     }
@@ -97,10 +118,8 @@ class SocketService {
     }
 
     sendMessage(room, message, callback) {
-        // We allow emit even if not "connected" status yet, socket.io will buffer internally
         if (this.socket) {
             this.socket.emit('sendMessage', { room, message }, (response) => {
-                console.log('Message Ack:', response);
                 if (callback) callback(response);
             });
         }
@@ -125,30 +144,20 @@ class SocketService {
     }
 
     _registerListener(event, callback) {
-        // Prevent duplicate local listeners in our queue
         const exists = this._listeners.some(l => l.event === event && l.callback === callback);
         if (!exists) {
             this._listeners.push({ event, callback });
         }
         
         if (this.socket) {
-            // Remove previous instances of same callback to avoid duplicates on the socket
             this.socket.off(event, callback);
             this.socket.on(event, callback);
         }
     }
 
-    offMessage(callback) {
-        this._removeListener('message', callback);
-    }
-
-    offRoomHistory(callback) {
-        this._removeListener('roomHistory', callback);
-    }
-
-    offUserTyping(callback) {
-        this._removeListener('userTyping', callback);
-    }
+    offMessage(callback) { this._removeListener('message', callback); }
+    offRoomHistory(callback) { this._removeListener('roomHistory', callback); }
+    offUserTyping(callback) { this._removeListener('userTyping', callback); }
 
     _removeListener(event, callback) {
         this._listeners = this._listeners.filter(

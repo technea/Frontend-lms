@@ -23,9 +23,7 @@ const CommunityChat = () => {
   const [showRooms, setShowRooms] = useState(false);
   const [user, setUser] = useState(null);
   const [typingUser, setTypingUser] = useState(null);
-  const [connected, setConnected] = useState(false);
-  const lastMessageRef = useRef(null);
-  const prevRoomRef = useRef(null);
+  const [connectionError, setConnectionError] = useState(null);
 
   /* ---- Socket connection (runs ONCE) ---- */
   useEffect(() => {
@@ -59,11 +57,15 @@ const CommunityChat = () => {
 
     // Track connection status
     if (socket) {
-      if (socket.connected) setConnected(true);
+      if (socket.connected) {
+        setConnected(true);
+        setConnectionError(null);
+      }
       
       socket.on('connect', () => {
         console.log('Chat Status: Online');
         setConnected(true);
+        setConnectionError(null);
       });
       socket.on('disconnect', () => {
         console.warn('Chat Status: Offline');
@@ -71,6 +73,8 @@ const CommunityChat = () => {
       });
       socket.on('connect_error', (err) => {
         console.error('Chat Connection Error:', err.message);
+        setConnectionError(err.message);
+        setConnected(false);
       });
     }
 
@@ -255,10 +259,10 @@ const CommunityChat = () => {
                     </div>
                   </div>
                   <Badge 
-                    bg={connected ? "success" : "secondary"} 
+                    bg={connected ? "success" : (connectionError ? "danger" : "secondary")} 
                     className="rounded-pill px-2 px-md-3 py-1 flex-shrink-0"
                   >
-                    {connected ? '● Online' : '🔌 Reconnecting…'}
+                    {connected ? '● Online' : (connectionError ? `❌ ${connectionError}` : '🔌 Reconnecting…')}
                   </Badge>
                 </Card.Header>
 
