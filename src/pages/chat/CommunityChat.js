@@ -80,9 +80,7 @@ const CommunityChat = () => {
       socketService.offMessage(handleMessage);
       socketService.offRoomHistory(handleRoomHistory);
       socketService.offUserTyping(handleUserTyping);
-      // Optional: keep socket connected for other background tasks, 
-      // but usually for chat-only apps disconnect is fine.
-      socketService.disconnect();
+      // Removed socketService.disconnect() to avoid StrictMode double-mount disconnection issues
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

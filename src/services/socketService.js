@@ -1,9 +1,11 @@
 import { io } from 'socket.io-client';
 import { API_BASE_URL } from './api';
 
-// Derived socket URL from API URL if not explicitly provided
-// e.g. https://backend.vercel.app/api -> https://backend.vercel.app
-const DEFAULT_SOCKET_URL = API_BASE_URL ? API_BASE_URL.replace(/\/api$/, '') : 'http://localhost:5000';
+const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const DEFAULT_SOCKET_URL = isLocalhost 
+    ? 'http://localhost:5000' 
+    : (API_BASE_URL ? API_BASE_URL.replace(/\/api$/, '') : 'http://localhost:5000');
+
 const SOCKET_URL = process.env.REACT_APP_SOCKET_URL || DEFAULT_SOCKET_URL;
 
 class SocketService {
@@ -24,14 +26,13 @@ class SocketService {
             this.socket = null;
         }
 
-        console.log('🔌 Attempting socket connection to:', SOCKET_URL);
+        console.log(`🔌 Attempting socket connection to: ${SOCKET_URL} (Localhost mode: ${isLocalhost})`);
 
         // According to Socket.io v4: Use 'auth' object for authentication
         this.socket = io(SOCKET_URL, {
-            transports: ['websocket', 'polling'], // Allow polling fallback
             autoConnect: true,
             reconnection: true,
-            reconnectionAttempts: 10,
+            reconnectionAttempts: Infinity,
             reconnectionDelay: 1000,
             reconnectionDelayMax: 5000,
             timeout: 20000,
