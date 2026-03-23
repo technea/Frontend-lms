@@ -137,6 +137,20 @@ const CommunityChat = () => {
     socketService.sendTyping(room, e.target.value.length > 0);
   };
 
+  const handleDeleteRoom = (roomToDelete, e) => {
+    e.stopPropagation();
+    if (roomToDelete === 'General') return; // Prevent deleting the default room
+    const confirmDelete = window.confirm(`Are you sure you want to delete the ${roomToDelete} room?`);
+    if (confirmDelete) {
+      const updatedRooms = rooms.filter(r => r !== roomToDelete);
+      setRooms(updatedRooms);
+      // If the user was in the deleted room, move them to General
+      if (room === roomToDelete) {
+        setRoom('General');
+      }
+    }
+  };
+
   /* ---- Room list component (Desktop sidebar/Mobile offcanvas) ---- */
   const RoomList = () => (
     <div className="rooms-container">
@@ -146,14 +160,25 @@ const CommunityChat = () => {
             key={r}
             active={room === r}
             onClick={() => { setRoom(r); setShowRooms(false); }}
-            className={`room-item border-0 ${room === r ? 'active' : ''}`}
+            className={`room-item border-0 d-flex justify-content-between align-items-center ${room === r ? 'active' : ''}`}
+            style={{ cursor: 'pointer' }}
           >
-            <div className="d-flex align-items-center gap-2">
+            <div className="d-flex align-items-center gap-2 overflow-hidden">
               <div className={`room-icon ${room === r ? 'active' : ''}`}>
                 <FaHashtag />
               </div>
               <span className="fw-medium text-truncate">{r}</span>
             </div>
+            {r !== 'General' && (
+              <Button 
+                variant="link" 
+                className="p-0 text-danger opacity-75"
+                onClick={(e) => handleDeleteRoom(r, e)}
+                style={{ zIndex: 10 }}
+              >
+                &times;
+              </Button>
+            )}
           </ListGroup.Item>
         ))}
       </ListGroup>
