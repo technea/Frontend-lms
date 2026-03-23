@@ -6,13 +6,14 @@ import {
   Card, Badge, ListGroup, Offcanvas, Modal
 } from 'react-bootstrap';
 import {
-  FaPaperPlane, FaHashtag, FaUsers, FaBars, FaPlus
+  FaPaperPlane, FaHashtag, FaUsers, FaBars, FaPlus, FaTrash
 } from 'react-icons/fa';
 import DashboardSidebar from '../../components/DashboardSidebar';
 import Navbar from '../../components/Navbar';
 import '../../styles/Chat.css';
 
 const CommunityChat = () => {
+  console.log('--- CHAT RENDER V4.5 ---');
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [room, setRoom] = useState('General');
@@ -23,7 +24,11 @@ const CommunityChat = () => {
   const [showRooms, setShowRooms] = useState(false);
   const [user, setUser] = useState(null);
   const [typingUser, setTypingUser] = useState(null);
+  const [connected, setConnected] = useState(false);
   const [connectionError, setConnectionError] = useState(null);
+  
+  const lastMessageRef = useRef(null);
+  const prevRoomRef = useRef(null);
 
   /* ---- Socket connection (runs ONCE) ---- */
   useEffect(() => {
@@ -50,10 +55,13 @@ const CommunityChat = () => {
     }
     const handleUserTyping = (data) =>
       setTypingUser(data.isTyping ? data.userName : null);
+    const handleMessageDeleted = (id) =>
+      setMessages((prev) => prev.filter(m => m._id !== id));
 
-    socketService.onMessage(handleMessage);
+    socketService.onMessage(handleMessage)
     socketService.onRoomHistory(handleRoomHistory);
     socketService.onUserTyping(handleUserTyping);
+    socketService.onMessageDeleted(handleMessageDeleted);
 
     // Track connection status
     if (socket) {
@@ -84,10 +92,17 @@ const CommunityChat = () => {
       socketService.offMessage(handleMessage);
       socketService.offRoomHistory(handleRoomHistory);
       socketService.offUserTyping(handleUserTyping);
+      socketService.offMessageDeleted(handleMessageDeleted);
       // Removed socketService.disconnect() to avoid StrictMode double-mount disconnection issues
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const handleDeleteMessage = (msgId) => {
+    if (window.confirm('Are you sure you want to delete this message?')) {
+      socketService.deleteMessage(msgId);
+    }
+  };
 
   /* ---- Join/leave rooms when room changes ---- */
   useEffect(() => {
@@ -267,10 +282,18 @@ const CommunityChat = () => {
                 </Card.Header>
 
                 <Card.Body className="chat-messages-body p-3 p-md-4" id="chat-box">
-                  {messages.length === 0 ? (
+                  {(!connected && connectionError) ? (
+                    <div className="empty-chat-placeholder">
+                      <FaHashtag size={36} className="mb-3 text-danger" style={{opacity: 0.5}} />
+                      <h6 className="text-danger fw-bold">Connection Failed</h6>
+                      <p className="text-muted small px-4">{connectionError}</p>
+                      <Button variant="outline-primary" size="sm" onClick={() => window.location.reload()}>Retry Connection</Button>
+                    </div>
+                  ) : messages.length === 0 ? (
                     <div className="empty-chat-placeholder">
                       <FaHashtag size={36} className="mb-3 opacity-10" />
                       <p className="text-muted small">No messages in # {room} yet.</p>
+                      {!connected && <p className="text-primary font-size-xs">🔌 Seeking server connection...</p>}
                     </div>
                   ) : (
                     messages.map((msg, idx) => {
@@ -293,9 +316,19 @@ const CommunityChat = () => {
                           )}
 
                           <div className="msg-content-wrapper">
-                            {!isSender && (
-                              <span className="sender-name">{msg.senderName}</span>
-                            )}
+                            <div className="d-flex align-items-center gap-2 mb-1">
+                                <span className="sender-name" style={{fontSize: '11px', fontWeight: 700, color: isSender ? '#2D5BE3' : '#6B6962'}}>
+                                    {isSender ? 'You' : msg.senderName}
+                                </span>
+                                {isSender && (
+                                    <FaTrash 
+                                        className="text-danger opacity-25 hover-opacity-100 cursor-pointer" 
+                                        size={10}
+                                        onClick={() => handleDeleteMessage(msg._id)}
+                                        title="Delete message"
+                                    />
+                                )}
+                            </div>
                             <div className="msg-bubble">
                               <span className="msg-text">{msg.message}</span>
                               <span className="msg-time">
@@ -329,7 +362,7 @@ const CommunityChat = () => {
                       <Form.Control
                         type="text"
                         className="chat-input-field border-0 px-4 py-2"
-                        placeholder={connected ? "Type a message…" : "Waiting for connection…"}
+                        placeholder={connected ? "Type a message…" : (connectionError ? `Error: ${connectionError}` : "🔌 Connecting to server...")}
                         value={newMessage}
                         onChange={handleTyping}
                         autoComplete="off"

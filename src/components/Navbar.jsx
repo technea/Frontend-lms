@@ -84,16 +84,7 @@ const Navbar = () => {
             
             <div className="nav-user-actions" style={{display:'flex', alignItems:'center', gap:'12px'}}>
               {/* Always show Connect Wallet as an option, optionally next to user dashboard */}
-              {!user?.walletAddress && (
-                <button 
-                  onClick={() => setShowWalletModal(true)} 
-                  className="edu-btn edu-btn-primary" 
-                  style={{padding: '8px 20px', fontSize: '12px', border:'none', cursor:'pointer', display:'flex', alignItems:'center', gap:'8px', borderRadius:'12px'}}
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"/></svg>
-                  Connect Wallet
-                </button>
-              )}
+              {/* Removed redundant Connect Wallet button to consolidate at login */}
 
               {user ? (
                 <>
@@ -121,15 +112,7 @@ const Navbar = () => {
              <div className="mobile-divider"></div>
              
              <div style={{padding:'10px 20px', display:'flex', flexDirection:'column', gap:'10px'}}>
-               {!user?.walletAddress && (
-                 <button 
-                  onClick={() => { setMobileMenuOpen(false); setShowWalletModal(true); }} 
-                  className="edu-btn edu-btn-primary" 
-                  style={{padding:'12px', border:'none', borderRadius:'12px', cursor:'pointer', fontWeight: 800}}
-                 >
-                   Connect Wallet
-                 </button>
-               )}
+               {/* Consolidated Connect Wallet button removed from here */}
 
                {user ? (
                  <>

@@ -92,6 +92,14 @@ const AppRoutes = () => {
           </ProtectedRoute>
         } 
       />
+      <Route 
+        path="/chat-community" 
+        element={
+          <ProtectedRoute allowedRoles={['student', 'instructor', 'admin']}>
+            <CommunityChat />
+          </ProtectedRoute>
+        } 
+      />
 
       <Route 
         path="/profile" 

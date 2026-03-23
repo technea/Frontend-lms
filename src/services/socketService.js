@@ -139,6 +139,20 @@ class SocketService {
         this._registerListener('roomHistory', callback);
     }
 
+    deleteMessage(messageId) {
+        if (this.socket?.connected) {
+            this.socket.emit('deleteMessage', messageId);
+        }
+    }
+
+    onMessageDeleted(callback) {
+        this._registerListener('messageDeleted', callback);
+    }
+
+    offMessageDeleted(callback) {
+        this._removeListener('messageDeleted', callback);
+    }
+
     onUserTyping(callback) {
         this._registerListener('userTyping', callback);
     }
