@@ -34,6 +34,12 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
   100% { box-shadow: 0 0 0 0 rgba(45, 91, 227, 0); }
 }
 
+@keyframes pulse-yellow {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7); opacity: 0.8; }
+  70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(255, 193, 7, 0); opacity: 1; }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 193, 7, 0); opacity: 0.8; }
+}
+
 @keyframes slideInUp {
   from { transform: translateY(30px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }

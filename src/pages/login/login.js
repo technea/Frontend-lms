@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { Modal } from 'react-bootstrap';
 import authService from '../../services/authService';
 import gsap from 'gsap';
 import '../../styles/EduFlow.css';
@@ -14,7 +13,6 @@ const Login = () => {
   const [twoFactorToken, setTwoFactorToken] = useState('');
   const [show2FA, setShow2FA] = useState(false);
   const [tempUserId, setTempUserId] = useState('');
-  const [showWalletModal, setShowWalletModal] = useState(false);
 
   useEffect(() => {
     gsap.from('.edu-auth-left', { x: -20, opacity: 0, duration: 0.8, ease: 'power2.out' });
@@ -22,54 +20,6 @@ const Login = () => {
     gsap.from('.edu-auth-stat', { opacity: 0, stagger: 0.05, duration: 0.6, delay: 0.3 });
   }, []);
 
-  const handleWalletLogin = async () => {
-    setError('');
-    setLoading(true);
-    try {
-      const { createBaseAccountSDK } = await import("@base-org/account");
-      const sdk = createBaseAccountSDK({ appName: "NexLearn" });
-      const provider = sdk.getProvider();
-      
-      const { accounts } = await provider.request({
-        method: "wallet_connect",
-        params: [{ version: "1", capabilities: { signInWithEthereum: { nonce: window.crypto.randomUUID().replace(/-/g, ""), chainId: "0x2105" }}}],
-      });
-
-      const { address } = accounts[0];
-      const { message, signature } = accounts[0].capabilities.signInWithEthereum;
-      const data = await authService.walletLogin({ address, message, signature });
-      
-      if (data.token) {
-        navigate(data.user?.role === 'admin' ? '/admin' : (data.user?.role === 'instructor' ? '/instructor' : '/dashboard'));
-      }
-    } catch (err) {
-      console.error("Wallet Login Error:", err);
-      setError(err.message || 'Verification with Base Account failed.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleMetaMaskLogin = async () => {
-    setError('');
-    setLoading(true);
-    try {
-      if (!window.ethereum) throw new Error('MetaMask not found.');
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      const address = accounts[0];
-      const message = `Welcome to NexLearn! Sign this message to log in to your account.\n\nNonce: ${window.crypto.randomUUID()}`;
-      const signature = await window.ethereum.request({ method: 'personal_sign', params: [message, address] });
-      const data = await authService.walletLogin({ address, message, signature });
-      if (data.token) {
-        navigate(data.user?.role === 'admin' ? '/admin' : (data.user?.role === 'instructor' ? '/instructor' : '/dashboard'));
-      }
-    } catch (err) {
-      console.error("MetaMask Error:", err);
-      setError(err.message || 'MetaMask verification failed.');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -186,93 +136,8 @@ const Login = () => {
                 </button>
               </form>
 
-              <div className="edu-auth-separator" style={{margin:'20px 0', textAlign:'center', display:'flex', alignItems:'center', gap:'10px'}}>
-                <hr style={{flexGrow:1, border:'0', borderTop:'1px solid #eee'}} />
-                <span style={{fontSize:'12px', color:'#9B9890', textTransform:'uppercase', fontWeight:600}}>or</span>
-                <hr style={{flexGrow:1, border:'0', borderTop:'1px solid #eee'}} />
-              </div>
+              <br/>
 
-              <div style={{display:'flex', justifyContent:'center'}}>
-                <button 
-                  onClick={() => setShowWalletModal(true)}
-                  disabled={loading}
-                  style={{
-                    background: '#2D5BE3',
-                    color: 'white',
-                    border: 'none',
-                    width: '100%',
-                    padding: '12px 20px',
-                    borderRadius: '30px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '10px',
-                    fontSize: '15px',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    boxShadow: '0 4px 12px rgba(45, 91, 227, 0.2)',
-                    transition: 'all 0.2s ease'
-                  }}
-                >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"/></svg>
-                  Connect Wallet
-                </button>
-              </div>
-
-              <Modal show={showWalletModal} onHide={() => setShowWalletModal(false)} centered className="wallet-selection-modal">
-                <Modal.Header closeButton className="border-0 pb-0">
-                  <Modal.Title className="fw-bold h5">Connect Your Wallet</Modal.Title>
-                </Modal.Header>
-                <Modal.Body className="pt-4 pb-4 px-4">
-                  <div style={{display:'flex', flexDirection:'column', gap:'12px'}}>
-                    <div 
-                      onClick={() => { setShowWalletModal(false); handleWalletLogin(); }}
-                      style={{
-                        padding: '16px',
-                        borderRadius: '12px',
-                        border: '1px solid #f0f0f0',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        transition: 'all 0.2s ease',
-                        background: '#f8fafc'
-                      }}
-                    >
-                      <div className="d-flex align-items-center gap-3">
-                        <div style={{width:'32px', height:'32px', background:'#0052FF', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center'}}>
-                          <div style={{width:'18px', height:'18px', borderRadius:'50%', background:'white'}} />
-                        </div>
-                        <div>
-                          <div className="fw-bold">Base / Coinbase</div>
-                          <div className="small text-muted">Sign in with Base Account</div>
-                        </div>
-                      </div>
-                      <span className="badge bg-primary rounded-pill">Fast</span>
-                    </div>
-
-                    <div 
-                      onClick={() => { setShowWalletModal(false); handleMetaMaskLogin(); }}
-                      style={{
-                        padding: '16px',
-                        borderRadius: '12px',
-                        border: '1px solid #f0f0f0',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '12px',
-                        transition: 'all 0.2s ease'
-                      }}
-                    >
-                      <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Logo.svg" alt="MetaMask" style={{width:'32px', height:'32px'}} />
-                      <div>
-                        <div className="fw-bold">MetaMask</div>
-                        <div className="small text-muted">Browser extension</div>
-                      </div>
-                    </div>
-                  </div>
-                </Modal.Body>
-              </Modal>
             </>
           ) : (
             <>

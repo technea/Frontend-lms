@@ -3,7 +3,10 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import authService from '../services/authService';
 import { Modal } from 'react-bootstrap';
 import { createBaseAccountSDK } from "@base-org/account";
+import socketService from '../services/socketService';
 import '../styles/EduFlow.css';
+
+const IS_VERCEL = window.location.hostname.includes('vercel.app');
 
 const Navbar = () => {
   const [user, setUser] = useState(authService.getCurrentUser());
@@ -11,6 +14,17 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [showWalletModal, setShowWalletModal] = useState(false);
+  const [chatConnected, setChatConnected] = React.useState(socketService.isConnected());
+
+  React.useEffect(() => {
+    if (IS_VERCEL) return;
+
+    const checkInterval = setInterval(() => {
+      setChatConnected(socketService.isConnected());
+    }, 2000);
+
+    return () => clearInterval(checkInterval);
+  }, []);
 
   const handleLogout = () => {
     authService.logout();
@@ -88,11 +102,61 @@ const Navbar = () => {
 
               {user ? (
                 <>
+                  {/* Chat Connection Status (Up Front) */}
+                  <Link to="/community-chat" className="chat-status-indicator" style={{
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '6px', 
+                    background: IS_VERCEL ? 'rgba(13, 202, 240, 0.1)' : (chatConnected ? 'rgba(25, 135, 84, 0.1)' : 'rgba(255, 193, 7, 0.1)'),
+                    padding: '6px 14px',
+                    borderRadius: '20px',
+                    marginRight: '8px',
+                    border: `1px solid ${IS_VERCEL ? '#0dcaf0' : (chatConnected ? '#198754' : '#ffc107')}`,
+                    textDecoration: 'none',
+                    transition: '0.2s'
+                  }}
+                  onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                  onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                  >
+                    <div style={{
+                      width: '8px', 
+                      height: '8px', 
+                      borderRadius: '50%', 
+                      background: IS_VERCEL ? '#0dcaf0' : (chatConnected ? '#198754' : '#ffc107'),
+                      boxShadow: chatConnected ? 'none' : '0 0 8px #ffc107',
+                      animation: chatConnected ? 'none' : 'pulse-yellow 1.5s infinite'
+                    }} />
+                    <span style={{
+                      fontSize: '11px', 
+                      fontWeight: 700, 
+                      color: IS_VERCEL ? '#0dcaf0' : (chatConnected ? '#198754' : '#856404'),
+                      textTransform: 'uppercase'
+                    }}>
+                      {IS_VERCEL ? '☁️ Cloud' : (chatConnected ? 'Connected' : 'Connecting')}
+                    </span>
+                  </Link>
+
                   <Link to={user.role === 'admin' ? '/admin' : user.role === 'instructor' ? '/instructor' : '/dashboard'} className="edu-btn edu-btn-outline" style={{padding: '8px 16px', fontSize: '13px'}}>Dashboard</Link>
                   <button onClick={handleLogout} className="edu-btn edu-btn-primary" style={{padding: '8px 16px', fontSize: '13px', background:'rgba(45, 91, 227, 0.1)', color:'#2D5BE3'}}>Logout</button>
                 </>
               ) : (
-                <Link to="/login" className="edu-nav-link" style={{fontSize:'13px'}}>Login</Link>
+                <>
+                  <button 
+                    onClick={() => setShowWalletModal(true)}
+                    className="edu-btn edu-btn-primary" 
+                    style={{
+                      padding: '8px 20px', 
+                      fontSize: '12px', 
+                      borderRadius: '30px', 
+                      background: '#2D5BE3',
+                      boxShadow: '0 4px 12px rgba(45, 91, 227, 0.2)',
+                      marginRight: '8px'
+                    }}
+                  >
+                    Connect Wallet
+                  </button>
+                  <Link to="/login" className="edu-nav-link" style={{fontSize:'13px'}}>Login</Link>
+                </>
               )}
             </div>
           </div>

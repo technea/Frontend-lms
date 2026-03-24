@@ -28,7 +28,7 @@ const CommunityChat = () => {
   const [connected, setConnected] = useState(false);
   const [connectionError, setConnectionError] = useState(null);
   const isPollingMode = socketService.isPollingMode; // true on Vercel
-  
+
   const lastMessageRef = useRef(null);
   const prevRoomRef = useRef(null);
 
@@ -77,7 +77,7 @@ const CommunityChat = () => {
         setConnected(true);
         setConnectionError(null);
       }
-      
+
       socket.on('connect', () => {
         console.log('Chat Status: Online');
         setConnected(true);
@@ -107,7 +107,7 @@ const CommunityChat = () => {
 
   const handleDeleteMessage = async (msgId) => {
     if (!window.confirm('Are you sure you want to delete this message?')) return;
-    
+
     if (isPollingMode) {
       // Optimistic removal
       setMessages(prev => prev.filter(m => m._id !== msgId));
@@ -156,7 +156,7 @@ const CommunityChat = () => {
         const res = await api.get(`/chat/messages?room=${room}`);
         if (res.data.success) {
           const fetched = res.data.messages.sort((a, b) => new Date(a.timestamp || a.createdAt) - new Date(b.timestamp || b.createdAt));
-          
+
           setMessages(prev => {
             // Skip update if messages are identical (avoid flickering)
             const prevIds = prev.map(m => m._id).filter(id => id && !String(id).startsWith('temp-')).join(',');
@@ -187,12 +187,12 @@ const CommunityChat = () => {
     setNewMessage('');
 
     // Optimistic UI: show the message immediately
-    const localMsg = { 
-      _id: `temp-${Date.now()}`, 
-      sender: { _id: user?._id, name: user?.name }, 
-      senderName: user?.name, 
-      message: msgText, 
-      timestamp: new Date().toISOString() 
+    const localMsg = {
+      _id: `temp-${Date.now()}`,
+      sender: { _id: user?._id, name: user?.name },
+      senderName: user?.name,
+      message: msgText,
+      timestamp: new Date().toISOString()
     };
     setMessages(prev => [...prev, localMsg]);
 
@@ -273,8 +273,8 @@ const CommunityChat = () => {
               <span className="fw-medium text-truncate">{r}</span>
             </div>
             {r !== 'General' && (
-              <Button 
-                variant="link" 
+              <Button
+                variant="link"
                 className="p-0 text-danger opacity-75"
                 onClick={(e) => handleDeleteRoom(r, e)}
                 style={{ zIndex: 10 }}
@@ -285,10 +285,10 @@ const CommunityChat = () => {
           </ListGroup.Item>
         ))}
       </ListGroup>
-      
+
       <div className="px-3 mt-3">
-        <Button 
-          variant="outline-primary" 
+        <Button
+          variant="outline-primary"
           className="w-100 rounded-pill d-flex align-items-center justify-content-center gap-2 py-2"
           onClick={() => setShowCreateModal(true)}
           style={{ fontSize: '13px', fontWeight: 600 }}
@@ -359,18 +359,12 @@ const CommunityChat = () => {
                       </small>
                     </div>
                   </div>
-                  <Badge 
-                    bg={isPollingMode ? "info" : (connected ? "success" : (connectionError ? "danger" : "secondary"))} 
-                    className="rounded-pill px-2 px-md-3 py-1 flex-shrink-0"
-                  >
-                    {isPollingMode ? '☁️ Cloud Mode' : (connected ? '● Online' : (connectionError ? `❌ ${connectionError}` : '🔌 Reconnecting...'))}
-                  </Badge>
                 </Card.Header>
 
                 <Card.Body className="chat-messages-body p-3 p-md-4" id="chat-box">
                   {(!isPollingMode && !connected && connectionError) ? (
                     <div className="empty-chat-placeholder">
-                      <FaHashtag size={36} className="mb-3 text-danger" style={{opacity: 0.5}} />
+                      <FaHashtag size={36} className="mb-3 text-danger" style={{ opacity: 0.5 }} />
                       <h6 className="text-danger fw-bold">Connection Failed</h6>
                       <p className="text-muted small px-4">{connectionError}</p>
                       <Button variant="outline-primary" size="sm" onClick={() => window.location.reload()}>Retry Connection</Button>
@@ -393,7 +387,7 @@ const CommunityChat = () => {
                           {!isSender && (
                             <div className="msg-avatar flex-shrink-0">
                               {msg.sender?.avatar ? (
-                                <img src={msg.sender.avatar.startsWith('/') ? `${process.env.REACT_APP_API_URL.replace('/api','')}${msg.sender.avatar}` : msg.sender.avatar} alt="avatar" />
+                                <img src={msg.sender.avatar.startsWith('/') ? `${process.env.REACT_APP_API_URL.replace('/api', '')}${msg.sender.avatar}` : msg.sender.avatar} alt="avatar" />
                               ) : (
                                 <div className="avatar-placeholder">
                                   {msg.senderName?.[0]?.toUpperCase() || 'U'}
@@ -404,17 +398,17 @@ const CommunityChat = () => {
 
                           <div className="msg-content-wrapper">
                             <div className="d-flex align-items-center gap-2 mb-1">
-                                <span className="sender-name" style={{fontSize: '11px', fontWeight: 700, color: isSender ? '#2D5BE3' : '#6B6962'}}>
-                                    {isSender ? 'You' : msg.senderName}
-                                </span>
-                                {isSender && (
-                                    <FaTrash 
-                                        className="text-danger opacity-25 hover-opacity-100 cursor-pointer" 
-                                        size={10}
-                                        onClick={() => handleDeleteMessage(msg._id)}
-                                        title="Delete message"
-                                    />
-                                )}
+                              <span className="sender-name" style={{ fontSize: '11px', fontWeight: 700, color: isSender ? '#2D5BE3' : '#6B6962' }}>
+                                {isSender ? 'You' : msg.senderName}
+                              </span>
+                              {isSender && (
+                                <FaTrash
+                                  className="text-danger opacity-25 hover-opacity-100 cursor-pointer"
+                                  size={10}
+                                  onClick={() => handleDeleteMessage(msg._id)}
+                                  title="Delete message"
+                                />
+                              )}
                             </div>
                             <div className="msg-bubble">
                               <span className="msg-text">{msg.message}</span>
@@ -458,7 +452,7 @@ const CommunityChat = () => {
                         type="submit"
                         variant="primary"
                         className="rounded-circle d-flex align-items-center justify-content-center m-1 p-0"
-                        style={{width: '38px', height: '38px'}}
+                        style={{ width: '38px', height: '38px' }}
                         disabled={!newMessage.trim()}
                       >
                         <FaPaperPlane size={14} />
@@ -487,8 +481,8 @@ const CommunityChat = () => {
           <Modal.Body>
             <Form onSubmit={handleCreateRoom}>
               <Form.Group className="mb-3">
-                <Form.Control 
-                  type="text" 
+                <Form.Control
+                  type="text"
                   placeholder="Room name..."
                   value={newRoomName}
                   onChange={(e) => setNewRoomName(e.target.value)}
