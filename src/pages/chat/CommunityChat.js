@@ -326,15 +326,15 @@ const CommunityChat = () => {
                     </div>
                   </div>
                   <Badge 
-                    bg={connected ? "success" : (connectionError ? "danger" : "secondary")} 
+                    bg={connected ? "success" : (window.location.hostname.includes('vercel.app') ? "info" : (connectionError ? "danger" : "secondary"))} 
                     className="rounded-pill px-2 px-md-3 py-1 flex-shrink-0"
                   >
-                    {connected ? '● Online' : (connectionError ? `❌ ${connectionError}` : '🔌 Reconnecting…')}
+                    {connected ? '● Online' : (window.location.hostname.includes('vercel.app') ? '● Cloud Sync' : (connectionError ? `❌ ${connectionError}` : '🔌 Reconnecting...'))}
                   </Badge>
                 </Card.Header>
 
                 <Card.Body className="chat-messages-body p-3 p-md-4" id="chat-box">
-                  {(!connected && connectionError) ? (
+                  {(!connected && connectionError && !window.location.hostname.includes('vercel.app')) ? (
                     <div className="empty-chat-placeholder">
                       <FaHashtag size={36} className="mb-3 text-danger" style={{opacity: 0.5}} />
                       <h6 className="text-danger fw-bold">Connection Failed</h6>
@@ -414,7 +414,7 @@ const CommunityChat = () => {
                       <Form.Control
                         type="text"
                         className="chat-input-field border-0 px-4 py-2"
-                        placeholder={connected ? "Type a message…" : (connectionError ? `Error: ${connectionError}` : "🔌 Connecting to server...")}
+                        placeholder={connected ? "Type a message..." : (window.location.hostname.includes('vercel.app') ? "Cloud mode: Type a message..." : (connectionError ? `Error: ${connectionError}` : "🔌 Connecting..."))}
                         value={newMessage}
                         onChange={handleTyping}
                         autoComplete="off"
