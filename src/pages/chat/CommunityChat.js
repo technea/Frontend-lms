@@ -4,7 +4,7 @@ import authService from '../../services/authService';
 import api from '../../services/api';
 import {
   Container, Row, Col, Form, Button,
-  Card, Badge, ListGroup, Offcanvas, Modal
+  Card, ListGroup, Offcanvas, Modal
 } from 'react-bootstrap';
 import {
   FaPaperPlane, FaHashtag, FaUsers, FaBars, FaPlus, FaTrash
