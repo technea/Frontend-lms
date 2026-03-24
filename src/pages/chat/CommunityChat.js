@@ -27,6 +27,7 @@ const CommunityChat = () => {
   const [typingUser, setTypingUser] = useState(null);
   const [connected, setConnected] = useState(false);
   const [connectionError, setConnectionError] = useState(null);
+  const isPollingMode = socketService.isPollingMode; // true on Vercel
   
   const lastMessageRef = useRef(null);
   const prevRoomRef = useRef(null);
@@ -39,6 +40,12 @@ const CommunityChat = () => {
 
     if (!token) {
       console.warn('No auth token found for chat');
+      return;
+    }
+
+    // On Vercel (polling mode), skip socket entirely
+    if (isPollingMode) {
+      console.log('☁️ Polling mode active — skipping socket connection');
       return;
     }
 
@@ -94,13 +101,22 @@ const CommunityChat = () => {
       socketService.offRoomHistory(handleRoomHistory);
       socketService.offUserTyping(handleUserTyping);
       socketService.offMessageDeleted(handleMessageDeleted);
-      // Removed socketService.disconnect() to avoid StrictMode double-mount disconnection issues
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleDeleteMessage = (msgId) => {
-    if (window.confirm('Are you sure you want to delete this message?')) {
+  const handleDeleteMessage = async (msgId) => {
+    if (!window.confirm('Are you sure you want to delete this message?')) return;
+    
+    if (isPollingMode) {
+      // Optimistic removal
+      setMessages(prev => prev.filter(m => m._id !== msgId));
+      try {
+        await api.delete(`/chat/messages/${msgId}`);
+      } catch (err) {
+        console.error('Delete error:', err);
+      }
+    } else {
       socketService.deleteMessage(msgId);
     }
   };
@@ -128,63 +144,81 @@ const CommunityChat = () => {
 
   /* ---- Polling Fallback (CRUCIAL for Vercel Deployment) ---- */
   useEffect(() => {
-    // We poll the server for nessages every few seconds as a backup.
-    // This is the ONLY way real-time works consistently on serverless Vercel.
-    const pollInterval = setInterval(async () => {
-      // We skip if we're connected via socket and NOT on vercel.app
-      if (!connected || window.location.hostname.includes('vercel.app')) {
-        try {
-          const res = await api.get(`/chat/messages?room=${room}`);
-          if (res.data.success) {
-            // Sort to ensure correct history order
-            const fetched = res.data.messages.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-            
-            // Deduplication logic to avoid state flickering
-            setMessages(prev => {
-              if (JSON.stringify(prev.map(m => m._id)) === JSON.stringify(fetched.map(m => m._id))) {
-                return prev; // Same data
-              }
-              return fetched;
-            });
-          }
-        } catch (err) {
-          console.error("Polling error (might be offline):", err.message);
+    // Determine if polling should be active:
+    // - ALWAYS poll on Vercel (polling mode) since there's no WebSocket
+    // - On non-Vercel, only poll if socket is disconnected
+    const shouldPoll = isPollingMode || !connected;
+    if (!shouldPoll) return;
+
+    // Fetch messages immediately on mount/room change (don't wait for first interval)
+    const fetchMessages = async () => {
+      try {
+        const res = await api.get(`/chat/messages?room=${room}`);
+        if (res.data.success) {
+          const fetched = res.data.messages.sort((a, b) => new Date(a.timestamp || a.createdAt) - new Date(b.timestamp || b.createdAt));
+          
+          setMessages(prev => {
+            // Skip update if messages are identical (avoid flickering)
+            const prevIds = prev.map(m => m._id).filter(id => id && !String(id).startsWith('temp-')).join(',');
+            const fetchedIds = fetched.map(m => m._id).join(',');
+            if (prevIds === fetchedIds) return prev;
+            return fetched;
+          });
         }
+      } catch (err) {
+        console.error('Polling error:', err.message);
       }
-    }, 4500); // 4.5 seconds polling frequency
+    };
+
+    // Initial fetch
+    fetchMessages();
+
+    // Then poll every 3 seconds
+    const pollInterval = setInterval(fetchMessages, 3000);
 
     return () => clearInterval(pollInterval);
-  }, [room, connected]);
+  }, [room, connected, isPollingMode]);
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!newMessage.trim()) return;
 
-    // 1. Try sending via Socket (Instant if connected)
-    if (connected) {
-       socketService.sendMessage(room, newMessage);
-    }
-
-    // 2. ALWAYS send via HTTP for persistence and Vercel compatibility
-    try {
-      await api.post('/chat/send', { room, message: newMessage });
-      // If we're on vercel and not connected, we could optimistic-add the message
-      if (!connected || window.location.hostname.includes('vercel.app')) {
-         // Local add for responsive feel while polling catches up
-         const localMsg = { 
-           _id: `temp-${Date.now()}`, 
-           sender: { _id: user?._id }, 
-           senderName: user?.name, 
-           message: newMessage, 
-           timestamp: new Date().toISOString() 
-         };
-         setMessages(prev => [...prev.filter(m => !m._id.startsWith('temp-')), localMsg]);
-      }
-    } catch (err) {
-      console.error("HTTP send error:", err);
-    }
-
+    const msgText = newMessage;
     setNewMessage('');
+
+    // Optimistic UI: show the message immediately
+    const localMsg = { 
+      _id: `temp-${Date.now()}`, 
+      sender: { _id: user?._id, name: user?.name }, 
+      senderName: user?.name, 
+      message: msgText, 
+      timestamp: new Date().toISOString() 
+    };
+    setMessages(prev => [...prev, localMsg]);
+
+    if (isPollingMode) {
+      // VERCEL: Send via HTTP only
+      try {
+        await api.post('/chat/send', { room, message: msgText });
+      } catch (err) {
+        console.error('HTTP send error:', err);
+        // Remove optimistic message on failure
+        setMessages(prev => prev.filter(m => m._id !== localMsg._id));
+      }
+    } else {
+      // NON-VERCEL: Send via Socket (instant) + HTTP (persistence backup)
+      if (connected) {
+        socketService.sendMessage(room, msgText);
+        // Remove the temp message since socket will echo it back
+        setMessages(prev => prev.filter(m => m._id !== localMsg._id));
+      }
+      try {
+        await api.post('/chat/send', { room, message: msgText });
+      } catch (err) {
+        console.error('HTTP send error:', err);
+      }
+    }
+
     socketService.sendTyping(room, false);
   };
 
@@ -326,15 +360,15 @@ const CommunityChat = () => {
                     </div>
                   </div>
                   <Badge 
-                    bg={connected ? "success" : (window.location.hostname.includes('vercel.app') ? "info" : (connectionError ? "danger" : "secondary"))} 
+                    bg={isPollingMode ? "info" : (connected ? "success" : (connectionError ? "danger" : "secondary"))} 
                     className="rounded-pill px-2 px-md-3 py-1 flex-shrink-0"
                   >
-                    {connected ? '● Online' : (window.location.hostname.includes('vercel.app') ? '● Cloud Sync' : (connectionError ? `❌ ${connectionError}` : '🔌 Reconnecting...'))}
+                    {isPollingMode ? '☁️ Cloud Mode' : (connected ? '● Online' : (connectionError ? `❌ ${connectionError}` : '🔌 Reconnecting...'))}
                   </Badge>
                 </Card.Header>
 
                 <Card.Body className="chat-messages-body p-3 p-md-4" id="chat-box">
-                  {(!connected && connectionError && !window.location.hostname.includes('vercel.app')) ? (
+                  {(!isPollingMode && !connected && connectionError) ? (
                     <div className="empty-chat-placeholder">
                       <FaHashtag size={36} className="mb-3 text-danger" style={{opacity: 0.5}} />
                       <h6 className="text-danger fw-bold">Connection Failed</h6>
@@ -345,7 +379,8 @@ const CommunityChat = () => {
                     <div className="empty-chat-placeholder">
                       <FaHashtag size={36} className="mb-3 opacity-10" />
                       <p className="text-muted small">No messages in # {room} yet.</p>
-                      {!connected && <p className="text-primary font-size-xs">🔌 Seeking server connection...</p>}
+                      {isPollingMode && <p className="text-info small">☁️ Cloud mode active — messages sync every few seconds</p>}
+                      {!isPollingMode && !connected && <p className="text-primary font-size-xs">🔌 Connecting to server...</p>}
                     </div>
                   ) : (
                     messages.map((msg, idx) => {
@@ -414,7 +449,7 @@ const CommunityChat = () => {
                       <Form.Control
                         type="text"
                         className="chat-input-field border-0 px-4 py-2"
-                        placeholder={connected ? "Type a message..." : (window.location.hostname.includes('vercel.app') ? "Cloud mode: Type a message..." : (connectionError ? `Error: ${connectionError}` : "🔌 Connecting..."))}
+                        placeholder={isPollingMode ? "Type a message..." : (connected ? "Type a message..." : (connectionError ? `Error: ${connectionError}` : "🔌 Connecting..."))}
                         value={newMessage}
                         onChange={handleTyping}
                         autoComplete="off"

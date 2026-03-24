@@ -1,17 +1,20 @@
 import { io } from 'socket.io-client';
 import { API_BASE_URL } from './api';
 
+// Detect if we're running on Vercel (serverless = no WebSocket support)
+const IS_VERCEL = window.location.hostname.includes('vercel.app');
+
 // Derive the socket URL dynamically. 
-// If we are on localhost, we point to localhost:5000.
-// If NOT on localhost, we derive from API URL.
 const getSocketUrl = () => {
+    // On Vercel, we don't need a socket URL (polling only mode)
+    if (IS_VERCEL) return null;
+
     // Priority 1: Environment variable
     if (process.env.REACT_APP_SOCKET_URL) return process.env.REACT_APP_SOCKET_URL;
     
     // Priority 2: Localhost detection
     const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     if (isLocalhost) {
-        // We use the same protocol as the page (http/https) but port 5000
         return `${window.location.protocol}//${window.location.hostname}:5000`;
     }
     
@@ -23,9 +26,20 @@ const SOCKET_URL = getSocketUrl();
 
 class SocketService {
     socket = null;
-    _listeners = []; // Track registered listeners for cleanup
+    _listeners = [];
+    _isPollingMode = IS_VERCEL; // True when on Vercel (no WebSocket)
+
+    get isPollingMode() {
+        return this._isPollingMode;
+    }
 
     connect(token) {
+        // On Vercel: skip Socket.io entirely, use HTTP polling only
+        if (this._isPollingMode) {
+            console.log('☁️ Vercel detected — running in HTTP polling-only mode (no WebSocket)');
+            return null;
+        }
+
         // If already connected, just return the socket
         if (this.socket?.connected) {
             console.log('✅ Socket already connected');
@@ -67,7 +81,6 @@ class SocketService {
 
         this.socket.on('disconnect', (reason) => {
             console.warn('🔌 Socket disconnected:', reason);
-            // If the server forced disconnect, try to reconnect manually after a delay
             if (reason === "io server disconnect") {
                 this.socket.connect();
             }
@@ -94,6 +107,7 @@ class SocketService {
     }
 
     joinRoom(room) {
+        if (this._isPollingMode) return; // No-op on Vercel
         if (!this.socket) {
             console.warn('Cannot join room: Socket not initialized');
             return;
@@ -112,12 +126,14 @@ class SocketService {
     }
 
     leaveRoom(room) {
+        if (this._isPollingMode) return;
         if (this.socket?.connected) {
             this.socket.emit('leaveRoom', room);
         }
     }
 
     sendMessage(room, message, callback) {
+        if (this._isPollingMode) return; // On Vercel, messages go via HTTP only
         if (this.socket) {
             this.socket.emit('sendMessage', { room, message }, (response) => {
                 if (callback) callback(response);
@@ -126,26 +142,31 @@ class SocketService {
     }
 
     sendTyping(room, isTyping) {
+        if (this._isPollingMode) return;
         if (this.socket?.connected) {
             this.socket.emit('typing', { room, isTyping });
         }
     }
 
     onMessage(callback) {
+        if (this._isPollingMode) return;
         this._registerListener('message', callback);
     }
 
     onRoomHistory(callback) {
+        if (this._isPollingMode) return;
         this._registerListener('roomHistory', callback);
     }
 
     deleteMessage(messageId) {
+        if (this._isPollingMode) return;
         if (this.socket?.connected) {
             this.socket.emit('deleteMessage', messageId);
         }
     }
 
     onMessageDeleted(callback) {
+        if (this._isPollingMode) return;
         this._registerListener('messageDeleted', callback);
     }
 
@@ -154,6 +175,7 @@ class SocketService {
     }
 
     onUserTyping(callback) {
+        if (this._isPollingMode) return;
         this._registerListener('userTyping', callback);
     }
 
@@ -183,6 +205,7 @@ class SocketService {
     }
 
     isConnected() {
+        if (this._isPollingMode) return false; // Polling mode = never "socket connected"
         return this.socket?.connected || false;
     }
 }
