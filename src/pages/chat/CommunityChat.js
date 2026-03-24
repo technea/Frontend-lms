@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import socketService from '../../services/socketService';
 import authService from '../../services/authService';
+import api from '../../services/api';
 import {
   Container, Row, Col, Form, Button,
   Card, Badge, ListGroup, Offcanvas, Modal
@@ -125,15 +126,66 @@ const CommunityChat = () => {
     lastMessageRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  /* ---- Handlers ---- */
-  const handleSendMessage = (e) => {
+  /* ---- Polling Fallback (CRUCIAL for Vercel Deployment) ---- */
+  useEffect(() => {
+    // We poll the server for nessages every few seconds as a backup.
+    // This is the ONLY way real-time works consistently on serverless Vercel.
+    const pollInterval = setInterval(async () => {
+      // We skip if we're connected via socket and NOT on vercel.app
+      if (!connected || window.location.hostname.includes('vercel.app')) {
+        try {
+          const res = await api.get(`/chat/messages?room=${room}`);
+          if (res.data.success) {
+            // Sort to ensure correct history order
+            const fetched = res.data.messages.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+            
+            // Deduplication logic to avoid state flickering
+            setMessages(prev => {
+              if (JSON.stringify(prev.map(m => m._id)) === JSON.stringify(fetched.map(m => m._id))) {
+                return prev; // Same data
+              }
+              return fetched;
+            });
+          }
+        } catch (err) {
+          console.error("Polling error (might be offline):", err.message);
+        }
+      }
+    }, 4500); // 4.5 seconds polling frequency
+
+    return () => clearInterval(pollInterval);
+  }, [room, connected]);
+
+  const handleSendMessage = async (e) => {
     e.preventDefault();
-    if (newMessage.trim()) {
-      console.log(`Sending message to ${room}: ${newMessage}`);
-      socketService.sendMessage(room, newMessage);
-      setNewMessage('');
-      socketService.sendTyping(room, false);
+    if (!newMessage.trim()) return;
+
+    // 1. Try sending via Socket (Instant if connected)
+    if (connected) {
+       socketService.sendMessage(room, newMessage);
     }
+
+    // 2. ALWAYS send via HTTP for persistence and Vercel compatibility
+    try {
+      await api.post('/chat/send', { room, message: newMessage });
+      // If we're on vercel and not connected, we could optimistic-add the message
+      if (!connected || window.location.hostname.includes('vercel.app')) {
+         // Local add for responsive feel while polling catches up
+         const localMsg = { 
+           _id: `temp-${Date.now()}`, 
+           sender: { _id: user?._id }, 
+           senderName: user?.name, 
+           message: newMessage, 
+           timestamp: new Date().toISOString() 
+         };
+         setMessages(prev => [...prev.filter(m => !m._id.startsWith('temp-')), localMsg]);
+      }
+    } catch (err) {
+      console.error("HTTP send error:", err);
+    }
+
+    setNewMessage('');
+    socketService.sendTyping(room, false);
   };
 
   const handleCreateRoom = (e) => {
