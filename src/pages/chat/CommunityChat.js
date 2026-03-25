@@ -4,10 +4,11 @@ import authService from '../../services/authService';
 import api from '../../services/api';
 import {
   Container, Row, Col, Form, Button,
-  Card, ListGroup, Offcanvas, Modal
+  Card, ListGroup, Offcanvas, Modal, Dropdown
 } from 'react-bootstrap';
 import {
-  FaPaperPlane, FaHashtag, FaUsers, FaBars, FaPlus, FaTrash
+  FaPaperPlane, FaHashtag, FaUsers, FaBars, FaPlus, FaTrash, 
+  FaChevronDown, FaEllipsisV
 } from 'react-icons/fa';
 import DashboardSidebar from '../../components/DashboardSidebar';
 import Navbar from '../../components/Navbar';
@@ -121,6 +122,20 @@ const CommunityChat = () => {
     }
   };
 
+  const handleDeleteAllMessages = async () => {
+    if (!window.confirm(`Are you sure you want to clear the chat history for #${room}?`)) return;
+    try {
+      await api.delete(`/chat/room/${room}`);
+      if (user?.role === 'admin') {
+        setMessages([]);
+      } else {
+        setMessages(prev => prev.filter(m => (m.sender?._id || m.sender) !== user?._id));
+      }
+    } catch (err) {
+      console.error('Delete all error:', err);
+    }
+  };
+
   /* ---- Join/leave rooms when room changes ---- */
   useEffect(() => {
     // Leave previous room if any
@@ -189,7 +204,7 @@ const CommunityChat = () => {
     // Optimistic UI: show the message immediately
     const localMsg = {
       _id: `temp-${Date.now()}`,
-      sender: { _id: user?._id, name: user?.name },
+      sender: { _id: user?._id, name: user?.name, avatar: user?.avatar },
       senderName: user?.name,
       message: msgText,
       timestamp: new Date().toISOString()
@@ -359,6 +374,16 @@ const CommunityChat = () => {
                       </small>
                     </div>
                   </div>
+                  <Dropdown align="end">
+                    <Dropdown.Toggle as="div" className="cursor-pointer text-muted p-2" bsPrefix="custom-toggle">
+                      <FaEllipsisV size={16} />
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu className="shadow border-0 py-2">
+                      <Dropdown.Item onClick={handleDeleteAllMessages} className="text-danger fw-medium d-flex align-items-center gap-2">
+                        <FaTrash size={12} /> Clear Chat
+                      </Dropdown.Item>
+                    </Dropdown.Menu>
+                  </Dropdown>
                 </Card.Header>
 
                 <Card.Body className="chat-messages-body p-3 p-md-4" id="chat-box">
@@ -384,30 +409,32 @@ const CommunityChat = () => {
                           key={msg._id || idx}
                           className={`message-wrapper ${isSender ? 'sender' : 'receiver'}`}
                         >
-                          {!isSender && (
-                            <div className="msg-avatar flex-shrink-0">
-                              {msg.sender?.avatar ? (
-                                <img src={msg.sender.avatar.startsWith('/') ? `${process.env.REACT_APP_API_URL.replace('/api', '')}${msg.sender.avatar}` : msg.sender.avatar} alt="avatar" />
-                              ) : (
-                                <div className="avatar-placeholder">
-                                  {msg.senderName?.[0]?.toUpperCase() || 'U'}
-                                </div>
-                              )}
-                            </div>
-                          )}
+                          <div className="msg-avatar flex-shrink-0">
+                            {msg.sender?.avatar ? (
+                              <img src={msg.sender.avatar.startsWith('/') ? `${process.env.REACT_APP_API_URL.replace('/api', '')}${msg.sender.avatar}` : msg.sender.avatar} alt="avatar" />
+                            ) : (
+                              <div className="avatar-placeholder">
+                                {msg.senderName?.[0]?.toUpperCase() || 'U'}
+                              </div>
+                            )}
+                          </div>
 
                           <div className="msg-content-wrapper">
-                            <div className="d-flex align-items-center gap-2 mb-1">
-                              <span className="sender-name" style={{ fontSize: '11px', fontWeight: 700, color: isSender ? '#2D5BE3' : '#6B6962' }}>
+                            <div className={`d-flex align-items-center gap-2 mb-1 ${isSender ? 'justify-content-end flex-row-reverse' : ''}`}>
+                              <span className={`sender-name ${isSender ? 'm-0 px-2' : ''}`} style={{ fontSize: '11px', fontWeight: 700, color: isSender ? '#2D5BE3' : '#6B6962' }}>
                                 {isSender ? 'You' : msg.senderName}
                               </span>
                               {isSender && (
-                                <FaTrash
-                                  className="text-danger opacity-25 hover-opacity-100 cursor-pointer"
-                                  size={10}
-                                  onClick={() => handleDeleteMessage(msg._id)}
-                                  title="Delete message"
-                                />
+                                <Dropdown align="end">
+                                  <Dropdown.Toggle as="div" className="cursor-pointer text-muted opacity-50 hover-opacity-100 p-1" bsPrefix="custom-toggle">
+                                    <FaChevronDown size={10} />
+                                  </Dropdown.Toggle>
+                                  <Dropdown.Menu className="shadow-sm border-0 py-1" style={{ minWidth: '120px' }}>
+                                    <Dropdown.Item onClick={() => handleDeleteMessage(msg._id)} className="text-danger text-sm d-flex align-items-center gap-2">
+                                      <FaTrash size={10} /> Delete for everyone
+                                    </Dropdown.Item>
+                                  </Dropdown.Menu>
+                                </Dropdown>
                               )}
                             </div>
                             <div className="msg-bubble">
